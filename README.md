@@ -5,7 +5,7 @@ Este proyecto tiene como objetivo la implementación de herramientas para el pro
 ## Estructura de Directorios
 
 ### 1. `compilados`
-Este directorio contiene los ejecutables generados y los archivos intermedios del proceso de compilación.
+Este directorio contiene los ejecutables generados del proceso de compilación.
 
 ### 2. `librerias`
 Este directorio contiene ejemplos de código fuente en formato de texto. Estos son fragmentos de código que podrían ser utilizados o procesados por el ensamblador y otras herramientas.
@@ -19,9 +19,9 @@ Archivo de documentación principal que proporciona una descripción general del
 ### 5. `src`
 Este directorio contiene los archivos fuente de las herramientas que forman el proyecto.
 
-- **analizador.l**: Código fuente en el lenguaje Lex que define el analizador lexical.
+- **analizador.l**: Código fuente en el lenguaje Lex que define el analizador lexico.
 - **ensamblador.l**: Código fuente en el lenguaje Lex que define el ensamblador.
-- **linkerLoader.l**: Código fuente en el lenguaje Lex que define el cargador y enlazador.
+- **linkerLoader.l**: Código fuente en el lenguaje Lex que define el cargador-enlazador.
 - **preprocessor.l**: Código fuente en el lenguaje Lex que define el preprocesador.
 
 ### 6. `vista`
