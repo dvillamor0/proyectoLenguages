@@ -120,10 +120,10 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Para generar los archivos `.c` a partir de los archivos `.l`, abre una terminal (como Cygwin o el terminal de MSYS2) y navega al directorio `src`. Luego, ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l -o ../compilados/lex.yy.c
-    flex ensamblador.l -o ../compilados/lex.yy.c
-    flex linkerLoader.l -o ../compilados/lex.yy.c
-    flex preprocessor.l -o ../compilados/lex.yy.c
+    flex analizador.l
+    flex ensamblador.l
+    flex linkerLoader.l
+    flex preprocessor.l
 
 
     gcc -o ../compilados/analizador.exe ../compilados/lex.yy.c -lfl
@@ -149,10 +149,10 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Al igual que en Windows, navega al directorio `src` y ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l -o ../compilados/lex.yy.c
-    flex ensamblador.l -o ../compilados/lex.yy.c
-    flex linkerLoader.l -o ../compilados/lex.yy.c
-    flex preprocessor.l -o ../compilados/lex.yy.c
+    flex analizador.l
+    flex ensamblador.l
+    flex linkerLoader.l
+    flex preprocessor.l
 
 
     gcc -o ../compilados/analizador ../compilados/lex.yy.c -lfl
