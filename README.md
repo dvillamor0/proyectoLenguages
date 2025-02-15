@@ -121,15 +121,16 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
 
    ```bash
     flex analizador.l
+    gcc -o ..\compilados\analizador lex.yy.c -lfl
+
     flex ensamblador.l
+    gcc -o ..\compilados\ensamblador lex.yy.c -lfl
+
     flex linkerLoader.l
+    gcc -o ..\compilados\linkerLoader lex.yy.c -lfl
+
     flex preprocessor.l
-
-
-    gcc -o ../compilados/analizador.exe ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/ensamblador.exe ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/linkerLoader.exe ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/preprocessor.exe ../compilados/lex.yy.c -lfl
+    gcc -o ..\compilados\preprocessor lex.yy.c -lfl
 
     ```
 
@@ -149,16 +150,17 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Al igual que en Windows, navega al directorio `src` y ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l
-    flex ensamblador.l
-    flex linkerLoader.l
-    flex preprocessor.l
+    flex analizador.l &&
+    gcc -o ../compilados/analizador lex.yy.c -lfl &&
+    
+    flex ensamblador.l &&
+    gcc -o ../compilados/ensamblador lex.yy.c -lfl &&
 
-
-    gcc -o ../compilados/analizador ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/ensamblador ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/linkerLoader ../compilados/lex.yy.c -lfl
-    gcc -o ../compilados/preprocessor ../compilados/lex.yy.c -lfl
+    flex linkerLoader.l &&
+    gcc -o ../compilados/linkerLoader lex.yy.c -lfl &&
+    
+    flex preprocessor.l &&
+    gcc -o ../compilados/preprocessor lex.yy.c -lfl
 
     ```
 

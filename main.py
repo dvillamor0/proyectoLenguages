@@ -11,9 +11,10 @@
 
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from Diseño_GUI import *
-from prueba import *
+from vista.Diseño_GUI import *
+from vista.prueba import *
 import subprocess
+import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,13 +33,16 @@ class MainWindow(QMainWindow):
         limpiar()
         text = self.ui.Input.toPlainText()
         
-        with open("Input.txt", "w", encoding="utf-8") as file:
+        with open("./pruebas/Input.txt", "w", encoding="utf-8") as file:
             file.write(text)
 
     def ejecutar_comando(self):
         # Comando a ejecutar
-        comando = "ensamblador.exe < Input.txt > Linker.txt"
-        
+        comando = "./compilados/ensamblador"
+        if os.name != 'posix':
+            comando += ".exe"
+        comando += " < ./pruebas/Input.txt > ./pruebas/salidaEnsamblador.txt"
+        print("comandito1",comando)
         try:
             # Ejecutar el comando
             resultado = subprocess.run(comando, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -49,7 +53,7 @@ class MainWindow(QMainWindow):
         lista_de_datos = []
 
         # Leer el archivo y agregar el contenido a la lista
-        with open("Linker.txt", 'r') as archivo:
+        with open("./pruebas/salidaEnsamblador.txt", 'r') as archivo:
             for linea in archivo:
                 lista_de_datos.append(linea.strip())
 
@@ -59,8 +63,11 @@ class MainWindow(QMainWindow):
 
     def cambiar_valores(self):
         global cp,memoria
-        comando = "linkerLoader.exe < Linker.txt > memoria.txt"
-        
+        comando = "./compilados/linkerLoader"
+        if os.name != 'posix':
+            comando += ".exe"
+        comando += " < ./pruebas/salidaEnsamblador.txt > ./pruebas/salidaLinker.txt"
+        print("comandito2",comando)
         try:
             # Ejecutar el comando
             resultado = subprocess.run(comando, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -71,7 +78,7 @@ class MainWindow(QMainWindow):
         memoria = []
 
         # Leer el archivo y agregar el contenido a la lista
-        with open("memoria.txt", 'r') as archivo:
+        with open("./pruebas/salidaLinker.txt", 'r') as archivo:
             contenido = archivo.read().strip()
 
         # Longitud de cada parte

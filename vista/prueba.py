@@ -13,6 +13,37 @@ zero = 0
 negativo = 0
 desvordamiento = 0
 
+# Definir el rango de 21 bits con signo
+MAX_VALOR = 2**20 - 1  # 1048575
+MIN_VALOR = -2**20     # -1048576
+
+def actualizar_banderas(resultado):
+    global carry, zero, negativo, desbordamiento
+    # Actualizamos la bandera "Zero"
+    if resultado == 0:
+        zero = 1
+    else:
+        zero = 0
+    
+    # Actualizamos la bandera "Negativo"
+    if resultado < 0:
+        negativo = 1
+    else:
+        negativo = 0
+    
+    # Bandera de "Overflow" para operaciones de suma o resta
+    if resultado > MAX_VALOR or resultado < MIN_VALOR:  # Desbordamiento de 21 bits
+        desbordamiento = 1
+    else:
+        desbordamiento = 0
+    
+    # La bandera "Carry" se ajusta para operaciones de suma y resta
+    # El carry se activa si hay un valor fuera del rango de 21 bits
+    if resultado > MAX_VALOR or resultado < MIN_VALOR:
+        carry = 1
+    else:
+        carry = 0
+
 def assembler_to_binary(instruction):
     parts = instruction.split()
     zero = 0
@@ -348,19 +379,23 @@ def ejecutar_instruccion():
     # Aritméticas
     elif opcode == "00100":  # ADD 4
         reg[rx] = int(reg[ry]) + int(reg[rz])
+        actualizar_banderas(reg[rx])
         print(f"ADD R{rx} <- R{ry} + R{rz} = {reg[rx]}")
 
     elif opcode == "00101":  # SUB 5
         reg[rx] = int(reg[ry]) - int(reg[rz])
+        actualizar_banderas(reg[rx])
         print(f"SUB R{rx} <- R{ry} - R{rz} = {reg[rx]}")
 
     elif opcode == "00110":  # MUL 6
         reg[rx] = int(reg[ry]) * int(reg[rz])
+        actualizar_banderas(reg[rx])
         print(f"MUL R{rx} <- R{ry} * R{rz} = {reg[rx]}")
 
     elif opcode == "00111":  # DIV 7
         if reg[rz] != 0:
             reg[rx] = int(reg[ry]) // int(reg[rz])
+            actualizar_banderas(reg[rx])
             print(f"DIV R{rx} <- R{ry} // R{rz} = {reg[rx]}")
         else:
             print("Error: División por cero")

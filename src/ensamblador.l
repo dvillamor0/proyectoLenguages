@@ -269,7 +269,7 @@ digits       [0-9]+
     printf("\n");
 }
 .+ {
-    printf("Instrucción no reconocida: %s\n", yytext);
+    printf("%s\n", yytext);
 }
 %%
 
