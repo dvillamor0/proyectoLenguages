@@ -7,6 +7,20 @@
 #define TRUE 1
 #define FALSE 0
 
+void print_binary(int num) {
+    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
+    
+    // Imprimir los 21 bits
+    for (int i = 0; i < 21; i++) {
+        if (num & mask) {
+            printf("1");
+        } else {
+            printf("0");
+        }
+        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
+    }
+}
+
 char* GetBinarioCommand(const char *command, int esRegistro) {
     static char binary[6];
     const char *commands[] = {
@@ -171,6 +185,7 @@ delim       [ \t\n]+
 spaces      [" "]
 R_REGISTER  "R"[0-3]
 HEX_ADDRESS \[0x[0-9A-F]+\]
+digits       [0-9]+
 
 %%
 
@@ -198,7 +213,7 @@ HEX_ADDRESS \[0x[0-9A-F]+\]
         //printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(LOAD|STORE){spaces}({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}) {
+(LOAD|STORE|NOR){spaces}({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}) {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
@@ -247,13 +262,20 @@ HEX_ADDRESS \[0x[0-9A-F]+\]
 }
 
 {delim} { /* No action */ }
-
+{digits} {
+    int value = atoi(yytext);
+    printf("00000000001");
+    print_binary(value);
+    printf("\n");
+}
 .+ {
-    //printf("Instrucción no reconocida: %s\n", yytext);
+    printf("Instrucción no reconocida: %s\n", yytext);
 }
 %%
 
 int main() {
-    yylex(); /* Llama al analizador léxico */
+    while (yylex() != 0) {
+        /* Cada llamada a yylex() lee un token */
+    }
     return 0;
 }
