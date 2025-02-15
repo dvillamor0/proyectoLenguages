@@ -4,74 +4,6 @@ Este proyecto tiene como objetivo la implementación de herramientas para el pro
 
 ## Estructura de Directorios
 
-La estructura del proyecto es la siguiente:
-
-.
-├── compilados
-
-│   ├── analizador.exe
-
-│   ├── ensamblador
-
-│   ├── ensamblador.exe
-
-│   ├── lex.yy.c
-
-│   ├── linkerLoader
-
-│   ├── linkerLoader.exe
-
-│   └── preprocessor.exe
-
-├── librerias
-
-│   ├── binarySearch.txt
-
-│   ├── bubbleSort.txt
-
-│   ├── factorial copy.txt
-
-│   └── factorial.txt
-
-├── pruebas
-
-│   ├── ejemploEnsamblador.txt
-
-│   ├── ejemplolinker.txt
-
-│   ├── Input.txt
-
-│   ├── salidaCargador.txt
-
-│   └── salidaEnsamblador.txt
-
-├── README.md
-
-├── src
-
-│   ├── analizador.l
-
-│   ├── ensamblador.l
-
-│   ├── linkerLoader.l
-
-│   └── preprocessor.l
-
-└── vista
-
-    ├── Diseño_GUI.py
-
-    ├── Diseño GUI.ui
-
-    ├── Linker.txt
-
-    ├── main.py
-
-    ├── memoria.txt
-
-    └── prueba.py
-
-
 ### 1. `compilados`
 Este directorio contiene los ejecutables generados y los archivos intermedios del proceso de compilación.
 
@@ -95,13 +27,12 @@ Este directorio contiene los archivos fuente de las herramientas que forman el p
 ### 6. `vista`
 Este directorio contiene los archivos relacionados con la interfaz gráfica de usuario (GUI) del proyecto.
 
-- **Diseño_GUI.py**: Código fuente en Python que define la interfaz gráfica de usuario utilizando PyQt o similar.
+- **Diseño_GUI.py**: Código fuente en Python que define la interfaz gráfica de usuario utilizando PyQt.
 - **Diseño GUI.ui**: Archivo de diseño de la interfaz gráfica en formato XML, utilizado por el framework para generar la GUI.
-- **Linker.txt**: Archivo de texto que podría contener información de configuración o salida relacionada con el cargador y enlazador.
-- **main.py**: Archivo principal del proyecto en Python que ejecuta la aplicación y gestiona la interfaz gráfica.
-- **memoria.txt**: Archivo de texto que podría contener datos relacionados con la memoria, utilizados en la interfaz o pruebas.
-- **prueba.py**: Archivo de prueba en Python para verificar funcionalidades antes de integrarlas con la GUI.
+- **prueba.py**: Archivo donde se encuentra el simulador del computador.
 
+### 7. `ui`
+- **main.py**: Archivo principal del proyecto en Python que ejecuta la aplicación y gestiona la interfaz gráfica.
 ---
 
 ## Guía de Uso
