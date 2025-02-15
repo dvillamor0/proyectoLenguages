@@ -1,0 +1,21 @@
+0
+1
+5
+LOAD R0, [2]         
+LOAD R2, [0]
+BEQ R0, R2, [A]        
+PUSH R0
+LOAD R2, [1]              
+SUB R0, R0, R2      
+CALL [12]
+LOAD R0, [14]
+POP R1               
+MUL R0, R0, R1
+STORE R0, [14]   
+JUMP [B]
+LOAD R0, [1]            
+STORE R0, [14]
+HALT
+POP R1
+JUMP [4]
+1

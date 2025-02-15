@@ -1,0 +1,33 @@
+0
+1
+5
+4
+3
+5
+2
+1
+2
+LOAD R0, [2] r0 = n #comienzo
+LOAD R1, [3] r1 = *arr
+ADD R0, R1, R0 r0 = *arr + n
+LOAD R2, [1] r2 = 1
+SUB R0, R0, R2 r0 --
+LOAD R2, [R1] r2 = arr[r1] #inicio
+STORE R0, [21] guardo r0 en 0x21
+LOAD R0 [1]  cargo 1 en r0
+ADD R1, R1, R0  r1 ++      
+LOAD R3, [R1] r3 = arr[r1]   
+BLT R2, R3, [18] salto al resto          
+STORE R2, [R1] arr[r1] = r2
+SUB R1, R1, R0 r1 --        
+STORE R3, [R1] arr[r1] = r3
+ADD R1, R1, R0  r1 ++
+LOAD R0, [21] leo lo que tenia en 0x21 #resto
+BNE R0, R1, [E] salto al inicio
+LOAD R0, [2] r0 = n
+LOAD R1, [1] r1 = 1
+SUB R0, R0, R1 r0 = n - 1
+STORE R0, [2] n = r0
+LOAD R1, [1] r1 = 1
+BNE R0, R1, [9] salto al comienzo
+HALT
