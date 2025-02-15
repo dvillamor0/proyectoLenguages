@@ -564,7 +564,7 @@ class Ui_MainWindow(object):
         self.label_19.setText(_translate("MainWindow", "IR"))
         self.label_20.setText(_translate("MainWindow", "CP"))
         self.CP_Value.setText(_translate("MainWindow", "0"))
-        self.Boton_Comp.setText(_translate("MainWindow", "Input a texto"))
+        self.Boton_Comp.setText(_translate("MainWindow", "Leer entrada"))
         self.Boton_Ens.setText(_translate("MainWindow", "Cargar a memoria"))
         self.Boton_Carg.setText(_translate("MainWindow", "Ejecutar"))
         self.label_21.setText(_translate("MainWindow", "Memoria"))
@@ -587,7 +587,7 @@ class Ui_MainWindow(object):
         self.label_22.setText(_translate("MainWindow", "CP"))
         self.label_23.setText(_translate("MainWindow", "DIR"))
         self.label_24.setText(_translate("MainWindow", "Código Reubicable"))
-        self.Linker.setText(_translate("MainWindow", "Linker Loader"))
+        self.Linker.setText(_translate("MainWindow", "Ensamblar Reubicable"))
 
 
 if __name__ == "__main__":

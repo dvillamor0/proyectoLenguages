@@ -1,2 +1,4 @@
-#1
-LOAD R1, [0x0]
+#22
+NOP
+1234
+LOAD R1, [0xFF]
