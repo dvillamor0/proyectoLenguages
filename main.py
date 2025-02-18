@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         self.zero = 0
         self.negative = 0
         self.desbordamiento = 0
-        self.config_input = {"text": "", "reg_input": 0, "wait": False}
+        self.config_input = {"text": "", "reg_input": 0, "Exxecute_all": False}
         self.set_REG_Values([0,0,0,0])
         self.setCarry(0)
         self.setZero(0)
@@ -43,8 +43,10 @@ class MainWindow(QMainWindow):
         self.ui.preprocesar_button.clicked.connect(self.Preprocesado)
         self.ui.ensamblador_button.clicked.connect(self.Ensamblador)
         self.ui.Linker_button.clicked.connect(self.EnlazadorCargador)
-        self.ui.Read_Next_Instruction.clicked.connect(lambda: self.LeerInstruccion(False))
+        self.ui.Read_Next_Instruction.clicked.connect(self.LeerInstruccion)
+        self.ui.Exxecute_instructions.clicked.connect(self.LeerInstrucciones)
         self.ui.input_button.clicked.connect(self.getInput)
+        self.ui.Charge_cp.clicked.connect(self.cargarCp)
         self.funciones = {
             "NOP" : self.NOP,
             "LOAD" : self.LOAD,
@@ -80,12 +82,25 @@ class MainWindow(QMainWindow):
             "HALT" : self.HALT,
         }
 
+    def cargarCp(self):
+        valor = self.ui.CP_Set.toPlainText()
+        try:
+            valor = int(valor)
+            self.setCp(valor)
+        except ValueError as e:
+            print(f"Error: '{valor}' no es un número válido.")
+            self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
+             
     def getInput(self):
         valor = self.ui.Input.toPlainText()
         self.guardar_en_registro(self.config_input["reg_input"], int(valor))
-        self.config_input = {"text": "", "reg_input": 0, "wait": False}
+        Llama_all = self.config_input['Exxecute_all']
+        self.config_input = {"text": "", "reg_input": 0, "Exxecute_all": False}
         self.ui.Read_Next_Instruction.setDisabled(False)
+        self.ui.Exxecute_instructions.setDisabled(False)
         self.ui.input_button.setDisabled(True)
+        if(Llama_all):
+            self.LeerInstrucciones()
         
     def setCp(self,new_cp):
         try:
@@ -249,18 +264,31 @@ class MainWindow(QMainWindow):
         instruccion = self.memoria.leer_memoria(direccion)
         return self.EjecutarComando(instruccion)
         
-    def LeerInstruccion(self,all):
+    def LeerInstruccion(self):
         instruccion = self.memoria.leer_memoria(self.cp)
+        self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
             #Ejecuta instruccion
             self.EjecutarComando(instruccion)
-            self.setCp(self.cp+1)
-            siguiente = False
-            if(siguiente):
-                self.LeerInstruccion(all)        
+            self.setCp(self.cp+1)      
         except ValueError as e:
             self.ui.Output.setPlainText("[Error Ejecutando]: "+ str(e))
             
+    def LeerInstrucciones(self):
+        instruccion = self.memoria.leer_memoria(self.cp)
+        while(self.IdentificarComando(instruccion) != 'HALT' 
+              and self.IdentificarComando(instruccion) != 'IN' 
+              and self.memoria.leer_memoria(self.cp) != 0 ):
+            self.LeerInstruccion()
+        if(self.IdentificarComando(instruccion) == 'IN'):
+            self.config_input = {"text":"","reg_input":reg,"Exxecute_all":True} 
+            try:
+                #Ejecuta instruccion
+                self.EjecutarComando(instruccion)
+                self.setCp(self.cp+1)      
+            except ValueError as e:
+                self.ui.Output.setPlainText("[Error Ejecutando]: "+ str(e))
+        
     def EjecutarComando(self,instruccion):
         nombre_comando = self.IdentificarComando(instruccion)
         funcion = self.funciones.get(nombre_comando)  # Obtener la función con el mismo nombre
@@ -270,7 +298,6 @@ class MainWindow(QMainWindow):
                 # Asegurar que la instrucción se maneje como cadena binaria y tenga 32 bits
                 binario = str(instruccion).zfill(32)  # Asegurar que tenga 32 bits, rellenando con ceros a la izquierda
                 print("🚀 ~ instruccion:", str(funcion))
-                # Extraer los 27 bits restantes de la instrucción (sin los primeros 5 bits)
                 resto_instruccion = binario[5:]  # Convertir los 27 bits restantes a entero
                 return funcion(resto_instruccion)
             except ValueError:
@@ -416,7 +443,6 @@ class MainWindow(QMainWindow):
         
         self.guardar_en_registro(reg_1,((valor << n_bits) & ((1 << BITS) - 1)) | (valor >> (BITS - n_bits)))
         return 0
-
         
     def ROR(self, instruccion):
         reg_1 = int(instruccion[:2], 2)  # Índice del registro destino
@@ -495,7 +521,7 @@ class MainWindow(QMainWindow):
         """Espera la entrada del usuario y la almacena en el registro correspondiente."""
         print("IN", instruccion)
         reg = int(instruccion[:2], 2)  # Obtener el índice del registro
-        self.config_input = {"text":"","reg_input":reg,"wait":True}
+        self.config_input = {"text":"","reg_input":reg,"Exxecute_all":self.config_input['Exxecute_all']}
         self.ui.input_button.setDisabled(False)
         self.ui.Read_Next_Instruction.setDisabled(True)
             

@@ -766,16 +766,16 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="Boton_Ens">
+      <widget class="QPushButton" name="Charge_cp">
        <property name="text">
-        <string>Cargar a memoria</string>
+        <string>Cargar CP</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="Exxecute_instructions">
        <property name="text">
-        <string>Ejecutar</string>
+        <string>Ejecutar Todo</string>
        </property>
       </widget>
      </item>
@@ -1044,7 +1044,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>siguiente</string>
+     <string>Ejecutar siguiente</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="codigofuente_input">
