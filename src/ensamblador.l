@@ -21,6 +21,44 @@ void print_binary(int num) {
     }
 }
 
+float binary_to_float_21_bits(const char *binary_str) {
+    if (strlen(binary_str) != 21) {
+        fprintf(stderr, "El binario debe tener 21 bits.\n");
+        return 0;
+    }
+    
+    // Desglosamos los 21 bits en signo, exponente y mantisa
+    int sign_bit = binary_str[0] - '0';  // Bit de signo
+    char exponent_bits[9];  // 8 bits para el exponente
+    char mantissa_bits[13]; // 12 bits para la mantisa
+    
+    strncpy(exponent_bits, binary_str + 1, 8);
+    strncpy(mantissa_bits, binary_str + 9, 12);
+    exponent_bits[8] = '\0';
+    mantissa_bits[12] = '\0';
+
+    // Convertimos el exponente de binario a entero
+    int exponent = strtol(exponent_bits, NULL, 2) - 127;  // Restamos el sesgo de 127
+
+    // Convertimos la mantisa de binario a número flotante
+    float mantissa = 1.0;  // El valor base de la mantisa es 1 (como en IEEE 754)
+    for (int i = 0; i < 12; ++i) {
+        if (mantissa_bits[i] == '1') {
+            mantissa += 1.0 / (1 << (i + 1));  // Sumamos la fracción correspondiente
+        }
+    }
+
+    // Calculamos el valor final
+    float value = mantissa * (1 << exponent);
+    
+    // Aplicamos el signo
+    if (sign_bit == 1) {
+        value = -value;
+    }
+
+    return value;
+}
+
 char* GetBinarioCommand(const char *command, int esRegistro) {
     static char binary[6];
     const char *commands[] = {
@@ -55,6 +93,7 @@ char* GetBinarioCommand(const char *command, int esRegistro) {
 
 char* GetBinarioRegistro(const char *reg){
     static char binary[3];
+
     if (reg[0] == 'R' && reg[1] >= '0' && reg[1] <= '3' && reg[2] == '\0') {
         int regNumber = reg[1] - '0'; // Convertir el caracter del número a un valor entero
 
@@ -82,15 +121,21 @@ char* GetBinarioRegistro(const char *reg){
 
 char* GetRelativeDirection(const char *reg){
     static char result[20];
-    if (reg != NULL && reg[0] == '[' && reg[strlen(reg) - 1] == ']' && strncmp(reg + 1, "0x", 2) == 0) {
-        char hexValue[10]; // Espacio para algo como "3F"
-        strncpy(hexValue, reg + 3, strlen(reg) - 4);  // Copiar desde el cuarto carácter hasta antes del último
-        hexValue[strlen(reg) - 4] = '\0';  // Asegurarse de que la cadena esté terminada
 
-        long decimalValue = strtol(hexValue, NULL, 16);
+    if (reg == NULL || strlen(reg) < 5) {
+        return "Formato Incorrecto Relative";
+    }
+
+    size_t len = strlen(reg);
+
+    if (reg[0] == '[' && reg[len - 1] == ']' && strncmp(reg + 1, "0x", 2) == 0) {
+        char hexValue[10]; // Para almacenar el número hexadecimal
+        strncpy(hexValue, reg + 3, len - 4); // Extraer solo los dígitos hexadecimales
+        hexValue[len - 4] = '\0'; // Terminar la cadena
+
+        long decimalValue = strtol(hexValue, NULL, 16); // Convertir a decimal
 
         snprintf(result, sizeof(result), "(%ld)", decimalValue);
-        
         return result;
     } else {
         return "Formato Incorrecto Relative";
@@ -113,12 +158,15 @@ char* ConcatenarDireccion(const char *numero, const char *direccion) {
 
 char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
     static char result[32];
-    int esRegistro = (reg[0] == 'R') ? TRUE : FALSE;
+    char limpio[32];
+
+    sscanf(reg, "%s", limpio);  // O usa otra opción de limpieza
+
+    int esRegistro = (limpio[0] == 'R') ? TRUE : FALSE;
     if (esRegistro) {
-        strcpy(result,GetBinarioRegistro(reg));
+        strcpy(result, GetBinarioRegistro(limpio));
     } else {
-        char direccion[33];  
-        strcpy(result,ConcatenarDireccion(numero, GetRelativeDirection(reg))); 
+        strcpy(result, ConcatenarDireccion(numero, GetRelativeDirection(limpio)));
     }
     return result;
 }
@@ -177,6 +225,14 @@ void GenerarBinarioParams(const char *command, const char *reg1, const char *reg
     printf("\n"); 
 }
 
+void printAscii(const char *str) {
+    printf("ASCII: ");
+    for (int i = 0; str[i] != '\0'; i++) {
+        printf("[%d]", str[i]);
+    }
+    printf("\n");
+}
+
 %}
 
 %option noyywrap
@@ -186,10 +242,23 @@ spaces      [" "]
 R_REGISTER  "R"[0-3]
 HEX_ADDRESS \[0x[0-9A-F]+\]
 digits       [0-9]+
+boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
 
 %%
 
-(ADD|SUB|MUL|DIV|AND|OR){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{R_REGISTER} {
+(ADD|SUB|MUL|DIV|AND|OR|NOR){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{R_REGISTER}{spaces}* {
+    //printf("Reconocido 3 R : %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
+    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
+    
+    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
+        GenerarBinarioParams(command, reg1, reg2, reg3);
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(BEQ|BNE|BLT|JLE){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{HEX_ADDRESS}{spaces}* {
     //printf("Reconocido 3 R : %s\n", yytext);
 
     char command[10];  // Para guardar el comando (ADD, SUB, etc.)
@@ -201,31 +270,18 @@ digits       [0-9]+
         //printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(BEQ|BNE|BLT|JLE){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{HEX_ADDRESS} {
-    //printf("Reconocido 3 R : %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
-    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
-        GenerarBinarioParams(command, reg1, reg2, reg3);
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
-(LOAD|STORE|NOR){spaces}({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}) {
+(LOAD|STORE){spaces}+({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}){spaces}* {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
     char reg1[10], reg2[15];  // Para guardar los registros
-
     if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1, reg2) == 3) {
         GenerarBinarioParams(command, reg1, reg2, "");
     } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
+        printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(JUMP|CALL){spaces}{HEX_ADDRESS} {
+(JUMP|CALL){spaces}{HEX_ADDRESS}{spaces}* {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
@@ -237,7 +293,7 @@ digits       [0-9]+
         //printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(NOT|CLR|PUSH|POP|IN|OUT){spaces}+{R_REGISTER} {
+(IN){spaces}+{HEX_ADDRESS}{spaces}* {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
@@ -249,7 +305,19 @@ digits       [0-9]+
         //printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(RET|NOP|HALT) {
+(NOT|CLR|PUSH|POP|IN|OUT){spaces}+{R_REGISTER}{spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+    char reg1[10];  // Para guardar los registros
+
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
+        GenerarBinarioParams(command, reg1, "", "");
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(RET|NOP|HALT){spaces}* {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
@@ -262,9 +330,37 @@ digits       [0-9]+
 }
 
 {delim} { /* No action */ }
-{digits} {
+'-'{digits} {
     int value = atoi(yytext);
-    printf("00000000001");
+    printf("00000000011");
+    print_binary(value);
+    printf("\n");
+}
+.{digits} {
+    printf("00000000100");
+    binary_to_float_21_bits(yytext);
+    printf("\n");
+}
+('+')*{digits} {
+    int value = atoi(yytext);
+    printf("00000000010");
+    print_binary(value);
+    printf("\n");
+}
+{boolean} {
+    if (strcmp(yytext, "TRUE") == 0) {
+        printf("00000000001000000000000000000001");  // 20 ceros antes del 1
+        printf("\n");
+    }
+    // Si es FALSE, imprimir 20 ceros seguidos de 0
+    else if (strcmp(yytext, "FALSE") == 0) {
+        printf("00000000001000000000000000000000");  // 20 ceros antes del 0
+        printf("\n");
+    }
+}
+[A-Za-z] {
+    int value = atoi(yytext);
+    printf("00000000101");
     print_binary(value);
     printf("\n");
 }
@@ -273,9 +369,20 @@ digits       [0-9]+
 }
 %%
 
-int main() {
-    while (yylex() != 0) {
-        /* Cada llamada a yylex() lee un token */
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s <archivo_python>\n", argv[0]);
+        return 1;
     }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("Error al abrir el archivo");
+        return 1;
+    }
+
+    yyin = file;
+    yylex();
+    fclose(file);
     return 0;
 }

@@ -1,4 +1,21 @@
-#22
-NOP
-1234
-LOAD R1, [0xFF]
+0
+1
+5
+LOAD R0, [0x2]         
+LOAD R2, [0x0]
+BEQ R0, R2, [0x9]        
+PUSH R0
+LOAD R2, [0x1]
+SUB R0, R0, R2      
+CALL [0x11]
+LOAD R0, [0x14]
+POP R1               
+MUL R0, R0, R1
+STORE R0, [0x14]   
+JUMP [0xA]
+LOAD R0, [0x1]
+STORE R0, [0x14]
+HALT
+POP R1
+JUMP [0x3]
+1

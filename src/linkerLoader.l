@@ -30,6 +30,8 @@ int direccionInicial;  // Esta es la dirección inicial que se usará en la suma
 
 %}
 
+%option noyywrap
+
 /* Regular definitions */
 delim       [ \t\n]
 ws          {delim}+
@@ -40,6 +42,7 @@ relative    \#([0-9]+)
 dir         \([0-9]+\)       
 
 %%
+
 
 {ws}        { printf("\n");}
 
