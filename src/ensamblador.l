@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h> 
+#include <stdint.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -21,42 +22,36 @@ void print_binary(int num) {
     }
 }
 
-float binary_to_float_21_bits(const char *binary_str) {
-    if (strlen(binary_str) != 21) {
-        fprintf(stderr, "El binario debe tener 21 bits.\n");
-        return 0;
-    }
-    
-    // Desglosamos los 21 bits en signo, exponente y mantisa
-    int sign_bit = binary_str[0] - '0';  // Bit de signo
-    char exponent_bits[9];  // 8 bits para el exponente
-    char mantissa_bits[13]; // 12 bits para la mantisa
-    
-    strncpy(exponent_bits, binary_str + 1, 8);
-    strncpy(mantissa_bits, binary_str + 9, 12);
-    exponent_bits[8] = '\0';
-    mantissa_bits[12] = '\0';
+void binary_to_float_21_bits(const char *str) {
+    float num = strtof(str, NULL);
+    uint32_t ieee_754_bin = *(uint32_t*)&num;
+    uint8_t sign = (ieee_754_bin >> 31) & 0x1;
+    int exponent_full = (ieee_754_bin >> 23) & 0xFF;  // Exponente de 8 bits
+    int exponent_adjusted = exponent_full - 127 + 63; // Nuevo sesgo de 7 bits
 
-    // Convertimos el exponente de binario a entero
-    int exponent = strtol(exponent_bits, NULL, 2) - 127;  // Restamos el sesgo de 127
+    if (exponent_adjusted < 0) exponent_adjusted = 0;
+    if (exponent_adjusted > 127) exponent_adjusted = 127;
+    uint16_t mantissa_reduced = (ieee_754_bin & 0x7FFFFF) >> 10;  // 13 bits más significativos
+    printf("%d", sign);
+    for (int i = 6; i >= 0; i--) 
+        printf("%d", (exponent_adjusted >> i) & 1);
+    for (int i = 12; i >= 0; i--) 
+        printf("%d", (mantissa_reduced >> i) & 1);
+}
 
-    // Convertimos la mantisa de binario a número flotante
-    float mantissa = 1.0;  // El valor base de la mantisa es 1 (como en IEEE 754)
-    for (int i = 0; i < 12; ++i) {
-        if (mantissa_bits[i] == '1') {
-            mantissa += 1.0 / (1 << (i + 1));  // Sumamos la fracción correspondiente
-        }
+void print_binary_from_entero(int num) {
+    // Asegurar que el número cabe en 21 bits con signo (-1048576 a 1048575)
+    if (num < -1048576 || num > 1048575) {
+        printf("Error: Número fuera del rango de 21 bits (-1048576 a 1048575)\n");
     }
 
-    // Calculamos el valor final
-    float value = mantissa * (1 << exponent);
-    
-    // Aplicamos el signo
-    if (sign_bit == 1) {
-        value = -value;
-    }
+    // Convertir a un entero sin signo de 21 bits (manejo del complemento a 2)
+    uint32_t binary_rep = (num < 0) ? (num & 0x1FFFFF) : num;
 
-    return value;
+    // Imprimir la representación binaria de 21 bits
+    for (int i = 20; i >= 0; i--) {
+        printf("%d", (binary_rep >> i) & 1);
+    }
 }
 
 char* GetBinarioCommand(const char *command, int esRegistro) {
@@ -237,6 +232,7 @@ void printAscii(const char *str) {
 
 %option noyywrap
 
+simbol      "+"|"-"
 delim       [ \t\n]+
 spaces      [" "]
 R_REGISTER  "R"[0-3]
@@ -330,18 +326,18 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
 }
 
 {delim} { /* No action */ }
-'-'{digits} {
-    int value = atoi(yytext);
-    printf("00000000011");
-    print_binary(value);
-    printf("\n");
-}
-.{digits} {
+{simbol}{digits}+.{digits}+ {
     printf("00000000100");
     binary_to_float_21_bits(yytext);
     printf("\n");
 }
-('+')*{digits} {
+{simbol}{digits}+ {
+    int value = atoi(yytext);
+    printf("00000000011");
+    print_binary_from_entero(value);
+    printf("\n");
+}
+{digits}+ {
     int value = atoi(yytext);
     printf("00000000010");
     print_binary(value);

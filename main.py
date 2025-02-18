@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.setZero(0)
         self.setNegative(0)
         self.setDesb(0)
+        self.ui.input_button.setDisabled(True)
         self.memoria = Memoria(self.ui)
         self.ui.preprocesar_button.clicked.connect(self.Preprocesado)
         self.ui.ensamblador_button.clicked.connect(self.Ensamblador)
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
         self.guardar_en_registro(self.config_input["reg_input"], int(valor))
         self.config_input = {"text": "", "reg_input": 0, "wait": False}
         self.ui.Read_Next_Instruction.setDisabled(False)
+        self.ui.input_button.setDisabled(True)
         
     def setCp(self,new_cp):
         try:
@@ -474,8 +476,8 @@ class MainWindow(QMainWindow):
 
     def POP(self,instruccion):
         reg_index = int(instruccion[:2], 2)
-        direccion = self.registro[reg_index]
-        self.memoria.pop_stack()
+        direccion = self.memoria.pop_stack()
+        self.guardar_en_registro(reg_index,direccion)
         return 0
 
     def CALL(self,instruccion):
@@ -485,14 +487,16 @@ class MainWindow(QMainWindow):
         return 0
 
     def RET(self,instruccion):
-        self.setCp(self.memoria.pop_stack())
+        direccion = self.memoria.pop_stack()
+        self.setCp(direccion-1)
         return 0
 
     def IN(self, instruccion):
         """Espera la entrada del usuario y la almacena en el registro correspondiente."""
         print("IN", instruccion)
-        direccion = int(instruccion, 2)  # Obtener el índice del registro
-        self.config_input = {"text":"","reg_input":direccion,"wait":True}
+        reg = int(instruccion[:2], 2)  # Obtener el índice del registro
+        self.config_input = {"text":"","reg_input":reg,"wait":True}
+        self.ui.input_button.setDisabled(False)
         self.ui.Read_Next_Instruction.setDisabled(True)
             
     def OUT(self,instruccion):
@@ -520,11 +524,7 @@ class MainWindow(QMainWindow):
         return 0
 
     def HALT(self,instruccion):
-        print("HALT",instruccion)
-        return 0
-
-        
-    
+        return 0  
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)

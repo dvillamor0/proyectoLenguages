@@ -63,7 +63,6 @@ class Memoria:
         """Agrega un valor a la pila (últimas 30 direcciones)."""
         # Verifica que haya espacio en la pila
         print("🚀 ~ valor:", valor)
-        print("🚀 ~ valor:", valor)
         for i in range(self.stack_start, len(self.memoria)):
             if self.memoria[i] == 0:  # Si la dirección está vacía
                 self.memoria[i] = valor
@@ -74,8 +73,9 @@ class Memoria:
     def pop_stack(self):
         """Elimina un valor de la pila (últimas 30 direcciones)."""
         for i in range(len(self.memoria) - 1, self.stack_start - 1, -1):  # Comienza desde el final
-            if i in self.memoria:
-                valor = self.memoria.pop(i)
+            if self.memoria[i] != 0:
+                valor = self.memoria[i]
+                self.memoria[i] = 0
                 self.actualizar_memoria_ui()
                 return valor
         print("Error: La pila está vacía, no se puede hacer pop.")
