@@ -49,6 +49,9 @@
 #define LBRACKET    282
 #define RBRACKET    283
 #define DOT         290
+#define SEMICOLON   291
+#define LBRACE      292
+#define RBRACE      293
 
 int yylval;
 
@@ -78,7 +81,6 @@ whitespace      [ \t\r\n]+
 
 %%
 
-
 if          { printf("<IF>\n"); return IF; } 
 else        { printf("<ELSE>\n"); return ELSE; }
 int         { printf("<INT>\n"); return INT; }
@@ -86,7 +88,6 @@ input       { printf("<INPUT>\n"); return INPUT; }
 print       { printf("<PRINT>\n"); return PRINT; }
 while       { printf("<WHILE>\n"); return WHILE; }
 return      { printf("<RETURN>\n"); return RETURN; }
-
 
 "string"    { printf("<STRING_TYPE>\n"); return STRING_TYPE; }
 "list"      { printf("<LIST_TYPE>\n"); return LIST_TYPE; }
@@ -133,6 +134,9 @@ return      { printf("<RETURN>\n"); return RETURN; }
 "["         { printf("<LBRACKET>\n"); return LBRACKET; }
 "]"         { printf("<RBRACKET>\n"); return RBRACKET; }
 "."         { printf("<DOT>\n"); return DOT; }
+";"         { printf("<SEMICOLON>\n"); return SEMICOLON; }
+"{"         { printf("<LBRACE>\n"); return LBRACE; }
+"}"         { printf("<RBRACE>\n"); return RBRACE; }
 
 {whitespace} {
     for(int i = 0; i < yyleng; i++) {
@@ -143,7 +147,7 @@ return      { printf("<RETURN>\n"); return RETURN; }
 }
 
 .           {
-    fprintf(stderr, "Error: Caracter no reconocido '%s' en la línea %d\n", yytext, linea);
+    fprintf(stderr, "Error: Caracter no reconocido '%s' en la linea %d\n", yytext, linea);
 }
 
 %%
@@ -156,7 +160,7 @@ int insTablaSimbolos(const char *lexema) {
         }
     }
     if (numIDs >= MAX_IDS) {
-        fprintf(stderr, "Error: Tabla de símbolos llena.\n");
+        fprintf(stderr, "Error: Tabla de simbolos llena.\n");
         exit(1);
     }
     tablaSimbolos[numIDs] = strdup(lexema);
@@ -182,7 +186,7 @@ int main(int argc, char **argv) {
         /* Aquí podría manejarse el token si se desea */
     }
 
-    printf("\n\n== Tabla de Símbolos ==\n");
+    printf("\n\n== Tabla de Simbolos ==\n");
     for (int i = 0; i < numIDs; i++) {
         printf("ID %d: %s\n", i, tablaSimbolos[i]);
     }

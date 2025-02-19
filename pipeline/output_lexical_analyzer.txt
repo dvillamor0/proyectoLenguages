@@ -1,0 +1,102 @@
+<PRINT>
+<LPAREN>
+<string,0>
+<RPAREN>
+<INT>
+<id,1>
+<=>
+<number,2>
+<SEMICOLON>
+<INT>
+<id,3>
+<=>
+<number,4>
+<SEMICOLON>
+<WHILE>
+<LPAREN>
+<id,3>
+<LT>
+<number,5>
+<RPAREN>
+<LBRACE>
+<id,1>
+<=>
+<id,1>
+<TIMES>
+<number,2>
+<SEMICOLON>
+<id,3>
+<=>
+<id,3>
+<PLUS>
+<number,4>
+<SEMICOLON>
+<RBRACE>
+<PRINT>
+<LPAREN>
+<string,6>
+<RPAREN>
+<INT>
+<id,7>
+<=>
+<number,8>
+<SEMICOLON>
+<INT>
+<id,9>
+<=>
+<id,7>
+<DIV>
+<number,10>
+<SEMICOLON>
+<INT>
+<id,11>
+<=>
+<number,12>
+<SEMICOLON>
+<WHILE>
+<LPAREN>
+<id,9>
+<NE>
+<id,11>
+<RPAREN>
+<LBRACE>
+<id,11>
+<=>
+<id,9>
+<SEMICOLON>
+<id,9>
+<=>
+<LPAREN>
+<id,9>
+<PLUS>
+<id,7>
+<DIV>
+<id,9>
+<RPAREN>
+<DIV>
+<number,10>
+<SEMICOLON>
+<RBRACE>
+<id,13>
+<PRINT>
+<LPAREN>
+<string,14>
+<RPAREN>
+
+
+== Tabla de Simbolos ==
+ID 0: "Inicio del programa"
+ID 1: result
+ID 2: 3
+ID 3: i
+ID 4: 1
+ID 5: 4
+ID 6: "Entre macro POWER y SQUAREROOT"
+ID 7: x
+ID 8: 16
+ID 9: guess
+ID 10: 2
+ID 11: lastGuess
+ID 12: 0
+ID 13: HOLA
+ID 14: "Fin del programa"
