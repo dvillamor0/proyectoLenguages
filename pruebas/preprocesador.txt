@@ -1,0 +1,27 @@
+# Este es un comentario de línea y no debe aparecer en la salida
+
+print("Inicio del programa")
+
+# Invocar macro POWER con espacios en blanco
+POWER( 3, 4 )
+
+print("Entre macro POWER y SQUAREROOT")
+
+# Invocar macro SQUAREROOT con espacios en blanco
+SQUAREROOT( 16 )
+
+# Otro comentario de línea que debe eliminarse
+
+'''
+Este es un comentario de bloque con comillas simples.
+Se elimina el contenido, pero se preservan los saltos de línea.
+'''
+
+HOLA
+
+"""
+Este es un comentario de bloque con comillas dobles.
+Se elimina el contenido, pero se mantienen los saltos de línea.
+"""
+
+print("Fin del programa")
