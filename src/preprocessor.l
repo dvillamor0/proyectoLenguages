@@ -5,54 +5,67 @@
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 
-POWER\(([0-9]+),([0-9]+)\) { 
-    int arg1 = atoi(yytext+6); 
-    char *comma_pos = strchr(yytext, ','); 
-    int arg2 = atoi(comma_pos+1); // +1 para saltar la coma
-    printf("memoria = ['0', '1', %d, %d, '00001000000000000000000000000001', '00001010000000000000000000000010', '00001100000000000000000000000011', '00001110000000000000000000000000', '10001101100000000000000000010000', '00001110000000000000000000000010', '10001100000000000000000000001110', '00110010111000000000000000000000', '00101101000000000000000000000000', '10111000000000000000000000001010', '00010010000000000000000000010010', '10111000000000000000000000010001', '00010000000000000000000000010010', '11111000000000000000000000000000', 1]\n",arg1, arg2); 
-    printf("stack = []\n");
-    printf("cp = 4\n");
-    printf("while cp < len(memoria):\n");
-    printf("    try:\n");
-    printf("        ejecutar_instruccion()\n");
-    printf("    except Exception as e:\n");
-    printf("        print(\"el resultado es: \",memoria[18])\n");
-    printf("        break\n");
-    printf("print(\"el resultado es:\",memoria[18])\n");
-} /* Reescribir cuando detecta HOLA con argumentos */
-SQUAREROOT\(([0-9]+)\) { 
-    int arg1 = atoi(yytext+11);
-    printf("memoria = ['0', '1', %d, '00001000000000000000000000000010', '00001010000000000000000000000000', '10011000100000000000000000001100', '00001110000000000000000000000001', '00110100101000000000000000000000', '10100001000000000000000000001011', '00100010111000000000000000000000', '10000000000000000000000000000111', '10001100000000000000000000001110', '00010000000000000000000000010000', '10000000000000000000000000001111', '00010010000000000000000000010000', '11111000000000000000000000000000', 1]\n",arg1); 
-    printf("stack = []\n");
-    printf("cp = 3\n");
-    printf("while cp < len(memoria):\n");
-    printf("    try:\n");
-    printf("        ejecutar_instruccion()\n");
-    printf("    except Exception as e:\n");
-    printf("        print(\"el resultado es: \",memoria[16])\n");
-    printf("        break\n");
-    printf("print(\"el resultado es: \",memoria[16])\n");
+POWER\([ \t]*[0-9]+[ \t]*,[ \t]*[0-9]+[ \t]*\) {
+    int base, exponent;
+    if (sscanf(yytext, "POWER( %d , %d )", &base, &exponent) != 2) {
+        fprintf(stderr, "Error parsing POWER macro: %s\n", yytext);
+    }
+    printf("int result = %d;\n", base);
+    printf("int i = 1;\n");
+    printf("while (i < %d) {\n", exponent);
+    printf("    result = result * %d;\n", base);
+    printf("    i = i + 1;\n");
+    printf("}\n");
 }
-HOLA               { printf("x = 10\n"); printf("x = x + x\n"); } /* Reescribir cuando detecta HOLA */
-#.*                ; /* Eliminar comentarios de línea */
-("""(.|\n)*?""") ; /* Eliminar comentarios de bloque con triple comillas dobles */
-("'''.*?'''")      ; /* Eliminar comentarios de bloque con triple comillas simples */
-.                  { putchar(yytext[0]); } /* Imprimir cualquier otro carácter */
+
+SQUAREROOT\([ \t]*[0-9]+[ \t]*\) {
+    int number;
+    if (sscanf(yytext, "SQUAREROOT( %d )", &number) != 1) {
+        fprintf(stderr, "Error parsing SQUAREROOT macro: %s\n", yytext);
+    }
+    printf("int x = %d;\n", number);
+    printf("int guess = x / 2;\n");
+    printf("int lastGuess = 0;\n");
+    printf("while (guess != lastGuess) {\n");
+    printf("    lastGuess = guess;\n");
+    printf("    guess = (guess + x / guess) / 2;\n");
+    printf("}\n");
+}
+
+"#".*    { /* Discard single-line comments */ }
+
+\"\"\"(.|\n)*?\"\"\" {
+    for(int i = 0; i < yyleng; i++) {
+        if(yytext[i] == '\n')
+            putchar('\n');
+    }
+}
+
+"'''"(.|\n)*?"'''" {
+    for(int i = 0; i < yyleng; i++) {
+        if(yytext[i] == '\n')
+            putchar('\n');
+    }
+}
+
+\n      { putchar('\n'); }  
+.       { putchar(yytext[0]); }  
 
 %%
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        fprintf(stderr, "Uso: %s <archivo_python>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
         return 1;
     }
 
     FILE *file = fopen(argv[1], "r");
     if (!file) {
-        perror("Error al abrir el archivo");
+        perror("Error opening file");
         return 1;
     }
 

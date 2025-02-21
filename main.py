@@ -110,6 +110,14 @@ class MainWindow(QMainWindow):
         except ValueError as e:
             print(f"Error: '{new_cp}' no es un número válido.")
             self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
+            
+    def setDir(self,new_dir):
+        try:
+            self.dir = new_dir
+            self.ui.DIR.setPlainText(str(new_dir))
+        except ValueError as e:
+            print(f"Error: '{new_dir}' no es un número válido.")
+            self.ui.Output.setPlainText("[Error Instruccion]: "+ str(e))
         
     def actualizarTablaMemoria(self):
         """ Actualiza la tabla de memoria en la interfaz. """
@@ -165,6 +173,12 @@ class MainWindow(QMainWindow):
     def setDesb(self,desbordamiento):
         self.desbordamiento = desbordamiento
         self.ui.REG_Desb.setText(str(desbordamiento))
+    
+    def resetBanderas(self):
+        self.setCarry(0)
+        self.setZero(0)
+        self.setNegative(0)
+        self.setDesb(0)
         
     def Preprocesado(self):
         texto = self.ui.codigofuente_input.toPlainText()  # Obtener el texto del QTextEdit
@@ -197,7 +211,9 @@ class MainWindow(QMainWindow):
             temp_file_path = temp_file.name
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
-        flex_executable = "./compilados/ensamblador.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
+        flex_executable = "./compilados/ensamblador"
+        if os.name != 'posix':
+            flex_executable += ".exe"
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal
@@ -268,6 +284,7 @@ class MainWindow(QMainWindow):
         instruccion = self.memoria.leer_memoria(self.cp)
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
+            self.resetBanderas()
             #Ejecuta instruccion
             self.EjecutarComando(instruccion)
             self.setCp(self.cp+1)      
@@ -291,6 +308,7 @@ class MainWindow(QMainWindow):
         
     def EjecutarComando(self,instruccion):
         nombre_comando = self.IdentificarComando(instruccion)
+        self.setDir(instruccion)
         funcion = self.funciones.get(nombre_comando)  # Obtener la función con el mismo nombre
             
         if funcion:
@@ -368,28 +386,48 @@ class MainWindow(QMainWindow):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] + self.registro[reg_2])
+        suma = self.registro[reg_1] + self.registro[reg_2]
+        if suma > 2097151:
+            self.setDesb(1)
+            self.setCarry(1)
+        if suma == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,suma)
         return 0
         
     def SUB(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] - self.registro[reg_2])
+        resta = self.registro[reg_1] - self.registro[reg_2]
+        if resta == 0:
+            self.setZero(1)
+        if resta < 0:
+            self.setNegative(1)
+        self.guardar_en_registro(reg_destino,resta)
         return 0
         
     def MUL(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] * self.registro[reg_2])
+        multi = self.registro[reg_1] * self.registro[reg_2]
+        if multi > 2097151:
+            self.setDesb(1)
+            self.setCarry(1)
+        if multi == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,multi)
         return 0
         
     def DIV(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] / self.registro[reg_2])
+        div = self.registro[reg_1] / self.registro[reg_2]
+        if div == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,div)
         return 0
         
     def AND(self,instruccion):
@@ -468,6 +506,7 @@ class MainWindow(QMainWindow):
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
         if(self.registro[reg_1] == self.registro[reg_2]):
+            self.setZero(1)
             self.setCp(dir_destino)
 
     def BNE(self, instruccion):
@@ -476,6 +515,7 @@ class MainWindow(QMainWindow):
         dir_destino = int(instruccion[4:], 2)
         
         if self.registro[reg_1] != self.registro[reg_2]:
+            self.setNegative(1)
             self.setCp(dir_destino)
 
     def BLT(self, instruccion):
@@ -484,12 +524,18 @@ class MainWindow(QMainWindow):
         dir_destino = int(instruccion[4:], 2)
         
         if self.registro[reg_1] < self.registro[reg_2]:
+            self.setNegative(1)
             self.setCp(dir_destino)
 
     def JLE(self, instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
+        
+        if self.registro[reg_1] < self.registro[reg_2]:
+            self.setNegative(1)            
+        if self.registro[reg_1] == self.registro[reg_2]:
+            self.setZero(1)
         
         if self.registro[reg_1] <= self.registro[reg_2]:
             self.setCp(dir_destino)
