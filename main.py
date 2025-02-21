@@ -224,7 +224,7 @@ class MainWindow(QMainWindow):
             output = result.stdout  # Obtener la salida del scanner
             self.ui.binary_input.setPlainText(output)
         except Exception as e:
-            self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
+            self.ui.Output.setPlainText("[Error Ensamblador]: "+ str(e))
         
     def EnlazadorCargador(self):
         direccion_referencia = self.ui.linker_input.toPlainText()
