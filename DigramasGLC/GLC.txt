@@ -1,0 +1,58 @@
+Program   ::= Imports Declarations MainBlock
+Imports   ::= ImportStmt*
+ImportStmt ::= "import" LibraryName ";"
+LibraryName ::= "math" | "string"
+
+Declarations ::= ( VarDecl | TypeDecl )*
+VarDecl   ::= Type Identifier ( "=" Expression )? ";"
+Type      ::= BasicType | UserType
+BasicType ::= "int" | "float" | "string"
+UserType  ::= Identifier
+
+TypeDecl  ::= "type" Identifier "{" FieldDecl* "}"
+FieldDecl ::= Type Identifier ";"
+
+MainBlock ::= "main" "{" Statement* "}"
+Statement ::= Assignment
+           | IfStmt
+           | WhileStmt
+           | ForStmt
+           | IOStmt
+           | ";"
+
+IfStmt    ::= "if" "(" BoolExpr ")" "{" Statement* "}"
+           ( "else" "{" Statement* "}" )?
+
+WhileStmt ::= "while" "(" BoolExpr ")" "{" Statement* "}"
+
+ForStmt   ::= "for" "(" Assignment ";" BoolExpr ";" Assignment ")"
+           "{" Statement* "}"
+
+IOStmt    ::= ( "read" | "write" ) "(" Expression ")" ";"
+
+Expression ::= ArithExpr | BoolExpr | StringExpr
+ArithExpr  ::= Term ( ("+" | "-") Term )*
+Term       ::= Factor ( ("*" | "/") Factor )*
+Factor     ::= Power ( "^" Power )*
+Power      ::= Number | Identifier | "(" ArithExpr ")" | FunctionCall
+
+BoolExpr   ::= BoolTerm ( ("or" | "||") BoolTerm )*
+BoolTerm   ::= BoolFactor ( ("and" | "&&") BoolFactor )*
+BoolFactor ::= "true"
+           | "false"
+           | "not" BoolFactor
+           | "!" BoolFactor
+           | Relation
+           | "(" BoolExpr ")"
+
+Relation   ::= ArithExpr ( ">" | "<" | ">=" | "<=" | "==" | "!=" ) ArithExpr
+
+FunctionCall ::= ( LibraryName "." )? Identifier "(" ( Expression ( "," Expression )* )? ")"
+
+Identifier ::= NCName
+Number     ::= Integer | Float
+Integer    ::= Digit+
+Float      ::= Digit+ "." Digit+
+Digit      ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+StringExpr ::= StringLiteral
+StringLiteral ::= '"' [^"]* '"' | "'" [^']* "'"
