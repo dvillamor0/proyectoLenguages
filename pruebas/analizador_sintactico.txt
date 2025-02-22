@@ -1,7 +1,3 @@
-# comentario
-POWER(2, 3)
-SQUAREROOT(16)
-
 int numero;
 string texto;
 list lista;

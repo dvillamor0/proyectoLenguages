@@ -12,7 +12,7 @@
 POWER\([ \t]*[0-9]+[ \t]*,[ \t]*[0-9]+[ \t]*\) {
     int base, exponent;
     if (sscanf(yytext, "POWER( %d , %d )", &base, &exponent) != 2) {
-        fprintf(stderr, "Error parsing POWER macro: %s\n", yytext);
+        fprintf(stderr, "Error parsing POWER macro en linea %d: %s\n", yylineno, yytext);
     }
     printf("int result = %d;\n", base);
     printf("int i = 1;\n");
@@ -25,7 +25,7 @@ POWER\([ \t]*[0-9]+[ \t]*,[ \t]*[0-9]+[ \t]*\) {
 SQUAREROOT\([ \t]*[0-9]+[ \t]*\) {
     int number;
     if (sscanf(yytext, "SQUAREROOT( %d )", &number) != 1) {
-        fprintf(stderr, "Error parsing SQUAREROOT macro: %s\n", yytext);
+        fprintf(stderr, "Error parsing SQUAREROOT macro en linea %d: %s\n", yylineno, yytext);
     }
     printf("int x = %d;\n", number);
     printf("int guess = x / 2;\n");
@@ -36,9 +36,10 @@ SQUAREROOT\([ \t]*[0-9]+[ \t]*\) {
     printf("}\n");
 }
 
-"#".*    { /* Discard single-line comments */ }
+"#".*    { /* Descartar comentarios de una línea */ }
 
 \"\"\"(.|\n)*?\"\"\" {
+    // Mantener los saltos de línea para preservar el número de línea correcto
     for(int i = 0; i < yyleng; i++) {
         if(yytext[i] == '\n')
             putchar('\n');
@@ -46,6 +47,7 @@ SQUAREROOT\([ \t]*[0-9]+[ \t]*\) {
 }
 
 "'''"(.|\n)*?"'''" {
+    // Mantener los saltos de línea para preservar el número de línea correcto
     for(int i = 0; i < yyleng; i++) {
         if(yytext[i] == '\n')
             putchar('\n');

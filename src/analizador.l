@@ -2,73 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parser.tab.h"
+#include "tokens.h"
+#include "symbol_table.h"
 
-/* Palabras Reservadas */
-#define IF         258
-#define ELSE       259
-#define INT        260
-#define INPUT      261
-#define PRINT      262
-#define WHILE      263
-#define RETURN     284
-
-/* ADT */
-#define STRING_TYPE 285
-#define LIST_TYPE   286
-#define APPEND      287
-#define DELETE      288
-#define LENGTH      289
-
-/* Identificadores y Literales */
-#define ID          264
-#define NUMBER      265
-#define STRING      266
-
-/* Operador de Asignación */
-#define ASSIGN      267
-
-/* Operadores de Comparación */
-#define EQ          268
-#define NE          269
-#define LT          270
-#define GT          271
-#define LE          272
-#define GE          273
-
-/* Operadores Aritméticos */
-#define PLUS        274
-#define MINUS       275
-#define TIMES       276
-#define DIV         277
-
-/* Delimitadores */
-#define LPAREN      278
-#define RPAREN      279
-#define COLON       280
-#define COMMA       281
-#define LBRACKET    282
-#define RBRACKET    283
-#define DOT         290
-#define SEMICOLON   291
-#define LBRACE      292
-#define RBRACE      293
-
-int yylval;
-
-/* Tabla de símbolos */
-#define MAX_IDS 1000
+/* Declaración de variables globales */
 char *tablaSimbolos[MAX_IDS];
 int numIDs = 0;
 
 /* Declaración de la función */
 int insTablaSimbolos(const char *lexema);
-
-/* Variable para llevar el conteo de líneas */
-int linea = 1;
-
-/* Declaración de yyin */
-extern FILE *yyin;
 %}
+
+%option yylineno
 
 /* Expresiones regulares */
 digit           [0-9]
@@ -96,25 +42,25 @@ return      { printf("<RETURN>\n"); return RETURN; }
 "length"    { printf("<LENGTH>\n"); return LENGTH; }
 
 {id}        {
-               int idx = insTablaSimbolos(yytext);
-               yylval = idx;
-               printf("<id,%d>\n", idx);
-               return ID;
-            }
+    int idx = insTablaSimbolos(yytext);
+    yylval.token_type = idx;
+    printf("<id,%d>\n", idx);
+    return ID;
+}
 
 {number}    {
-               int idx = insTablaSimbolos(yytext);
-               yylval = idx;
-               printf("<number,%d>\n", idx);
-               return NUMBER;
-            }
+    int idx = insTablaSimbolos(yytext);
+    yylval.token_type = idx;
+    printf("<number,%d>\n", idx);
+    return NUMBER;
+}
 
 {string_literal} {
-               int idx = insTablaSimbolos(yytext);
-               yylval = idx;
-               printf("<string,%d>\n", idx);
-               return STRING;
-            }
+    int idx = insTablaSimbolos(yytext);
+    yylval.token_type = idx;
+    printf("<string,%d>\n", idx);
+    return STRING;
+}
 
 "=="        { printf("<EQ>\n"); return EQ; }
 "!="        { printf("<NE>\n"); return NE; }
@@ -138,16 +84,10 @@ return      { printf("<RETURN>\n"); return RETURN; }
 "{"         { printf("<LBRACE>\n"); return LBRACE; }
 "}"         { printf("<RBRACE>\n"); return RBRACE; }
 
-{whitespace} {
-    for(int i = 0; i < yyleng; i++) {
-        if(yytext[i] == '\n') {
-            linea++;
-        }
-    }
-}
+{whitespace} { /* ignorar espacios en blanco */ }
 
 .           {
-    fprintf(stderr, "Error: Caracter no reconocido '%s' en la linea %d\n", yytext, linea);
+    fprintf(stderr, "Error: Caracter no reconocido '%s' en la linea %d\n", yytext, yylineno);
 }
 
 %%
@@ -169,27 +109,4 @@ int insTablaSimbolos(const char *lexema) {
 
 int yywrap() {
     return 1;
-}
-
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        FILE *f = fopen(argv[1], "r");
-        if (!f) {
-            perror("Error al abrir el archivo");
-            return 1;
-        }
-        yyin = f;
-    }
-
-    int token;
-    while ((token = yylex()) != 0) {
-        /* Aquí podría manejarse el token si se desea */
-    }
-
-    printf("\n\n== Tabla de Simbolos ==\n");
-    for (int i = 0; i < numIDs; i++) {
-        printf("ID %d: %s\n", i, tablaSimbolos[i]);
-    }
-
-    return 0;
 }
