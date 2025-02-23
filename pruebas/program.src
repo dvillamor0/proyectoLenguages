@@ -1,7 +1,6 @@
 #import <math>
 # This is a comment that will be removed
 Fun main() {
-    Flo number = 16
-    Flo root = sqrt(number)    # This comment will be removed
-    Flo powered = power(root, 2)
+    Flo number = 16;
+    Flo root = sqrt(number);   # This comment will be removed
 }

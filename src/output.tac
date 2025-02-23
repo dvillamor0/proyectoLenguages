@@ -43,9 +43,5 @@ number = 16
 param number
 t9 = call sqrt, 1
 root = t9
-param root
-param 2
-t10 = call power, 2
-powered = t10
 end_func
 
