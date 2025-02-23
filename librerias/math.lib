@@ -1,0 +1,25 @@
+Fun sqrt(Flo num) {
+    Flo result = num
+    Flo temp = 0
+    
+    While(temp != result) {
+        temp = result
+        result = (num/result + result) / 2
+    }
+    Ret result
+}
+
+Fun power(Flo base, Ent exp) {
+    If(exp == 0) {
+        Ret 1
+    }
+    
+    Flo result = 1
+    Ent i = 0
+    
+    While(i < exp) {
+        result = result * base
+        i = i + 1
+    }
+    Ret result
+}
