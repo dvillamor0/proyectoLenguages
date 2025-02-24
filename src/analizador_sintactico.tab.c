@@ -1935,19 +1935,45 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char **argv) {
-    if (argc > 1) {
-        if (!(yyin = fopen(argv[1], "r"))) {
-            perror(argv[1]);
+    printf("Debug: Starting compiler\n");
+    
+    if (argc < 2) {
+        fprintf(stderr, "Debug: No input file provided\n");
+        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+        return 1;
+    }
+
+    printf("Debug: Attempting to open file: %s\n", argv[1]);
+    if (!(yyin = fopen(argv[1], "r"))) {
+        fprintf(stderr, "Debug: Failed to open input file\n");
+        perror(argv[1]);
+        return 1;
+    }
+    printf("Debug: Successfully opened input file\n");
+
+    printf("Debug: Starting parsing\n");
+    int parse_result = yyparse();
+    printf("Debug: Parse result = %d (0 means success)\n", parse_result);
+    
+    if (parse_result == 0) {
+        if (ast_root) {
+            printf("Debug: AST successfully created\n");
+            printf("Debug: Starting semantic analysis\n");
+            init_semantic_analysis(ast_root);
+            printf("Debug: Semantic analysis completed\n");
+            
+            printf("Debug: Generating intermediate code\n");
+            generate_intermediate_code(ast_root, "output.tac");
+            printf("Debug: Intermediate code generation completed\n");
+        } else {
+            fprintf(stderr, "Debug: AST root is NULL despite successful parse\n");
             return 1;
         }
+    } else {
+        fprintf(stderr, "Debug: Parsing failed\n");
+        return 1;
     }
     
-    if (yyparse() == 0) {
-        if (ast_root) {
-            init_semantic_analysis(ast_root);
-            generate_intermediate_code(ast_root, "output.tac");
-        }
-    }
-    
+    printf("Debug: Compilation completed successfully\n");
     return 0;
 }

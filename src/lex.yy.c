@@ -354,8 +354,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 6
-#define YY_END_OF_BUFFER 7
+#define YY_NUM_RULES 5
+#define YY_END_OF_BUFFER 6
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -363,29 +363,27 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[33] =
+static const flex_int16_t yy_accept[13] =
     {   0,
-        0,    0,    7,    5,    3,    4,    4,    2,    2,    4,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    2,    1,    0,    1,    1,    1,    1,
-        1,    0
+        0,    0,    6,    4,    1,    4,    4,    1,    2,    0,
+        3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
-        1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    5,    1,    1,    6,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    7,
-        1,    8,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    1,    1,    4,    1,    1,    1,    1,    5,
+        6,    1,    1,    1,    1,    1,    1,    7,    7,    7,
+        7,    7,    7,    7,    7,    7,    7,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-        1,    1,    1,    1,    9,    1,    1,    1,   10,    1,
-       11,   12,    1,   13,    1,   14,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -403,48 +401,35 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[15] =
+static const YY_CHAR yy_meta[8] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1
+        1,    2,    2,    1,    1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[37] =
+static const flex_int16_t yy_base[14] =
     {   0,
-        0,    5,   52,   53,   53,   53,   48,    9,   11,   53,
-       41,   53,   46,    7,    9,   13,   10,   16,   26,    0,
-       33,   39,   40,   24,   25,   38,   35,   53,   42,   53,
-       41,   53,   39,   33,   25,    0
+        0,    0,   14,   15,    0,    6,    5,    0,    4,    2,
+       15,   15,    8
     } ;
 
-static const flex_int16_t yy_def[37] =
+static const flex_int16_t yy_def[14] =
     {   0,
-       33,   33,   32,   32,   32,   32,   32,   34,   34,   32,
-        9,   32,   32,    9,    9,    9,    9,    9,    9,   19,
-       35,   35,   36,   36,   34,   36,   32,   32,   32,   32,
-       32,    0,   32,   32,   32,   32
+       12,    1,   12,   12,   13,   12,   12,   13,   12,   12,
+       12,    0,   12
     } ;
 
-static const flex_int16_t yy_nxt[68] =
+static const flex_int16_t yy_nxt[23] =
     {   0,
-       26,    5,    6,    7,    5,    8,    5,    6,    7,    5,
-        9,   12,   13,   12,   13,   11,   15,   11,   11,   14,
-       16,   11,   18,   17,   11,   22,   23,   28,   29,   19,
-       20,   27,   21,   11,   11,   23,   24,   30,   31,    4,
-       25,   23,   24,   30,   28,   27,   25,   27,   12,   11,
-       10,   32,    3,   32,   32,   32,   32,   32,   32,   32,
-       32,   32,   32,   32,   32,   32,   32
+        4,    5,    5,    6,    7,    4,    4,   11,   10,    8,
+        9,   10,    9,   12,    3,   12,   12,   12,   12,   12,
+       12,   12
     } ;
 
-static const flex_int16_t yy_chk[68] =
+static const flex_int16_t yy_chk[23] =
     {   0,
-       36,    1,    1,    1,    1,    1,    2,    2,    2,    2,
-        2,    8,    8,    9,    9,   14,   14,   15,   17,    9,
-       15,   16,   17,   16,   18,   35,   24,   25,   25,   18,
-       19,   24,   19,   34,   19,   21,   21,   27,   27,   33,
-       21,   22,   22,   31,   29,   26,   22,   23,   13,   11,
-        7,    3,   32,   32,   32,   32,   32,   32,   32,   32,
-       32,   32,   32,   32,   32,   32,   32
+        1,    1,    1,    1,    1,    1,    1,   10,   10,   13,
+        9,    7,    6,    3,   12,   12,   12,   12,   12,   12,
+       12,   12
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -461,20 +446,91 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 ".\\preprocesador.l"
-#line 2 ".\\preprocesador.l"
+#line 1 ".\\linkerLoader.l"
+#line 2 ".\\linkerLoader.l"
+/* Enhanced loader implementation */
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-#define MAX_BUFFER 1000
-char buffer[MAX_BUFFER];
-char lib_content[MAX_BUFFER];
-int import_active = 0;
+// Función para imprimir un número en binario con exactamente 21 bits
+void print_binary(FILE* output, int num) {
+    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20)
+    
+    // Imprimir los 21 bits
+    for (int i = 0; i < 21; i++) {
+        if (num & mask) {
+            fprintf(output, "1");
+        } else {
+            fprintf(output, "0");
+        }
+        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
+    }
+}
 
-void process_import(const char* lib_name);
-#line 476 "lex.yy.c"
-#line 477 "lex.yy.c"
+// Función para detectar si una línea contiene una dirección relativa
+int contains_relative_address(const char* line) {
+    return (strstr(line, "(") != NULL && strstr(line, ")") != NULL);
+}
+
+// Función para extraer el número entre paréntesis
+int extract_address(const char* line) {
+    const char* start = strchr(line, '(');
+    if (start == NULL) return 0;
+    
+    const char* end = strchr(start, ')');
+    if (end == NULL) return 0;
+    
+    // Crear una subcadena para el número
+    int len = end - start - 1;
+    char num_str[32] = {0};
+    strncpy(num_str, start + 1, len);
+    
+    return atoi(num_str);
+}
+
+// Función para reemplazar la dirección relativa con la absoluta
+char* replace_address(const char* line, int rel_addr, int base_addr) {
+    static char result[1024];
+    const char* start = strchr(line, '(');
+    const char* end = strchr(line, ')');
+    
+    if (start == NULL || end == NULL) {
+        strcpy(result, line);
+        return result;
+    }
+    
+    // Calcular la dirección absoluta
+    int abs_addr = base_addr + rel_addr;
+    
+    // Copiar la parte antes del paréntesis
+    int prefix_len = start - line;
+    strncpy(result, line, prefix_len);
+    result[prefix_len] = '\0';
+    
+    // Añadir la dirección absoluta en binario
+    char binary[32] = {0};
+    sprintf(binary, "");
+    for (int i = 20; i >= 0; i--) {
+        binary[20-i] = ((abs_addr >> i) & 1) ? '1' : '0';
+    }
+    binary[21] = '\0';
+    
+    strcat(result, binary);
+    
+    // Añadir la parte después del paréntesis
+    strcat(result, end + 1);
+    
+    return result;
+}
+
+int direccionInicial = 0;  // Dirección base para la relocalización
+
+#line 531 "lex.yy.c"
+/* Regular definitions */
+#line 533 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -654,9 +710,6 @@ extern int yylex (void);
 #endif
 
 #define YY_RULE_SETUP \
-	if ( yyleng > 0 ) \
-		YY_CURRENT_BUFFER_LVALUE->yy_at_bol = \
-				(yytext[yyleng - 1] == '\n'); \
 	YY_USER_ACTION
 
 /** The main scanner function which does all the work.
@@ -694,10 +747,9 @@ YY_DECL
 		}
 
 	{
-#line 23 ".\\preprocesador.l"
+#line 95 ".\\linkerLoader.l"
 
-
-#line 700 "lex.yy.c"
+#line 752 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -712,7 +764,6 @@ YY_DECL
 		yy_bp = yy_cp;
 
 		yy_current_state = (yy_start);
-		yy_current_state += YY_AT_BOL();
 yy_match:
 		do
 			{
@@ -725,13 +776,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 33 )
+				if ( yy_current_state >= 13 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 53 );
+		while ( yy_base[yy_current_state] != 15 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -758,55 +809,38 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 25 ".\\preprocesador.l"
-{
-    char lib_name[100];
-    sscanf(yytext, "#import <%[^>]>", lib_name);
-    process_import(lib_name);
-}
+#line 96 ".\\linkerLoader.l"
+{ fprintf(yyout, "\n"); }
 	YY_BREAK
 case 2:
-/* rule 2 can match eol */
 YY_RULE_SETUP
-#line 31 ".\\preprocesador.l"
+#line 98 ".\\linkerLoader.l"
 { 
-    printf("\n");
+    direccionInicial = atoi(yytext + 1); 
+    fprintf(yyout, "\n");  
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 ".\\preprocesador.l"
+#line 103 ".\\linkerLoader.l"
 { 
-    if (import_active == 0) {
-        ECHO; 
-    }
+    int dir_value = atoi(yytext + 1); 
+    int suma = direccionInicial + dir_value;
+    print_binary(yyout, suma);  
 }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 41 ".\\preprocesador.l"
-{
-    if (import_active == 0) {
-        printf("\n");
-    }
-}
+#line 109 ".\\linkerLoader.l"
+{ fprintf(yyout, "%s", yytext); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 47 ".\\preprocesador.l"
-{ 
-    if (import_active == 0) {
-        ECHO; 
-    }
-}
-	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 53 ".\\preprocesador.l"
+#line 111 ".\\linkerLoader.l"
 ECHO;
 	YY_BREAK
-#line 809 "lex.yy.c"
+#line 843 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1091,7 +1125,6 @@ static int yy_get_next_buffer (void)
 	char *yy_cp;
     
 	yy_current_state = (yy_start);
-	yy_current_state += YY_AT_BOL();
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
@@ -1104,7 +1137,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 33 )
+			if ( yy_current_state >= 13 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1132,11 +1165,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 33 )
+		if ( yy_current_state >= 13 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 32);
+	yy_is_jam = (yy_current_state == 12);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1251,8 +1284,6 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
-
-	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = (c == '\n');
 
 	return c;
 }
@@ -1814,54 +1845,79 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 53 ".\\preprocesador.l"
+#line 111 ".\\linkerLoader.l"
 
 
-void process_import(const char* lib_name) {
-    FILE* lib_file;
-    char filename[120];
+// Función principal que procesa el archivo de entrada y genera el archivo de salida
+void process_file(const char* input_file, const char* output_file, int base_address) {
+    FILE* in = fopen(input_file, "r");
+    FILE* out = fopen(output_file, "w");
     
-    snprintf(filename, sizeof(filename), "%s.lib", lib_name);
-    
-    lib_file = fopen(filename, "r");
-    if (!lib_file) {
-        fprintf(stderr, "Error: Cannot open library %s\n", filename);
+    if (!in || !out) {
+        fprintf(stderr, "Error opening files\n");
+        if (in) fclose(in);
+        if (out) fclose(out);
         return;
     }
     
-    import_active = 1;
-    size_t n = fread(lib_content, 1, MAX_BUFFER - 1, lib_file);
-    lib_content[n] = '\0';
+    char line[1024];
     
-    printf("%s\n\n", lib_content);
+    // Establecer la dirección base
+    direccionInicial = base_address;
     
-    import_active = 0;
-    fclose(lib_file);
+    while (fgets(line, sizeof(line), in)) {
+        // Eliminar el salto de línea final si existe
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n') {
+            line[len-1] = '\0';
+        }
+        
+        if (contains_relative_address(line)) {
+            // Esta línea contiene una dirección relativa
+            int rel_addr = extract_address(line);
+            char* new_line = replace_address(line, rel_addr, direccionInicial);
+            fprintf(out, "%s\n", new_line);
+        } else {
+            // Esta línea no contiene dirección relativa, copiarla tal cual
+            fprintf(out, "%s\n", line);
+        }
+    }
+    
+    fclose(in);
+    fclose(out);
+    printf("Processing complete. Output written to %s\n", output_file);
 }
 
-int main(int argc, char** argv) {
-    if (argc > 1) {
-        FILE* input = fopen(argv[1], "r");
-        if (!input) {
-            fprintf(stderr, "Error: Cannot open input file %s\n", argv[1]);
-            return 1;
-        }
-        yyin = input;
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s [base_address] [input_file] [output_file]\n", argv[0]);
+        printf("  base_address: Base address for relocation (default: 0)\n");
+        printf("  input_file: Binary input file (default: output.bin)\n");
+        printf("  output_file: Output file (default: executable.bin)\n");
+        return 1;
     }
     
-    if (argc > 2) {
-        FILE* output = freopen(argv[2], "w", stdout);
-        if (!output) {
-            fprintf(stderr, "Error: Cannot open output file %s\n", argv[2]);
-            return 1;
-        }
+    int base_address = 0;
+    const char* input_file = "output.bin";
+    const char* output_file = "executable.bin";
+    
+    if (argc >= 2) {
+        base_address = atoi(argv[1]);
     }
     
-    yylex();
-    
-    if (argc > 1) {
-        fclose(yyin);
+    if (argc >= 3) {
+        input_file = argv[2];
     }
+    
+    if (argc >= 4) {
+        output_file = argv[3];
+    }
+    
+    printf("Loading from: %s\n", input_file);
+    printf("Base address: %d\n", base_address);
+    printf("Output file: %s\n", output_file);
+    
+    process_file(input_file, output_file, base_address);
     
     return 0;
 }
