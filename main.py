@@ -10,6 +10,7 @@
 # sys.exit(app.exec_())
 
 import sys
+import struct
 import tempfile
 from assets.memoria import Memoria
 from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.cp = 0
-        self.registro = [0,0,0,0]
+        self.registro = [0] * 4
         self.carry = 0
         self.zero = 0
         self.negative = 0
@@ -139,7 +140,20 @@ class MainWindow(QMainWindow):
         if numero < 0:
             numero = (1 << 16) + numero  # Convierte a complemento a dos si es negativo
         return format(numero & 0xFFFF, '016b')  # Asegura 16 bits
+
+    def float_to_bin16(self, value):
+        """Convierte un flotante en su representación IEEE 754 de 16 bits (half precision)."""
+        packed = struct.pack('>e', value)  # '>e' indica media precisión (16 bits)
+        return ''.join(f'{byte:08b}' for byte in packed)  # Convierte a binario
  
+    def guardar_en_registro(self, indice, value):
+        """Guarda un número en el registro, detectando su tipo."""
+        print("🚀 ~ value:", value)
+        temp_reg = self.registro
+        temp_reg[indice] = value
+        print("🚀 ~ temp_reg:", temp_reg)
+        self.set_REG_Values(temp_reg)
+
     def guardar_en_registro(self,indice,value):
         temp_reg = self.registro
         temp_reg[indice] = value
@@ -150,14 +164,24 @@ class MainWindow(QMainWindow):
         self.registro[1] = arreglo[1]
         self.registro[2] = arreglo[2]
         self.registro[3] = arreglo[3]
-        self.ui.REG_A.setText(str(arreglo[0]))
-        self.ui.REG_B.setText(str(arreglo[1]))
-        self.ui.REG_C.setText(str(arreglo[2]))
-        self.ui.REG_D.setText(str(arreglo[3]))
-        self.ui.BIN_A.setText(self.int_to_bin16(arreglo[0]))
-        self.ui.BIN_B.setText(self.int_to_bin16(arreglo[1]))
-        self.ui.BIN_C.setText(self.int_to_bin16(arreglo[2]))
-        self.ui.BIN_D.setText(self.int_to_bin16(arreglo[3]))
+        self.ui.REG_A.setText(f"{(arreglo[0]):.1f}")
+        self.ui.REG_B.setText(f"{(arreglo[1]):.1f}")
+        self.ui.REG_C.setText(f"{(arreglo[2]):.1f}")
+        self.ui.REG_D.setText(f"{(arreglo[3]):.1f}")
+        print("🚀 ~ arreglo:", arreglo)
+        
+        def convertir_a_binario(valor):
+            """Convierte un valor a binario según su tipo (int o float)."""
+            if isinstance(valor, int):
+                return self.int_to_bin16(valor)
+            elif isinstance(valor, float):
+                return self.float_to_bin16(valor)
+            else:
+                return "ERROR"  # Manejo de error en caso de tipo desconocido
+        self.ui.BIN_A.setText(convertir_a_binario(arreglo[0]))
+        self.ui.BIN_B.setText(convertir_a_binario(arreglo[1]))
+        self.ui.BIN_C.setText(convertir_a_binario(arreglo[2]))
+        self.ui.BIN_D.setText(convertir_a_binario(arreglo[3]))
       
     def setCarry(self,caryy):
         self.carry = caryy
@@ -171,7 +195,6 @@ class MainWindow(QMainWindow):
         
     def setNegative(self,negative):
         self.negative = negative
-        print("🚀 ~ negative:", negative)
         self.ui.REG_Neg.setText(str(negativo))
         self.ui.BIN_Neg.setText(self.int_to_bin16(negativo))
         
@@ -290,9 +313,6 @@ class MainWindow(QMainWindow):
         instruccion = self.memoria.leer_memoria(self.cp)
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
-            print("Leer instruccion resetea")
-            self.resetBanderas()
-            #Ejecuta instruccion
             self.EjecutarComando(instruccion)
             self.setCp(self.cp+1)      
         except ValueError as e:
@@ -322,7 +342,6 @@ class MainWindow(QMainWindow):
             try:
                 # Asegurar que la instrucción se maneje como cadena binaria y tenga 32 bits
                 binario = str(instruccion).zfill(32)  # Asegurar que tenga 32 bits, rellenando con ceros a la izquierda
-                print("🚀 ~ instruccion:", str(funcion))
                 resto_instruccion = binario[5:]  # Convertir los 27 bits restantes a entero
                 return funcion(resto_instruccion)
             except ValueError:
@@ -350,7 +369,7 @@ class MainWindow(QMainWindow):
                 print(f"Error: Código de instrucción fuera de rango ({opcode}).")
                 return "ERROR"
         except ValueError:
-            print("Error: La instrucción debe ser un número entero.")
+            print("Error: Las instrucción debe ser un número entero.")
             return "ERROR"
 
     def NOP(self,instruccion):
@@ -410,7 +429,6 @@ class MainWindow(QMainWindow):
         if resta == 0:
             self.setZero(1)
         if resta < 0:
-            print("🚀 ~ resta:", resta)
             self.setNegative(1)
         self.guardar_en_registro(reg_destino,resta)
         return 0
