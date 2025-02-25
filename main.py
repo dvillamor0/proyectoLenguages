@@ -161,18 +161,23 @@ class MainWindow(QMainWindow):
     def setCarry(self,caryy):
         self.carry = caryy
         self.ui.REG_Carry.setText(str(caryy))
+        self.ui.BIN_Carry.setText(self.int_to_bin16(caryy))
       
     def setZero(self,zero):
         self.zero = zero
         self.ui.REG_Zero.setText(str(zero))
+        self.ui.BIN_Zero.setText(self.int_to_bin16(zero))
         
     def setNegative(self,negative):
         self.negative = negative
+        print("🚀 ~ negative:", negative)
         self.ui.REG_Neg.setText(str(negativo))
+        self.ui.BIN_Neg.setText(self.int_to_bin16(negativo))
         
     def setDesb(self,desbordamiento):
         self.desbordamiento = desbordamiento
         self.ui.REG_Desb.setText(str(desbordamiento))
+        self.ui.BIN_Desb.setText(self.int_to_bin16(desbordamiento))
     
     def resetBanderas(self):
         self.setCarry(0)
@@ -224,7 +229,7 @@ class MainWindow(QMainWindow):
             output = result.stdout  # Obtener la salida del scanner
             self.ui.binary_input.setPlainText(output)
         except Exception as e:
-            self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
+            self.ui.Output.setPlainText("[Error Ensamblador]: "+ str(e))
         
     def EnlazadorCargador(self):
         direccion_referencia = self.ui.linker_input.toPlainText()
@@ -284,6 +289,7 @@ class MainWindow(QMainWindow):
         instruccion = self.memoria.leer_memoria(self.cp)
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
+            print("Leer instruccion resetea")
             self.resetBanderas()
             #Ejecuta instruccion
             self.EjecutarComando(instruccion)
@@ -403,6 +409,7 @@ class MainWindow(QMainWindow):
         if resta == 0:
             self.setZero(1)
         if resta < 0:
+            print("🚀 ~ resta:", resta)
             self.setNegative(1)
         self.guardar_en_registro(reg_destino,resta)
         return 0
