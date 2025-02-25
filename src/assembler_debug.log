@@ -1,0 +1,85 @@
+Unsigned int: 0
+Unsigned int: 1
+Unsigned int: 2
+Float: 16.0
+Float: 0.0
+Float: 0.0
+Float: 0.0
+Processing: LOAD R0, [4]
+Command: LOAD, Operands: R0, [4]
+LOAD reg,mem: R0, [4]
+Processing: STORE R0, [3]
+Command: STORE, Operands: R0, [3]
+STORE reg,mem: R0, [3]
+Processing: LOAD R0, [3]
+Command: LOAD, Operands: R0, [3]
+LOAD reg,mem: R0, [3]
+Processing: STORE R0, [5]
+Command: STORE, Operands: R0, [5]
+STORE reg,mem: R0, [5]
+Processing: LOAD R0, [6]
+Command: LOAD, Operands: R0, [6]
+LOAD reg,mem: R0, [6]
+Processing: LOAD R1, [5]
+Command: LOAD, Operands: R1, [5]
+LOAD reg,mem: R1, [5]
+Processing: CMP R0, R1
+Command: CMP, Operands: R0, R1
+CMP: R0, R1
+Processing: BNE R0, R1, [11]
+Command: BNE, Operands: R0, R1, [11]
+Branch: BNE R0, R1, [11]
+Processing: LOAD R2, [0]
+Command: LOAD, Operands: R2, [0]
+LOAD reg,mem: R2, [0]
+Processing: JUMP [12]
+Command: JUMP, Operands: [12]
+JUMP to address: [12]
+Processing: LOAD R2, [1]
+Command: LOAD, Operands: R2, [1]
+LOAD reg,mem: R2, [1]
+Processing: LOAD R1, [0]
+Command: LOAD, Operands: R1, [0]
+LOAD reg,mem: R1, [0]
+Processing: BEQ R2, R1, [1E]
+Command: BEQ, Operands: R2, R1, [1E]
+Branch: BEQ R2, R1, [1E]
+Processing: LOAD R0, [5]
+Command: LOAD, Operands: R0, [5]
+LOAD reg,mem: R0, [5]
+Processing: LOAD R0, [3]
+Command: LOAD, Operands: R0, [3]
+LOAD reg,mem: R0, [3]
+Processing: LOAD R1, [5]
+Command: LOAD, Operands: R1, [5]
+LOAD reg,mem: R1, [5]
+Processing: DIV R2, R0, R1
+Command: DIV, Operands: R2, R0, R1
+3-reg op: DIV R2, R0, R1
+Processing: LOAD R1, [5]
+Command: LOAD, Operands: R1, [5]
+LOAD reg,mem: R1, [5]
+Processing: ADD R3, R2, R1
+Command: ADD, Operands: R3, R2, R1
+3-reg op: ADD R3, R2, R1
+Processing: LOAD R1, [2]
+Command: LOAD, Operands: R1, [2]
+LOAD reg,mem: R1, [2]
+Processing: DIV R2, R3, R1
+Command: DIV, Operands: R2, R3, R1
+3-reg op: DIV R2, R3, R1
+Processing: STORE R2, [5]
+Command: STORE, Operands: R2, [5]
+STORE reg,mem: R2, [5]
+Processing: JUMP [C]
+Command: JUMP, Operands: [C]
+JUMP to address: [C]
+Processing: LOAD R0, [5]
+Command: LOAD, Operands: R0, [5]
+LOAD reg,mem: R0, [5]
+Processing: STORE R0, [0x14]
+Command: STORE, Operands: R0, [0x14]
+STORE reg,mem: R0, [0x14]
+Processing: HALT
+Command: HALT, Operands: 
+No-op instruction: HALT

@@ -1,0 +1,11 @@
+Fun main() {
+    Flo num = 16.0;
+    Flo result = num;
+    Flo temp = 0.0;
+    
+    While(temp != result) {
+        temp = result;
+        result = (num/result + result) / 2;
+    }
+    Ret result;
+}
