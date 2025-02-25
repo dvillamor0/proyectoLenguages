@@ -147,14 +147,6 @@ class MainWindow(QMainWindow):
         return ''.join(f'{byte:08b}' for byte in packed)  # Convierte a binario
  
     def guardar_en_registro(self, indice, value):
-        """Guarda un número en el registro, detectando su tipo."""
-        print("🚀 ~ value:", value)
-        temp_reg = self.registro
-        temp_reg[indice] = value
-        print("🚀 ~ temp_reg:", temp_reg)
-        self.set_REG_Values(temp_reg)
-
-    def guardar_en_registro(self,indice,value):
         temp_reg = self.registro
         temp_reg[indice] = value
         self.set_REG_Values(temp_reg)
@@ -164,11 +156,10 @@ class MainWindow(QMainWindow):
         self.registro[1] = arreglo[1]
         self.registro[2] = arreglo[2]
         self.registro[3] = arreglo[3]
-        self.ui.REG_A.setText(f"{(arreglo[0]):.1f}")
-        self.ui.REG_B.setText(f"{(arreglo[1]):.1f}")
-        self.ui.REG_C.setText(f"{(arreglo[2]):.1f}")
-        self.ui.REG_D.setText(f"{(arreglo[3]):.1f}")
-        print("🚀 ~ arreglo:", arreglo)
+        self.ui.REG_A.setText(str(arreglo[0]))
+        self.ui.REG_B.setText(str(arreglo[1]))
+        self.ui.REG_C.setText(str(arreglo[2]))
+        self.ui.REG_D.setText(str(arreglo[3]))
         
         def convertir_a_binario(valor):
             """Convierte un valor a binario según su tipo (int o float)."""
@@ -176,6 +167,13 @@ class MainWindow(QMainWindow):
                 return self.int_to_bin16(valor)
             elif isinstance(valor, float):
                 return self.float_to_bin16(valor)
+            elif isinstance(valor, str):
+                    return self.float_to_bin16(bin(ord(valor))[2:].zfill(16))
+            elif isinstance(valor, bool):
+                if(valor):
+                    return self.float_to_bin16(1)
+                else:
+                    return self.float_to_bin16(0)
             else:
                 return "ERROR"  # Manejo de error en caso de tipo desconocido
         self.ui.BIN_A.setText(convertir_a_binario(arreglo[0]))
