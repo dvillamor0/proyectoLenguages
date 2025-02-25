@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         self.ui.input_button.setDisabled(True)
         self.memoria = Memoria(self.ui)
         self.ui.preprocesar_button.clicked.connect(self.Preprocesado)
+        
         self.ui.ensamblador_button.clicked.connect(self.Ensamblador)
         self.ui.Linker_button.clicked.connect(self.EnlazadorCargador)
         self.ui.Read_Next_Instruction.clicked.connect(self.LeerInstruccion)

@@ -4,30 +4,12 @@
 #include <string.h>
 #include <ctype.h> 
 #include <stdint.h>
-#include <stdarg.h>
 
 #define TRUE 1
 #define FALSE 0
 
-FILE *debug_file = NULL;
-
-void debug_print(const char *format, ...) {
-    if (debug_file == NULL) {
-        debug_file = fopen("assembler_debug.log", "w");
-    }
-    
-    if (debug_file != NULL) {
-        va_list args;
-        va_start(args, format);
-        vfprintf(debug_file, format, args);
-        va_end(args);
-        fprintf(debug_file, "\n");
-        fflush(debug_file);
-    }
-}
-
 void print_binary(int num) {
-    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20)
+    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
     
     // Imprimir los 21 bits
     for (int i = 0; i < 21; i++) {
@@ -104,7 +86,7 @@ char* GetBinarioCommand(const char *command, int esRegistro) {
     return binary;
 }
 
-char* GetBinarioRegistro(const char *reg) {
+char* GetBinarioRegistro(const char *reg){
     static char binary[3];
 
     if (reg[0] == 'R' && reg[1] >= '0' && reg[1] <= '3' && reg[2] == '\0') {
@@ -132,365 +114,271 @@ char* GetBinarioRegistro(const char *reg) {
     return binary;
 }
 
-// Extract hex value from [0xNNN] or [NNN] format and return in (N) format
-char* ExtractHexAddress(const char *addr) {
+char* GetRelativeDirection(const char *reg){
     static char result[20];
-    memset(result, 0, sizeof(result));
 
-    // Remove whitespace
-    char clean_addr[50] = {0};
-    int j = 0;
-    for (int i = 0; addr[i]; i++) {
-        if (!isspace(addr[i])) {
-            clean_addr[j++] = addr[i];
-        }
+    if (reg == NULL || strlen(reg) < 5) {
+        return "Formato Incorrecto Relative";
     }
-    clean_addr[j] = '\0';
-    
-    // Extract the number between brackets
-    char *start = strchr(clean_addr, '[');
-    char *end = strchr(clean_addr, ']');
-    
-    if (start && end && start < end) {
-        char hex_part[20] = {0};
-        int len = end - start - 1;
-        strncpy(hex_part, start + 1, len);
-        hex_part[len] = '\0';
-        
-        // Convert to decimal value
-        int value;
-        if (strncmp(hex_part, "0x", 2) == 0) {
-            // Handle 0x prefix
-            sscanf(hex_part + 2, "%x", &value);
-        } else {
-            // No prefix, assume hex
-            sscanf(hex_part, "%x", &value);
-        }
-        
-        sprintf(result, "(%d)", value);
+
+    size_t len = strlen(reg);
+
+    if (reg[0] == '[' && reg[len - 1] == ']' && strncmp(reg + 1, "0x", 2) == 0) {
+        char hexValue[10]; // Para almacenar el número hexadecimal
+        strncpy(hexValue, reg + 3, len - 4); // Extraer solo los dígitos hexadecimales
+        hexValue[len - 4] = '\0'; // Terminar la cadena
+
+        long decimalValue = strtol(hexValue, NULL, 16); // Convertir a decimal
+
+        snprintf(result, sizeof(result), "(%ld)", decimalValue);
         return result;
+    } else {
+        return "Formato Incorrecto Relative";
     }
-    
-    // Default if parsing fails
-    strcpy(result, "(0)");
-    return result;
 }
 
-char* CompletarCeros(const char *numero) {
-    static char resultado[33];
-    memset(resultado, 0, sizeof(resultado));
+char* ConcatenarDireccion(const char *numero, const char *direccion) {
+    static char resultado[32];
     int numero_len = strlen(numero);
-    int size_to_fill = 32 - numero_len;
-    
+    int size_to_fill = 32 - numero_len - 8;  // 32 menos el largo de numero y los 8 bits para la dirección
+    resultado[0] = '\0';
+    /*
     for (int i = 0; i < size_to_fill; i++) {
         strcat(resultado, "0");
     }
-    
+    */
+    strcat(resultado, direccion);
     return resultado;
 }
 
-// Process floating point numbers
-void process_float(const char *str) {
-    printf("00000000100");
-    binary_to_float_21_bits(str);
-    printf("\n");
+char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
+    static char result[32];
+    char limpio[32];
+
+    sscanf(reg, "%s", limpio);  // O usa otra opción de limpieza
+
+    int esRegistro = (limpio[0] == 'R') ? TRUE : FALSE;
+    if (esRegistro) {
+        strcpy(result, GetBinarioRegistro(limpio));
+    } else {
+        strcpy(result, ConcatenarDireccion(numero, GetRelativeDirection(limpio)));
+    }
+    return result;
 }
 
-// Process a full assembly instruction
-void process_instruction(const char *line) {
-    debug_print("Processing: %s", line);
-    
-    // Extract the command
-    char command[10] = {0};
-    char operands[100] = {0};
-    
-    sscanf(line, "%9s %99[^\n]", command, operands);
-    debug_print("Command: %s, Operands: %s", command, operands);
-    
-    // Arithmetic operations with 3 registers
-    if (strcmp(command, "ADD") == 0 || strcmp(command, "SUB") == 0 || 
-        strcmp(command, "MUL") == 0 || strcmp(command, "DIV") == 0 || 
-        strcmp(command, "AND") == 0 || strcmp(command, "OR") == 0 || 
-        strcmp(command, "NOR") == 0) {
-        
-        // Check if this is a 3-register operation
-        char reg1[5] = {0}, reg2[5] = {0}, reg3[5] = {0};
-        int count = sscanf(operands, "%4[^,], %4[^,], %4s", reg1, reg2, reg3);
-        
-        if (count == 3 && reg1[0] == 'R' && reg2[0] == 'R' && reg3[0] == 'R') {
-            // This is a 3-register arithmetic operation
-            debug_print("3-reg op: %s %s, %s, %s", command, reg1, reg2, reg3);
-            
-            // Generate 5-bit opcode
-            char *opcode = GetBinarioCommand(command, 0);
-            
-            // Generate register encodings
-            char *r1_code = GetBinarioRegistro(reg1);
-            char *r2_code = GetBinarioRegistro(reg2);
-            char *r3_code = GetBinarioRegistro(reg3);
-            
-            // Combine and pad
-            char binary[33] = {0};
-            sprintf(binary, "%s%s%s%s", opcode, r1_code, r2_code, r3_code);
-            strcat(binary, CompletarCeros(binary));
-            
-            printf("%s\n", binary);
-            return;
+int contieneParentesis(const char *str) {
+    while (*str != '\0') {  // Mientras no lleguemos al final de la cadena
+        if (*str == '(') {   // Si encontramos '('
+            return 1;         // Retornamos 1
         }
+        str++;  // Avanzamos al siguiente carácter
     }
-    
-    // Branch operations
-    if (strcmp(command, "BEQ") == 0 || strcmp(command, "BNE") == 0 || 
-        strcmp(command, "BLT") == 0 || strcmp(command, "JLE") == 0) {
-        
-        char reg1[5] = {0}, reg2[5] = {0}, addr[20] = {0};
-        int count = sscanf(operands, "%4[^,], %4[^,], %19s", reg1, reg2, addr);
-        
-        if (count == 3 && reg1[0] == 'R' && reg2[0] == 'R' && addr[0] == '[') {
-            debug_print("Branch: %s %s, %s, %s", command, reg1, reg2, addr);
-            
-            char *opcode = GetBinarioCommand(command, 0);
-            char *r1_code = GetBinarioRegistro(reg1);
-            char *r2_code = GetBinarioRegistro(reg2);
-            char *addr_str = ExtractHexAddress(addr);
-            
-            char binary[33] = {0};
-            sprintf(binary, "%s%s%s%s", opcode, r1_code, r2_code, addr_str);
-            
-            printf("%s\n", binary);
-            return;
-        }
+    return 0;  // Si no se encontró '('
+}
+
+char* CompletarCeros(const char *numero){
+    static char resultado[32];
+    int numero_len = strlen(numero);
+    int size_to_fill = 32 - numero_len;
+    resultado[0] = '\0';
+
+    for (int i = 0; i < size_to_fill; i++) {
+        strcat(resultado, "0");
     }
-    
-    // LOAD/STORE with register and memory
-    if (strcmp(command, "LOAD") == 0 || strcmp(command, "STORE") == 0) {
-        char op1[20] = {0}, op2[20] = {0};
-        int count = sscanf(operands, "%19[^,], %19s", op1, op2);
-        
-        if (count == 2) {
-            if (op1[0] == 'R' && op2[0] == '[') {
-                // Register to memory: LOAD/STORE Rx, [addr]
-                debug_print("%s reg,mem: %s, %s", command, op1, op2);
-                
-                char *opcode = GetBinarioCommand(command, 1); // Use special opcode for reg->mem
-                char *reg_code = GetBinarioRegistro(op1);
-                char *addr_str = ExtractHexAddress(op2);
-                
-                char binary[33] = {0};
-                sprintf(binary, "%s%s%s", opcode, reg_code, addr_str);
-                
-                printf("%s\n", binary);
-                return;
-            } else if (op1[0] == '[' && op2[0] == 'R') {
-                // Memory to register: LOAD/STORE [addr], Rx
-                debug_print("%s mem,reg: %s, %s", command, op1, op2);
-                
-                char *opcode = GetBinarioCommand(command, 0);
-                char *addr_str = ExtractHexAddress(op1);
-                char *reg_code = GetBinarioRegistro(op2);
-                
-                char binary[33] = {0};
-                sprintf(binary, "%s00%s%s", opcode, addr_str, reg_code);
-                
-                printf("%s\n", binary);
-                return;
-            }
-        }
+    return resultado;
+}
+
+void GenerarBinarioParams(const char *command, const char *reg1, const char *reg2, const char *reg3) {
+    //printf("Comando: %s\n", command);
+    int esRegistro2 = (reg2[0] == 'R') ? TRUE : FALSE;
+    char numero[32] = "";
+    strcat(numero,GetBinarioCommand(command, esRegistro2));
+    int esRegistro1 = (reg1[0] == 'R') ? TRUE : FALSE;
+    if(!esRegistro1){
+        strcat(numero,"000000");
     }
-    
-    // JUMP and CALL
-    if (strcmp(command, "JUMP") == 0 || strcmp(command, "CALL") == 0) {
-        if (operands[0] == '[') {
-            debug_print("%s to address: %s", command, operands);
-            
-            char *opcode = GetBinarioCommand(command, 0);
-            char *addr_str = ExtractHexAddress(operands);
-            
-            char binary[33] = {0};
-            sprintf(binary, "%s00%s", opcode, addr_str);
-            
-            printf("%s\n", binary);
-            return;
-        }
+    if (strcmp(reg1, "") != 0){
+        strcat(numero, GetBinarioSecondRegistro(reg1,numero));
     }
-    
-    // Single register instructions
-    if (strcmp(command, "NOT") == 0 || strcmp(command, "CLR") == 0 || 
-        strcmp(command, "PUSH") == 0 || strcmp(command, "POP") == 0 || 
-        strcmp(command, "IN") == 0 || strcmp(command, "OUT") == 0) {
-        
-        if (operands[0] == 'R') {
-            debug_print("Single reg op: %s %s", command, operands);
-            
-            char *opcode = GetBinarioCommand(command, 0);
-            char *reg_code = GetBinarioRegistro(operands);
-            
-            char binary[33] = {0};
-            sprintf(binary, "%s%s", opcode, reg_code);
-            strcat(binary, CompletarCeros(binary));
-            
-            printf("%s\n", binary);
-            return;
-        }
+    if(!esRegistro2 && esRegistro1){
+        strcat(numero,"0000");
     }
-    
-    // CMP instruction
-    if (strcmp(command, "CMP") == 0) {
-        char reg1[5] = {0}, reg2[5] = {0};
-        int count = sscanf(operands, "%4[^,], %4s", reg1, reg2);
-        
-        if (count == 2 && reg1[0] == 'R' && reg2[0] == 'R') {
-            debug_print("CMP: %s, %s", reg1, reg2);
-            
-            char *opcode = GetBinarioCommand(command, 0);
-            char *r1_code = GetBinarioRegistro(reg1);
-            char *r2_code = GetBinarioRegistro(reg2);
-            
-            char binary[33] = {0};
-            sprintf(binary, "%s%s%s", opcode, r1_code, r2_code);
-            strcat(binary, CompletarCeros(binary));
-            
-            printf("%s\n", binary);
-            return;
-        }
+    if (strcmp(reg2, "") != 0){
+        strcat(numero, GetBinarioSecondRegistro(reg2,numero));
     }
-    
-    // No-operand instructions
-    if (strcmp(command, "RET") == 0 || strcmp(command, "NOP") == 0 || 
-        strcmp(command, "HALT") == 0) {
-        
-        debug_print("No-op instruction: %s", command);
-        
-        char *opcode = GetBinarioCommand(command, 0);
-        
-        char binary[33] = {0};
-        strcpy(binary, opcode);
-        strcat(binary, CompletarCeros(binary));
-        
-        printf("%s\n", binary);
-        return;
+    int esRegistro3 = (reg3[0] == 'R') ? TRUE : FALSE;
+    if(!esRegistro3 && esRegistro1 && esRegistro2){
+        strcat(numero,"00");
     }
-    
-    // If we couldn't parse it, just print the original line
-    printf("%s\n", line);
+    if (strcmp(reg3, "") != 0){
+        strcat(numero, GetBinarioSecondRegistro(reg3,numero));
+    }
+    if(strlen(numero) < 32 && !contieneParentesis(numero)){
+        strcat(numero,CompletarCeros(numero));
+    }
+    printf("%s", numero);
+    printf("\n"); 
+}
+
+void printAscii(const char *str) {
+    printf("ASCII: ");
+    for (int i = 0; str[i] != '\0'; i++) {
+        printf("[%d]", str[i]);
+    }
+    printf("\n");
 }
 
 %}
 
 %option noyywrap
 
-WHITESPACE  [ \t\n\r]+
-FLOAT       [+-]?[0-9]+\.[0-9]+
-SINT        [+-][0-9]+
-UINT        [0-9]+
-BOOLEAN     TRUE|FALSE|true|false
-CHAR        [A-Za-z]
-INSTR       [A-Z][A-Z][A-Z][A-Z]?.*
+simbol      "+"|"-"
+delim       [ \t\n]+
+spaces      [" "]
+R_REGISTER  "R"[0-3]
+HEX_ADDRESS \[0x[0-9A-F]+\]
+digits       [0-9]+
+boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
 
 %%
 
-{FLOAT}     {
-    debug_print("Float: %s", yytext);
+(ADD|SUB|MUL|DIV|AND|OR|NOR){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{R_REGISTER}{spaces}* {
+    //printf("Reconocido 3 R : %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
+    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
+    
+    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
+        GenerarBinarioParams(command, reg1, reg2, reg3);
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(BEQ|BNE|BLT|JLE){spaces}+{R_REGISTER},{spaces}*{R_REGISTER},{spaces}*{HEX_ADDRESS}{spaces}* {
+    //printf("Reconocido 3 R : %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
+    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
+
+    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
+        GenerarBinarioParams(command, reg1, reg2, reg3);
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(LOAD|STORE|CMP){spaces}+({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}){spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+    char reg1[10], reg2[15];  // Para guardar los registros
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1, reg2) == 3) {
+        GenerarBinarioParams(command, reg1, reg2, "");
+    } else {
+        printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(JUMP|CALL){spaces}{HEX_ADDRESS}{spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+    char reg1[10];  // Para guardar los registros
+
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
+        GenerarBinarioParams(command, reg1, "", "");
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(IN){spaces}+{HEX_ADDRESS}{spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+    char reg1[10];  // Para guardar los registros
+
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
+        GenerarBinarioParams(command, reg1, "", "");
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(NOT|CLR|PUSH|POP|IN|OUT){spaces}+{R_REGISTER}{spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+    char reg1[10];  // Para guardar los registros
+
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
+        GenerarBinarioParams(command, reg1, "", "");
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+(RET|NOP|HALT){spaces}* {
+    //printf("Reconocido 1 R 1 H: %s\n", yytext);
+
+    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
+
+    if (sscanf(yytext, "%9s %[^,], %[^,]", command) == 1) {
+        GenerarBinarioParams(command, "", "", "");
+    } else {
+        //printf("Error al analizar la instrucción: %s\n", yytext);
+    }
+}
+
+{delim} { /* No action */ }
+{simbol}?{digits}+.{digits}+ {
     printf("00000000100");
     binary_to_float_21_bits(yytext);
     printf("\n");
 }
-
-{SINT}      {
-    debug_print("Signed int: %s", yytext);
+{simbol}{digits}+ {
     int value = atoi(yytext);
     printf("00000000011");
     print_binary_from_entero(value);
     printf("\n");
 }
-
-{UINT}      {
-    debug_print("Unsigned int: %s", yytext);
+{digits}+ {
     int value = atoi(yytext);
     printf("00000000010");
     print_binary(value);
     printf("\n");
 }
-
-{BOOLEAN}   {
-    debug_print("Boolean: %s", yytext);
-    if (strcasecmp(yytext, "TRUE") == 0) {
-        printf("00000000001000000000000000000001\n");
-    } else {
-        printf("00000000001000000000000000000000\n");
+{boolean} {
+    if (strcmp(yytext, "TRUE") == 0) {
+        printf("00000000001000000000000000000001");  // 20 ceros antes del 1
+        printf("\n");
+    }
+    // Si es FALSE, imprimir 20 ceros seguidos de 0
+    else if (strcmp(yytext, "FALSE") == 0) {
+        printf("00000000001000000000000000000000");  // 20 ceros antes del 0
+        printf("\n");
     }
 }
-
-{CHAR}      {
-    debug_print("Char: %s", yytext);
-    int value = (int)yytext[0];
+[A-Za-z] {
+    int value = atoi(yytext);
     printf("00000000101");
     print_binary(value);
     printf("\n");
 }
-
-^LOAD.*     |
-^STORE.*    |
-^ADD.*      |
-^SUB.*      |
-^MUL.*      |
-^DIV.*      |
-^AND.*      |
-^OR.*       |
-^NOR.*      |
-^NOT.*      |
-^BEQ.*      |
-^BNE.*      |
-^BLT.*      |
-^JLE.*      |
-^JUMP.*     |
-^CALL.*     |
-^RET.*      |
-^PUSH.*     |
-^POP.*      |
-^IN.*       |
-^OUT.*      |
-^CMP.*      |
-^CLR.*      |
-^NOP.*      |
-^HALT.*     {
-    process_instruction(yytext);
-}
-
-{WHITESPACE}    { /* ignore */ }
-
-.+      {
-    debug_print("Unknown: %s", yytext);
+.+ {
     printf("%s\n", yytext);
 }
-
 %%
 
-int main() {
-    FILE *infile = fopen("output.asm", "r");
-    if (!infile) {
-        perror("Error al abrir output.asm");
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Uso: %s <archivo_python>\n", argv[0]);
         return 1;
     }
 
-    // Create debug file
-    debug_file = fopen("assembler_debug.log", "w");
-    if (!debug_file) {
-        perror("Error al crear archivo de depuración");
-    }
-
-    // Redirect stdout to output.bin
-    if (freopen("output.bin", "w", stdout) == NULL) {
-        perror("Error al crear output.bin");
-        fclose(infile);
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("Error al abrir el archivo");
         return 1;
     }
 
-    yyin = infile;
+    yyin = file;
     yylex();
-    
-    fclose(infile);
-    fclose(stdout);
-    if (debug_file) fclose(debug_file);
+    fclose(file);
     return 0;
 }

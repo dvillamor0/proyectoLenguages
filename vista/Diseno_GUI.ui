@@ -949,7 +949,7 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="Compilar_button">
     <property name="geometry">
      <rect>
       <x>20</x>
