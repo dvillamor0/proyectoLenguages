@@ -13,7 +13,7 @@ import sys
 import struct
 import tempfile
 from assets.memoria import Memoria
-from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16
+from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16, int_to_bin16, float_to_bin16
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
              
     def getInput(self):
         valor = self.ui.Input.toPlainText()
-        self.guardar_en_registro(self.config_input["reg_input"], int(valor))
+        self.guardar_en_registro(self.config_input["reg_input"], float(valor))
         Llama_all = self.config_input['Exxecute_all']
         self.config_input = {"text": "", "reg_input": 0, "Exxecute_all": False}
         self.ui.Read_Next_Instruction.setDisabled(False)
@@ -135,16 +135,6 @@ class MainWindow(QMainWindow):
                 item.setBackground(QColor(255, 255, 255))  # Blanco
 
             self.ui.table_memoria.setItem(i, 0, item)
-       
-    def int_to_bin16(self,numero):
-        if numero < 0:
-            numero = (1 << 16) + numero  # Convierte a complemento a dos si es negativo
-        return format(numero & 0xFFFF, '016b')  # Asegura 16 bits
-
-    def float_to_bin16(self, value):
-        """Convierte un flotante en su representación IEEE 754 de 16 bits (half precision)."""
-        packed = struct.pack('>e', value)  # '>e' indica media precisión (16 bits)
-        return ''.join(f'{byte:08b}' for byte in packed)  # Convierte a binario
  
     def guardar_en_registro(self, indice, value):
         temp_reg = self.registro
@@ -164,16 +154,16 @@ class MainWindow(QMainWindow):
         def convertir_a_binario(valor):
             """Convierte un valor a binario según su tipo (int o float)."""
             if isinstance(valor, int):
-                return self.int_to_bin16(valor)
+                return int_to_bin16(valor)
             elif isinstance(valor, float):
-                return self.float_to_bin16(valor)
+                return float_to_bin16(valor)
             elif isinstance(valor, str):
-                    return self.float_to_bin16(bin(ord(valor))[2:].zfill(16))
+                    return float_to_bin16(bin(ord(valor))[2:].zfill(16))
             elif isinstance(valor, bool):
                 if(valor):
-                    return self.float_to_bin16(1)
+                    return int_to_bin16(1)
                 else:
-                    return self.float_to_bin16(0)
+                    return int_to_bin16(0)
             else:
                 return "ERROR"  # Manejo de error en caso de tipo desconocido
         self.ui.BIN_A.setText(convertir_a_binario(arreglo[0]))
@@ -184,22 +174,22 @@ class MainWindow(QMainWindow):
     def setCarry(self,caryy):
         self.carry = caryy
         self.ui.REG_Carry.setText(str(caryy))
-        self.ui.BIN_Carry.setText(self.int_to_bin16(caryy))
+        self.ui.BIN_Carry.setText(int_to_bin16(caryy))
       
     def setZero(self,zero):
         self.zero = zero
         self.ui.REG_Zero.setText(str(zero))
-        self.ui.BIN_Zero.setText(self.int_to_bin16(zero))
+        self.ui.BIN_Zero.setText(int_to_bin16(zero))
         
     def setNegative(self,negative):
         self.negative = negative
         self.ui.REG_Neg.setText(str(negativo))
-        self.ui.BIN_Neg.setText(self.int_to_bin16(negativo))
+        self.ui.BIN_Neg.setText(int_to_bin16(negativo))
         
     def setDesb(self,desbordamiento):
         self.desbordamiento = desbordamiento
         self.ui.REG_Desb.setText(str(desbordamiento))
-        self.ui.BIN_Desb.setText(self.int_to_bin16(desbordamiento))
+        self.ui.BIN_Desb.setText(int_to_bin16(desbordamiento))
     
     def resetBanderas(self):
         self.setCarry(0)
@@ -396,7 +386,9 @@ class MainWindow(QMainWindow):
       
     def STORE(self,instruccion):
         reg_origen = int(instruccion[:2], 2)
+        print("🚀 ~ reg_origen:", reg_origen)
         dir_destino = int(instruccion[2:], 2)
+        print("🚀 ~ dir_destino:", dir_destino)
         self.memoria.escribir_memoria(reg_origen,self.LeerDato(dir_destino))
         return 0
         
