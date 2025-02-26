@@ -1,13 +1,12 @@
 %{
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-// Función para imprimir un número en binario con exactamente 21 bits
+// Funcion para imprimir un numero en binario con exactamente 21 bits
 void print_binary(FILE* output, int num) {
-    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20)
+    unsigned int mask = 1 << 20; // Mascara para el bit mas significativo (bit 20)
     
     // Imprimir los 21 bits
     for (int i = 0; i < 21; i++) {
@@ -16,16 +15,16 @@ void print_binary(FILE* output, int num) {
         } else {
             fprintf(output, "0");
         }
-        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
+        mask >>= 1;  // Desplazar la mascara para el siguiente bit
     }
 }
 
-// Función para detectar si una línea contiene una dirección relativa
+// Funcion para detectar si una linea contiene una direccion relativa
 int contains_relative_address(const char* line) {
     return (strstr(line, "(") != NULL && strstr(line, ")") != NULL);
 }
 
-// Función para extraer el número entre paréntesis
+// Funcion para extraer el numero entre parentesis
 int extract_address(const char* line) {
     const char* start = strchr(line, '(');
     if (start == NULL) return 0;
@@ -33,7 +32,7 @@ int extract_address(const char* line) {
     const char* end = strchr(start, ')');
     if (end == NULL) return 0;
     
-    // Crear una subcadena para el número
+    // Crear una subcadena para el numero
     int len = end - start - 1;
     char num_str[32] = {0};
     strncpy(num_str, start + 1, len);
@@ -41,7 +40,7 @@ int extract_address(const char* line) {
     return atoi(num_str);
 }
 
-// Función para reemplazar la dirección relativa con la absoluta
+// Funcion para reemplazar la direccion relativa con la absoluta
 char* replace_address(const char* line, int rel_addr, int base_addr) {
     static char result[1024];
     const char* start = strchr(line, '(');
@@ -52,15 +51,15 @@ char* replace_address(const char* line, int rel_addr, int base_addr) {
         return result;
     }
     
-    // Calcular la dirección absoluta
+    // Calcular la direccion absoluta
     int abs_addr = base_addr + rel_addr;
     
-    // Copiar la parte antes del paréntesis
+    // Copiar la parte antes del parentesis
     int prefix_len = start - line;
     strncpy(result, line, prefix_len);
     result[prefix_len] = '\0';
     
-    // Añadir la dirección absoluta en binario
+    // Anadir la direccion absoluta en binario
     char binary[32] = {0};
     sprintf(binary, "");
     for (int i = 20; i >= 0; i--) {
@@ -70,13 +69,13 @@ char* replace_address(const char* line, int rel_addr, int base_addr) {
     
     strcat(result, binary);
     
-    // Añadir la parte después del paréntesis
+    // Anadir la parte despues del parentesis
     strcat(result, end + 1);
     
     return result;
 }
 
-int direccionInicial = 0;  // Dirección base para la relocalización
+int direccionInicial = 0;  // Direccion base para la relocalizacion
 
 %}
 
@@ -109,7 +108,7 @@ dir         \([0-9]+\)
 
 %%
 
-// Función principal que procesa el archivo de entrada y genera el archivo de salida
+// Funcion principal que procesa el archivo de entrada y genera el archivo de salida
 void process_file(const char* input_file, const char* output_file, int base_address) {
     FILE* in = fopen(input_file, "r");
     FILE* out = fopen(output_file, "w");
@@ -123,23 +122,23 @@ void process_file(const char* input_file, const char* output_file, int base_addr
     
     char line[1024];
     
-    // Establecer la dirección base
+    // Establecer la direccion base
     direccionInicial = base_address;
     
     while (fgets(line, sizeof(line), in)) {
-        // Eliminar el salto de línea final si existe
+        // Eliminar el salto de linea final si existe
         size_t len = strlen(line);
         if (len > 0 && line[len-1] == '\n') {
             line[len-1] = '\0';
         }
         
         if (contains_relative_address(line)) {
-            // Esta línea contiene una dirección relativa
+            // La linea contiene una direccion relativa
             int rel_addr = extract_address(line);
             char* new_line = replace_address(line, rel_addr, direccionInicial);
             fprintf(out, "%s\n", new_line);
         } else {
-            // Esta línea no contiene dirección relativa, copiarla tal cual
+            // La linea no contiene direccion relativa, copiarla tal cual
             fprintf(out, "%s\n", line);
         }
     }

@@ -1,20 +1,23 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+    // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
 
-#define MAX_BUFFER 1000
-char buffer[MAX_BUFFER];
-char lib_content[MAX_BUFFER];
-int import_active = 0;
+    // Definicion del tamaño maximo del buffer.
+    #define MAX_BUFFER 1000
+    char buffer[MAX_BUFFER];
+    char lib_content[MAX_BUFFER];
+    int import_active = 0;
 
-void process_import(const char* lib_name);
+    // Declaracion de la funcion que procesa la importacion de bibliotecas.
+    void process_import(const char* lib_name);
 %}
 
 %option noyywrap
 
 DIGIT    [0-9]
-NUMBER   {DIGIT}+("."{DIGIT}+)?
+NUMBER   {DIGIT}+("."{DIGIT}+)?  
 ID       [a-zA-Z][a-zA-Z0-9_]*
 WS       [ \t]
 NL       \r|\n|\r\n
@@ -52,6 +55,19 @@ COMMENT  #[^\r\n]*{NL}?
 
 %%
 
+/*
+ * Funcion: process_import
+ * -------------------------
+ * Lee el contenido de una biblioteca y lo imprime.
+ *
+ * Parametro:
+ *   lib_name - Nombre de la biblioteca sin la extension.
+ *
+ * Procedimiento:
+ *   - Construye el nombre del archivo agregando ".lib".
+ *   - Abre el archivo y, si se abre correctamente, lee su contenido.
+ *   - Imprime el contenido y cierra el archivo.
+ */
 void process_import(const char* lib_name) {
     FILE* lib_file;
     char filename[120];
@@ -74,14 +90,22 @@ void process_import(const char* lib_name) {
     fclose(lib_file);
 }
 
+/*
+ * Funcion: main
+ * ---------------
+ * Funcion principal del programa.
+ *
+ * Procedimiento:
+ *   - Verifica que se proporcione uno o dos argumentos.
+ *   - Abre el archivo de entrada y, si se especifica, redirige la salida a un archivo.
+ *   - Ejecuta el analizador lexico y cierra el archivo de entrada.
+ */
 int main(int argc, char** argv) {
-    // Require either one or two arguments.
     if (argc < 2 || argc > 3) {
         fprintf(stderr, "Usage: %s <input_file> [output_file]\n", argv[0]);
         return 1;
     }
     
-    // Open the input file.
     FILE* input = fopen(argv[1], "r");
     if (!input) {
         fprintf(stderr, "Error: Cannot open input file %s\n", argv[1]);
@@ -89,7 +113,6 @@ int main(int argc, char** argv) {
     }
     yyin = input;
     
-    // If an output file is provided, redirect stdout to it.
     if (argc == 3) {
         FILE* output = freopen(argv[2], "w", stdout);
         if (!output) {
@@ -98,7 +121,6 @@ int main(int argc, char** argv) {
         }
     }
     
-    // Run the lexer.
     yylex();
     
     fclose(yyin);

@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "analizador_sintactico.tab.h"
 
+// Declaracion externa de la tabla de simbolos
 extern struct {
     char *name;
     int type;
@@ -13,6 +14,7 @@ extern struct {
     } value;
 } symbol_table[];
 
+// Estructura para manejar los temporales y etiquetas en la generacion de codigo
 typedef struct {
     int next_temp;
     char **temp_names;
@@ -23,6 +25,9 @@ typedef struct {
 static TempManager *temp_mgr;
 static char *generate_code(Node *node, FILE *output);
 
+// Funcion: init_temp_manager
+// ---------------------------
+// Crea e inicializa el manejador de temporales con una capacidad inicial de 100.
 static TempManager *init_temp_manager() {
     TempManager *mgr = malloc(sizeof(TempManager));
     mgr->next_temp = 1;
@@ -32,6 +37,9 @@ static TempManager *init_temp_manager() {
     return mgr;
 }
 
+// Funcion: new_temp
+// -----------------
+// Genera un nuevo nombre de temporal. Si se alcanza la capacidad, la duplica.
 static char *new_temp() {
     if (temp_mgr->next_temp >= temp_mgr->capacity) {
         temp_mgr->capacity *= 2;
@@ -43,16 +51,26 @@ static char *new_temp() {
     return temp;
 }
 
+// Funcion: new_label
+// ------------------
+// Genera una nueva etiqueta.
 static char *new_label() {
     char *label = malloc(20);
     sprintf(label, "L%d", temp_mgr->next_label++);
     return label;
 }
 
+// Funcion: get_symbol_name
+// -------------------------
+// Retorna el nombre del simbolo a partir de su indice en la tabla.
 static char *get_symbol_name(int symbol_index) {
     return symbol_table[symbol_index].name;
 }
 
+// Funcion: process_binary_op
+// ---------------------------
+// Procesa una operacion binaria, genera el codigo intermedio y retorna el temporal
+// donde se almacena el resultado.
 static char *process_binary_op(Node *node, FILE *output) {
     char *left = generate_code(node->left, output);
     char *right = generate_code(node->right, output);
@@ -114,6 +132,10 @@ static char *process_binary_op(Node *node, FILE *output) {
     return temp;
 }
 
+// Funcion: process_function_def
+// -------------------------------
+// Procesa la definicion de una funcion, genera el codigo para sus parametros
+// y su cuerpo, e imprime las etiquetas de inicio y fin.
 static void process_function_def(Node *node, FILE *output) {
     fprintf(output, "begin_func %s\n", get_symbol_name(node->symbol_index));
     
@@ -132,6 +154,10 @@ static void process_function_def(Node *node, FILE *output) {
     fprintf(output, "end_func\n\n");
 }
 
+// Funcion: process_if_statement
+// ------------------------------
+// Procesa una sentencia if. Genera el codigo para evaluar la condicion,
+// y para el bloque verdadero y falso usando etiquetas.
 static void process_if_statement(Node *node, FILE *output) {
     char *condition = generate_code(node->left, output);
     char *label_else = new_label();
@@ -148,6 +174,10 @@ static void process_if_statement(Node *node, FILE *output) {
     fprintf(output, "%s:\n", label_end);
 }
 
+// Funcion: process_while_statement
+// -------------------------------
+// Procesa una sentencia while. Genera etiquetas para el inicio y fin
+// del bucle, y el codigo de la condicion y del cuerpo.
 static void process_while_statement(Node *node, FILE *output) {
     char *label_start = new_label();
     char *label_end = new_label();
@@ -164,6 +194,10 @@ static void process_while_statement(Node *node, FILE *output) {
     fprintf(output, "%s:\n", label_end);
 }
 
+// Funcion: process_function_call
+// -------------------------------
+// Procesa una llamada a funcion. Genera el codigo para cada argumento,
+// invoca la funcion y retorna el temporal con el resultado.
 static char *process_function_call(Node *node, FILE *output) {
     Node *arg = node->right;
     int arg_count = 0;
@@ -182,6 +216,11 @@ static char *process_function_call(Node *node, FILE *output) {
     return temp;
 }
 
+// Funcion: generate_code
+// -----------------------
+// Genera el codigo intermedio de forma recursiva para el AST.
+// Dependiendo del tipo de nodo, se invocan diferentes funciones
+// para procesar la operacion correspondiente.
 static char *generate_code(Node *node, FILE *output) {
     if (!node) return NULL;
     
@@ -250,6 +289,10 @@ static char *generate_code(Node *node, FILE *output) {
     return result;
 }
 
+// Funcion: generate_intermediate_code
+// -------------------------------------
+// Genera el codigo intermedio a partir del AST y lo escribe en el archivo de salida.
+// Inicializa el manejador de temporales, procesa el AST y libera los recursos.
 void generate_intermediate_code(Node *ast, const char *output_file) {
     if (!ast) return;
     

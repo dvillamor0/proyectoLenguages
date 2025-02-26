@@ -1,43 +1,49 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "analizador_sintactico.tab.h"
+    // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    // Inclusión del header generado por el analizador sintactico.
+    #include "analizador_sintactico.tab.h"
 
-#define MAX_SYMBOLS 1000
+    // Definicion del maximo de simbolos en la tabla.
+    #define MAX_SYMBOLS 1000
 
-#define SYMTAB_IDENTIFIER 1
-#define SYMTAB_NUMBER 2
+    // Constantes para identificar el tipo de simbolo.
+    #define SYMTAB_IDENTIFIER 1
+    #define SYMTAB_NUMBER 2
 
-typedef struct {
-    char *name;
-    int type;
-    union {
-        double number_value;
-        char *string_value;
-    } value;
-} SymbolEntry;
+    // Estructura que representa una entrada en la tabla de simbolos.
+    typedef struct {
+        char *name;   // Nombre del simbolo.
+        int type;     // Tipo de simbolo (identificador o numero).
+        union {
+            double number_value;  // Valor numerico (para numeros).
+            char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
+        } value;
+    } SymbolEntry;
 
-SymbolEntry symbol_table[MAX_SYMBOLS];
-int symbol_count = 0;
+    // Declaracion de la tabla de simbolos y contador de entradas.
+    SymbolEntry symbol_table[MAX_SYMBOLS];
+    int symbol_count = 0;
 
-int install_id(char *lexeme);
-int install_num(char *lexeme);
+    // Declaracion de las funciones para instalar identificadores y numeros.
+    int install_id(char *lexeme);
+    int install_num(char *lexeme);
 %}
 
 %option noyywrap
 %option yylineno
 
-/* Regular definitions */
+/* Definiciones de expresiones regulares */
 DIGIT       [0-9]
 LETTER      [a-zA-Z]
 ID          {LETTER}({LETTER}|{DIGIT})*
-NUMBER      {DIGIT}+(\.{DIGIT}+)?([Ee][+-]?{DIGIT}+)?
+NUMBER      {DIGIT}+(\.{DIGIT}+)?([Ee][+-]?{DIGIT}+)?  
 WHITESPACE  [ \t\n\r]+
 COMMENT     #[^\n]*\n
 
 %%
-
 {WHITESPACE}    { /* Skip whitespace */ }
 {COMMENT}       { /* Skip comments */ }
 
@@ -71,9 +77,24 @@ COMMENT     #[^\n]*\n
 {NUMBER}    { yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
 
 .           { printf("Lexical Error: Unexpected character %s\n", yytext); }
-
 %%
 
+/*
+ * Funcion: install_id
+ * ---------------------
+ * Instala un identificador en la tabla de simbolos.
+ *
+ * Parametro:
+ *   lexeme - Cadena que representa el identificador.
+ *
+ * Retorna:
+ *   Indice del simbolo en la tabla.
+ *
+ * Procedimiento:
+ *   - Verifica si la tabla esta llena.
+ *   - Busca si el identificador ya existe.
+ *   - Si no existe, lo agrega y aumenta el contador.
+ */
 int install_id(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
         fprintf(stderr, "Symbol table full\n");
@@ -92,6 +113,22 @@ int install_id(char *lexeme) {
     return symbol_count++;
 }
 
+/*
+ * Funcion: install_num
+ * ----------------------
+ * Instala un numero en la tabla de simbolos.
+ *
+ * Parametro:
+ *   lexeme - Cadena que representa el numero.
+ *
+ * Retorna:
+ *   Indice del simbolo en la tabla.
+ *
+ * Procedimiento:
+ *   - Verifica si la tabla esta llena.
+ *   - Agrega el numero, convirtiendo la cadena a valor numerico.
+ *   - Aumenta el contador y retorna el indice.
+ */
 int install_num(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
         fprintf(stderr, "Symbol table full\n");
@@ -103,4 +140,3 @@ int install_num(char *lexeme) {
     symbol_table[symbol_count].value.number_value = atof(lexeme);
     return symbol_count++;
 }
-
