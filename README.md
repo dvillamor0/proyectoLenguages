@@ -105,3 +105,7 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    - El archivo `Diseño_GUI.ui` contiene el diseño visual de la interfaz que se puede modificar utilizando un editor visual compatible.
 
 ---
+## Gramaticas
+
+<iframe src="/DiagramasGLC/Diagramas_svg.html"></iframe>
+<iframe src="/DiagramasGLC/proyectBigraphDiagram.html"></iframe>

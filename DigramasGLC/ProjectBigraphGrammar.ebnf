@@ -1,0 +1,20 @@
+bg_2_node ::= '(' elementoArreglo ',' elementoArreglo')' // 2 nodos como operandos
+
+//nodos
+bg_vertice ::= identifier ':nod(' elementoArreglo ')' // añade un vertice al bigrafo
+           |   identifier ':nod' bg_2_node //intercambia nodo 1 por nodo 2
+           |   identifier ':rnod(' elementoArreglo ')' //borra un nodo
+
+//enlace
+bg_enlace ::= identifier ':enl' bg_2_node //añadir arista grafo enlace
+           |  identifier ':enl(' identifier ',' identifier ')' //compocicion entre B_1 B_2 resulta en id
+           |  identifier ':renl' bg_2_node // borrar arista entre 2 nodos
+           
+//ctl
+bg_ctl ::= identifier ':tip(' string ',' elementoArreglo ')'
+
+//parentesco
+bg_parent ::= identifier ':hij'bg_2_node //añadir arista grafo ubicacion
+
+//link
+bg_exit ::= identifier ':lnk(' elementoArreglo ',' nat ')' //conexiones de salida del bigrafo <m,Y>
