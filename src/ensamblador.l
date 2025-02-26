@@ -9,6 +9,17 @@
 #define TRUE 1
 #define FALSE 0
 
+void binary_from_char(const char *c) {
+    unsigned short utf16 = (unsigned char)c[0]; 
+
+    printf("00000");  
+
+    for (int i = 15; i >= 0; i--) {
+        printf("%d", (utf16 >> i) & 1);
+    }
+    printf("\n");
+}
+
 void print_binary(int num) {
     unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
     
@@ -278,7 +289,7 @@ spaces      [" "]
 R_REGISTER  "R"[0-3]
 HEX_ADDRESS \[0x[0-9A-F]+\]
 digits       [0-9]+
-boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
+boolean     (F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e)
 
 %%
 
@@ -395,13 +406,63 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
     }
 }
 [A-Za-z] {
-    int value = atoi(yytext);
     printf("00000000101");
-    print_binary(value);
+    binary_from_char(yytext);
     printf("\n");
 }
+\[((({simbol}?{digits}+.{digits}+)|({simbol}{digits}+)|{digits}+|{boolean}|'[A-Za-z]')(,)?)+\] {
+    printf("00000000110");
+
+    char array_content[strlen(yytext) - 1];
+    strncpy(array_content, yytext + 1, strlen(yytext) - 2);
+    array_content[strlen(yytext) - 2] = '\0';
+
+    int count = 0;
+    char copy[strlen(array_content) + 1];  // Copia para contar tokens
+    strcpy(copy, array_content);
+
+    char *temp_token = strtok(copy, ",");
+    while (temp_token != NULL) {
+        count++;
+        temp_token = strtok(NULL, ",");
+    }
+
+    print_binary(count);
+    printf("\n");
+
+    char *token = strtok(array_content, ",");
+
+    while (token != NULL) {
+        // Determinar si es entero o flotante
+        if (strchr(token, '.') != NULL) {
+            printf("00000000100");
+            binary_from_float_21_bits(token);
+            printf("\n");
+        } else if (strcasecmp(token, "TRUE") == 0) {
+            printf("00000000001000000000000000000001\n");  // 32 bits con 1 al final
+        } else if (strcasecmp(token, "FALSE") == 0) {
+            printf("00000000001000000000000000000000\n");  // 32 bits con 0 al final
+        } else if (token[0] == '\'' && token[1] != '\0' && token[2] == '\'' && token[3] == '\0') {
+            char character = token[1];  // Extraer el carácter
+            printf("00000000101");  
+            print_binary(character);  // Convierte el carácter a binario
+            printf("\n");
+        } else if (token[0] == '+' || token[0] == '-'){
+            int value = atoi(token);
+            printf("00000000011");
+            print_binary_from_entero(value);
+            printf("\n");
+        } else {
+            int value = atoi(token);
+            printf("00000000010");
+            print_binary(value);
+            printf("\n");
+        }
+        token = strtok(NULL, ",");
+    }
+}
 .+ {
-    printf("%s\n", yytext);
+    printf("[Error ensamblador ]%s\n", yytext);
 }
 %%
 
