@@ -1,94 +1,113 @@
 def tac_to_assembly(tac_file):
     """
-    Convert a TAC (Three-Address Code) file to assembly code for the custom CPU.
+    Convierte un archivo TAC (Three-Address Code) a código ensamblador para la CPU personalizada.
     
     Args:
-        tac_file (str): Path to the TAC file
+        tac_file (str): Ruta al archivo TAC
         
     Returns:
-        list: List of assembly instructions
+        tuple: (data_section, code_section) conteniendo listas de datos y instrucciones en ensamblador
     """
-    # Read the TAC file
+    # Leer el archivo TAC
     with open(tac_file, 'r') as f:
         tac_lines = f.readlines()
     
-    # Remove leading/trailing whitespace and empty lines
+    # Eliminar espacios en blanco al inicio/final y líneas vacías
     tac_lines = [line.strip() for line in tac_lines if line.strip()]
     
-    # Initialize data structures
-    assembly = []          # The final assembly code
-    temp_vars = {}         # Maps temporary variables to registers
-    variables = {}         # Maps program variables to memory addresses
-    memory_values = {}     # Tracks actual values at memory locations
-    label_positions = {}   # Maps labels to positions in the TAC
-    label_to_asm = {}      # Maps labels to positions in the assembly
+    # Inicializar estructuras de datos
+    data_section = []      # Valores de inicialización de memoria
+    code_section = []      # Instrucciones de ensamblador
+    temp_vars = {}         # Mapea variables temporales a registros
+    variables = {}         # Mapea variables del programa a direcciones de memoria
+    memory_values = {}     # Rastrea valores actuales en ubicaciones de memoria
+    label_positions = {}   # Mapea etiquetas a posiciones en el TAC
+    label_to_asm = {}      # Mapea etiquetas a posiciones en el ensamblador
     
-    # Initialize standard constants
-    assembly.append("0")   # Address 0: Constant 0
-    assembly.append("1")   # Address 1: Constant 1
-    assembly.append("2")   # Address 2: Constant 2
+    # Inicializar constantes estándar
+    data_section.append("0")   # Dirección 0: Constante 0
     memory_values[0] = "0"
-    memory_values[1] = "1" 
-    memory_values[2] = "2"
     
-    # Memory allocation starts at address 3
-    next_addr = 3
+    # Primera pasada: identificar todas las variables y asignar direcciones de memoria
+    next_addr = 1
     
-    # First pass: identify all variables and assign memory addresses
     for i, line in enumerate(tac_lines):
         if line.startswith('L') and ':' in line:
-            # It's a label (L1:, L2:, etc.)
+            # Es una etiqueta (L1:, L2:, etc.)
             label = line.split(':')[0]
             label_positions[label] = i
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
-            # Variable assignment
+            # Asignación de variable
             target = line.split('=', 1)[0].strip()
             expr = line.split('=', 1)[1].strip()
             
-            # Add non-temporary variables to our mapping
-            if not target.startswith('t') and target not in variables:
+            # Agregar variables no temporales a nuestro mapeo
+            if target not in variables:
                 variables[target] = next_addr
                 next_addr += 1
             
-            # If it's a numeric constant, add it to our constants
+            # Si es una constante numérica, agregarla a nuestras constantes
             if expr.replace('.', '', 1).isdigit() and expr not in memory_values.values():
                 memory_values[next_addr] = expr
-                assembly.append(expr)
+                data_section.append(expr)
                 next_addr += 1
     
-    # Debug: Print variable mapping
-    print("# Variables and their memory addresses:")
+    # Agregar constantes requeridas
+    if "2" not in memory_values.values():
+        memory_values[next_addr] = "2"
+        data_section.append("2")
+        next_addr += 1
+    
+    # También encontrar todas las variables usadas en las declaraciones de retorno
+    for line in tac_lines:
+        if line.startswith('return'):
+            return_var = line.split()[1]
+            if return_var not in variables:
+                variables[return_var] = next_addr
+                next_addr += 1
+    
+    # Depuración: Imprimir mapeo de variables
+    print("# Variables y sus direcciones de memoria:")
     for var, addr in variables.items():
-        print(f"# {var}: address {addr}")
+        print(f"# {var}: dirección {addr}")
     
-    # Second pass: Add initial values to memory
-    for var_addr in range(3, next_addr):
+    # Segunda pasada: Agregar valores iniciales a la memoria
+    for var_addr in range(1, next_addr):
         if var_addr not in memory_values:
-            # This is a variable that doesn't have an initial value yet
-            # We'll fill it with zeros for now
-            assembly.append("0.0")  # Default value
+            # Esta es una variable que aún no tiene un valor inicial
+            # La llenaremos con ceros por ahora
+            data_section.append("0")  # Valor predeterminado
     
-    # Third pass: Generate assembly code
-    asm_position = len(assembly)  # Start after constants and initial values
+    # Tercera pasada: Generar código ensamblador
+    asm_position = 0  # Iniciar posición de código desde 0, separada de la sección de datos
     
     for i, line in enumerate(tac_lines):
-        # Skip function declarations and endings
-        if line.startswith('begin_func') or line.startswith('end_func'):
+        # Saltar declaraciones de función y finalizaciones
+        if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
             
-        # Record label positions in assembly
+        # Registrar posiciones de etiqueta en ensamblador
         if line.startswith('L') and ':' in line:
             label = line.split(':')[0]
             label_to_asm[label] = asm_position
             continue
         
-        # Handle variable assignments (var = something)
+        # Manejar asignaciones de variables (var = algo)
         if '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             target, expr = [part.strip() for part in line.split('=', 1)]
             
-            # Handle different types of expressions
-            if expr.replace('.', '', 1).isdigit():  # It's a numeric constant
-                # Find where the constant is stored
+            # Asegurar que el objetivo tenga una dirección
+            if target not in variables:
+                variables[target] = next_addr
+                data_section.append("0")  # Agregar valor predeterminado a la memoria
+                next_addr += 1
+                
+            # Encontrar dirección del objetivo
+            target_addr = variables.get(target)
+            
+            # Manejar diferentes tipos de expresiones
+            if expr.replace('.', '', 1).isdigit():  # Es una constante numérica
+                # Encontrar dónde se almacena la constante
                 const_addr = None
                 for addr, val in memory_values.items():
                     if val == expr:
@@ -96,279 +115,362 @@ def tac_to_assembly(tac_file):
                         break
                 
                 if const_addr is None:
-                    # Add the constant to memory
+                    # Agregar la constante a la memoria
                     const_addr = next_addr
                     memory_values[next_addr] = expr
-                    assembly.append(expr)
+                    data_section.append(expr)
                     next_addr += 1
-                    asm_position += 1
                 
-                # Load the constant into a register
-                r0 = 0  # Use R0 for constants
-                assembly.append(f"LOAD R{r0}, [{const_addr}]")
+                # Cargar la constante en R0 y almacenar en la dirección objetivo
+                code_section.append(f"LOAD R0, [0x{const_addr:X}]")
                 asm_position += 1
-                
-                # If it's a program variable, store it
-                if not target.startswith('t'):
-                    target_addr = variables[target]
-                    assembly.append(f"STORE R{r0}, [{target_addr}]")
-                    asm_position += 1
-                
-                # Keep track of which register has the value
-                temp_vars[target] = r0
+                code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                asm_position += 1
             
-            elif '!=' in expr:  # Not equal comparison
+            elif '!=' in expr:  # Comparación de desigualdad
                 operands = expr.split('!=')
                 left = operands[0].strip()
                 right = operands[1].strip()
                 
-                # Load the left operand
-                r0 = 0
-                if left in variables:
-                    left_addr = variables[left]
-                    assembly.append(f"LOAD R{r0}, [{left_addr}]")
-                    asm_position += 1
-                elif left in temp_vars:
-                    r0 = temp_vars[left]
+                # Asegurar que los operandos tengan direcciones
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")  # Agregar valor predeterminado a la memoria
+                        next_addr += 1
                 
-                # Load the right operand
-                r1 = 1
-                if right in variables:
-                    right_addr = variables[right]
-                    assembly.append(f"LOAD R{r1}, [{right_addr}]")
-                    asm_position += 1
-                elif right in temp_vars:
-                    r1 = temp_vars[right]
+                # Encontrar direcciones para operandos izquierdo y derecho
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
                 
-                # Compare the values
-                assembly.append(f"CMP R{r0}, R{r1}")
+                # Cargar operando izquierdo en R0
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 
-                # The result of != is the opposite of equality
-                # Store 1 in a register to indicate they're not equal
-                # This will be used with BEQ in the ifz instruction
-                r2 = 2
-                assembly.append(f"BNE R{r0}, R{r1}, [SKIP1]")
+                # Cargar operando derecho en R1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
                 
-                # If we get here, they were equal (result = 0)
-                assembly.append(f"LOAD R{r2}, [0]")  # Load 0 (false)
-                asm_position += 1
-                assembly.append(f"JUMP [SKIP2]")
+                # Comparar los valores
+                code_section.append(f"CMP R0, R1")
                 asm_position += 1
                 
-                # SKIP1: They were not equal (result = 1)
-                label_to_asm["SKIP1"] = asm_position
-                assembly.append(f"LOAD R{r2}, [1]")  # Load 1 (true)
+                # Almacenar el resultado
+                code_section.append(f"STORE R0, [0x{target_addr:X}]")  
                 asm_position += 1
-                
-                # SKIP2: Continue with the next instruction
-                label_to_asm["SKIP2"] = asm_position
-                
-                # The comparison result is in r2
-                temp_vars[target] = r2
             
-            elif '/' in expr:  # Division operation
+            elif '/' in expr:  # Operación de división
                 operands = expr.split('/')
                 left = operands[0].strip()
                 right = operands[1].strip()
                 
-                # Load the left operand
-                r0 = 0
-                if left in variables:
-                    left_addr = variables[left]
-                    assembly.append(f"LOAD R{r0}, [{left_addr}]")
-                    asm_position += 1
-                elif left in temp_vars:
-                    r0 = temp_vars[left]
+                # Asegurar que los operandos tengan direcciones
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")  # Agregar valor predeterminado a la memoria
+                        next_addr += 1
                 
-                # Load the right operand
-                r1 = 1
+                # Encontrar direcciones para operandos izquierdo y derecho
+                left_addr = variables.get(left)
+                
+                # Manejar operando derecho - podría ser una variable o una constante
+                right_addr = None
                 if right in variables:
                     right_addr = variables[right]
-                    assembly.append(f"LOAD R{r1}, [{right_addr}]")
-                    asm_position += 1
-                elif right in temp_vars:
-                    r1 = temp_vars[right]
-                elif right == "2":  # Special case for division by 2
-                    assembly.append(f"LOAD R{r1}, [2]")  # Load constant 2
+                else:
+                    # Verificar si es una constante
+                    for addr, val in memory_values.items():
+                        if val == right:
+                            right_addr = addr
+                            break
+                    
+                    # Si aún no se encuentra, agregarla
+                    if right_addr is None and right.replace('.', '', 1).isdigit():
+                        right_addr = next_addr
+                        memory_values[next_addr] = right
+                        data_section.append(right)
+                        next_addr += 1
+                
+                # Cargar operandos
+                if left_addr is not None:
+                    code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                     asm_position += 1
                 
-                # Perform the division
-                r2 = 2  # Result goes in R2
-                assembly.append(f"DIV R{r2}, R{r0}, R{r1}")
+                if right_addr is not None:
+                    code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                    asm_position += 1
+                
+                # Realizar división
+                code_section.append(f"DIV R2, R0, R1")
                 asm_position += 1
                 
-                # If it's a program variable, store the result
-                if not target.startswith('t'):
-                    target_addr = variables[target]
-                    assembly.append(f"STORE R{r2}, [{target_addr}]")
-                    asm_position += 1
-                
-                # Keep track of which register has the value
-                temp_vars[target] = r2
+                # Almacenar resultado
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
             
-            elif '+' in expr:  # Addition operation
+            elif '+' in expr:  # Operación de suma
                 operands = expr.split('+')
                 left = operands[0].strip()
                 right = operands[1].strip()
                 
-                # Load the left operand
-                r0 = 0
-                if left in variables:
-                    left_addr = variables[left]
-                    assembly.append(f"LOAD R{r0}, [{left_addr}]")
-                    asm_position += 1
-                elif left in temp_vars:
-                    r0 = temp_vars[left]
+                # Asegurar que los operandos tengan direcciones
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")  # Agregar valor predeterminado a la memoria
+                        next_addr += 1
                 
-                # Load the right operand
-                r1 = 1
-                if right in variables:
-                    right_addr = variables[right]
-                    assembly.append(f"LOAD R{r1}, [{right_addr}]")
-                    asm_position += 1
-                elif right in temp_vars:
-                    r1 = temp_vars[right]
+                # Encontrar direcciones para operandos izquierdo y derecho
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
                 
-                # Perform the addition
-                r3 = 3  # Result goes in R3
-                assembly.append(f"ADD R{r3}, R{r0}, R{r1}")
+                # Cargar operando izquierdo en R0
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 
-                # If it's a program variable, store the result
-                if not target.startswith('t'):
-                    target_addr = variables[target]
-                    assembly.append(f"STORE R{r3}, [{target_addr}]")
-                    asm_position += 1
+                # Cargar operando derecho en R1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
                 
-                # Keep track of which register has the value
-                temp_vars[target] = r3
+                # Realizar la suma
+                code_section.append(f"ADD R3, R0, R1")
+                asm_position += 1
+                
+                # Almacenar el resultado
+                code_section.append(f"STORE R3, [0x{target_addr:X}]")
+                asm_position += 1
             
-            else:  # Simple variable assignment (target = var)
-                # Find the value we're assigning from
-                src_reg = None
-                if expr in variables:
-                    src_addr = variables[expr]
-                    r0 = 0
-                    assembly.append(f"LOAD R{r0}, [{src_addr}]")
-                    asm_position += 1
-                    src_reg = r0
-                elif expr in temp_vars:
-                    src_reg = temp_vars[expr]
+            elif '*' in expr:  # Operación de multiplicación
+                operands = expr.split('*')
+                left = operands[0].strip()
+                right = operands[1].strip()
                 
-                # If it's a program variable, store the value
-                if not target.startswith('t') and src_reg is not None:
-                    target_addr = variables[target]
-                    assembly.append(f"STORE R{src_reg}, [{target_addr}]")
-                    asm_position += 1
+                # Asegurar que los operandos tengan direcciones
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")  # Agregar valor predeterminado a la memoria
+                        next_addr += 1
                 
-                # Keep track of which register has the value
-                if src_reg is not None:
-                    temp_vars[target] = src_reg
+                # Encontrar direcciones para operandos izquierdo y derecho
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                
+                # Cargar operando izquierdo en R0
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                
+                # Cargar operando derecho en R1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                
+                # Realizar la multiplicación
+                code_section.append(f"MUL R3, R0, R1")
+                asm_position += 1
+                
+                # Almacenar el resultado
+                code_section.append(f"STORE R3, [0x{target_addr:X}]")
+                asm_position += 1
+            
+            elif '<' in expr:  # Comparación menor que
+                operands = expr.split('<')
+                left = operands[0].strip()
+                right = operands[1].strip()
+                
+                # Asegurar que los operandos tengan direcciones
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")  # Agregar valor predeterminado a la memoria
+                        next_addr += 1
+                
+                # Encontrar direcciones para operandos izquierdo y derecho
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                
+                # Cargar operando izquierdo en R0
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                
+                # Cargar operando derecho en R1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                
+                # Comparar los valores
+                code_section.append(f"CMP R0, R1")
+                asm_position += 1
+                
+                # Almacenar el resultado
+                code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                asm_position += 1
+            
+            else:  # Asignación simple de variable (target = var)
+                # Asegurar que la variable fuente tenga una dirección
+                if expr not in variables and not expr.replace('.', '', 1).isdigit():
+                    variables[expr] = next_addr
+                    data_section.append("0")  # Agregar valor predeterminado a la memoria
+                    next_addr += 1
+                
+                # Encontrar la dirección de origen
+                src_addr = variables.get(expr)
+                
+                if src_addr is not None:
+                    # Cargar desde dirección de origen a R0
+                    code_section.append(f"LOAD R0, [0x{src_addr:X}]")
+                    asm_position += 1
+                    
+                    # Almacenar desde R0 a dirección objetivo
+                    code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                    asm_position += 1
+                elif expr.replace('.', '', 1).isdigit():
+                    # Es una constante que aún no estaba en la memoria
+                    const_addr = next_addr
+                    memory_values[next_addr] = expr
+                    data_section.append(expr)
+                    next_addr += 1
+                    
+                    # Cargar y almacenar
+                    code_section.append(f"LOAD R0, [0x{const_addr:X}]")
+                    asm_position += 1
+                    code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                    asm_position += 1
+                else:
+                    # La fuente no es una variable que conocemos
+                    # Podría ser una llamada a función u otra expresión
+                    # Manejémosla genéricamente con un comentario
+                    code_section.append(f"# Asignación desconocida: {target} = {expr}")
+                    asm_position += 1
         
-        # Handle conditional jumps (ifz t1 goto L2)
+        # Manejar saltos condicionales (ifz t1 goto L2)
         elif line.startswith('ifz'):
             parts = line.split()
             condition_var = parts[1]
             goto_label = parts[3]
             
-            # The condition should already be in a register from a previous comparison
-            condition_reg = None
-            if condition_var in temp_vars:
-                condition_reg = temp_vars[condition_var]
+            # Asegurar que la variable de condición tenga una dirección
+            if condition_var not in variables:
+                variables[condition_var] = next_addr
+                data_section.append("0")  # Agregar valor predeterminado a la memoria
+                next_addr += 1
             
-            # If it's not, we need to load it
-            if condition_reg is None:
-                r0 = 0
-                if condition_var in variables:
-                    condition_addr = variables[condition_var]
-                    assembly.append(f"LOAD R{r0}, [{condition_addr}]")
-                    asm_position += 1
-                    condition_reg = r0
+            # Encontrar dirección para la variable de condición
+            condition_addr = variables.get(condition_var)
             
-            # Load 0 for comparison (since ifz means "if zero")
-            r1 = 1
-            assembly.append(f"LOAD R{r1}, [0]")
+            # Cargar condición en R0
+            code_section.append(f"LOAD R0, [0x{condition_addr:X}]")
             asm_position += 1
             
-            # Add the branch instruction with a placeholder for the target
+            # Cargar 0 para comparación
+            code_section.append(f"LOAD R1, [0x0]")
+            asm_position += 1
+            
+            # Comparar los valores
+            code_section.append(f"CMP R0, R1")
+            asm_position += 1
+            
+            # BEQ significa "branch if equal" - usado para ifz (si es cero)
             if goto_label in label_to_asm:
-                target_addr = label_to_asm[goto_label]
-                assembly.append(f"BEQ R{condition_reg}, R{r1}, [{target_addr:X}]")
+                code_section.append(f"BEQ R0, R1, [0x{label_to_asm[goto_label]:X}]")
             else:
-                assembly.append(f"BEQ R{condition_reg}, R{r1}, [PLACEHOLDER_{goto_label}]")
+                # Almacenar la etiqueta para resolución posterior
+                code_section.append(f"BEQ R0, R1, [{goto_label}]")
             asm_position += 1
         
-        # Handle unconditional jumps (goto L1)
+        # Manejar saltos incondicionales (goto L1)
         elif line.startswith('goto'):
             goto_label = line.split()[1]
             
-            # Add the jump instruction with a placeholder for the target
+            # Agregar la instrucción de salto
             if goto_label in label_to_asm:
-                target_addr = label_to_asm[goto_label]
-                assembly.append(f"JUMP [{target_addr:X}]")
+                code_section.append(f"JUMP [0x{label_to_asm[goto_label]:X}]")
             else:
-                assembly.append(f"JUMP [PLACEHOLDER_{goto_label}]")
+                # Almacenar la etiqueta para resolución posterior
+                code_section.append(f"JUMP [{goto_label}]")
             asm_position += 1
         
-        # Handle return statements
+        # Manejar declaraciones de retorno
         elif line.startswith('return'):
             return_var = line.split()[1]
             
-            # Load the return value into a register
-            r0 = 0
-            if return_var in variables:
-                return_addr = variables[return_var]
-                assembly.append(f"LOAD R{r0}, [{return_addr}]")
-                asm_position += 1
-            elif return_var in temp_vars:
-                r0 = temp_vars[return_var]
+            # Asegurar que la variable de retorno tenga una dirección
+            if return_var not in variables:
+                variables[return_var] = next_addr
+                data_section.append("0")  # Agregar valor predeterminado a la memoria
+                next_addr += 1
             
-            # Store to the designated return location
-            assembly.append(f"STORE R{r0}, [0x14]")
+            # Encontrar dirección para la variable de retorno
+            return_addr = variables.get(return_var)
+            
+            # Cargar valor de retorno en R0
+            code_section.append(f"LOAD R0, [0x{return_addr:X}]")
             asm_position += 1
             
-            # End the program
-            assembly.append("HALT")
+            # Retornar de la función
+            code_section.append("RET")
+            asm_position += 1
+        
+        # Manejar llamadas a funciones (t9 = call sqrt, 1)
+        elif 'call' in line:
+            parts = line.split('=')
+            target = parts[0].strip()
+            
+            # Asegurar que la variable objetivo tenga una dirección
+            if target not in variables:
+                variables[target] = next_addr
+                data_section.append("0")  # Agregar valor predeterminado a la memoria
+                next_addr += 1
+                
+            target_addr = variables.get(target)
+            
+            # Extraer nombre de función y argumentos
+            call_parts = parts[1].strip().split(',')
+            func_name = call_parts[0].strip()
+            func_name = func_name.replace('call ', '')
+            
+            # Por ahora, solo agregar un comentario
+            code_section.append(f"# Llamada a función: {line}")
             asm_position += 1
     
-    # Final pass: resolve label references
-    for i, instr in enumerate(assembly):
-        if "PLACEHOLDER_" in instr:
+    # Última pasada: resolver referencias de etiquetas
+    fixed_code_section = []
+    for instr in code_section:
+        if instr.startswith("#"):
+            # Mantener comentarios como están
+            fixed_code_section.append(instr)
+        else:
+            # Verificar referencias de etiquetas en la instrucción
+            modified_instr = instr
             for label, pos in label_to_asm.items():
-                placeholder = f"PLACEHOLDER_{label}"
-                if placeholder in instr:
-                    assembly[i] = instr.replace(f"[{placeholder}]", f"[{pos:X}]")
-        elif "SKIP1" in instr or "SKIP2" in instr:
-            for label, pos in label_to_asm.items():
-                if label in instr:
-                    assembly[i] = instr.replace(f"[{label}]", f"[{pos:X}]")
+                if f"[{label}]" in modified_instr:
+                    modified_instr = modified_instr.replace(f"[{label}]", f"[0x{pos:X}]")
+            fixed_code_section.append(modified_instr)
     
-    return assembly
+    return data_section, fixed_code_section
 
 def main():
-    """Main function to run the TAC to assembly converter."""
+    """Función principal para ejecutar el convertidor de TAC a ensamblador."""
     import sys
     
     if len(sys.argv) != 2:
-        print("Usage: python tac_to_assembly.py <input_file.tac>")
+        print("Uso: python tac_to_assembly.py <archivo_entrada.tac>")
         sys.exit(1)
     
     tac_file = sys.argv[1]
-    asm_instructions = tac_to_assembly(tac_file)
+    data_section, code_section = tac_to_assembly(tac_file)
     
-    # Print the generated assembly
-    for instruction in asm_instructions:
-        print(instruction)
-    
-    # Also write to a file
+    # escribir a un archivo
     output_file = tac_file.replace('.tac', '.asm')
     with open(output_file, 'w') as f:
-        for instruction in asm_instructions:
-            f.write(f"{instruction}\n")
+        f.write("; SECCION DE DATOS\n")
+        for data in data_section:
+            f.write(f"{data}\n")
+        
+        f.write("\n; SECCION DE CODIGO\n")
+        for instr in code_section:
+            f.write(f"{instr}\n")
     
-    print(f"\nAssembly code written to {output_file}")
+    print(f"\nCódigo ensamblador escrito en {output_file}")
 
 if __name__ == "__main__":
     main()
