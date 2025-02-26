@@ -107,5 +107,5 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
 ---
 ## Gramáticas
 
-- [Ver Diagrama SVG](DiagramasGLC/Diagramas_svg.html)
-- [Ver Bigraph Diagram](DiagramasGLC/proyectBigraphDiagram.html)
+- [Ver Diagrama SVG](DigramasGLC/Diagramas_svg.html)
+- [Ver Bigraph Diagram](DigramasGLC/proyectBigraphDiagram.html)
