@@ -467,18 +467,30 @@ boolean     (F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e)
 %%
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Uso: %s <archivo_python>\n", argv[0]);
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Uso: %s <archivo_python> [archivo_salida]\n", argv[0]);
         return 1;
     }
 
+    // Open the input file.
     FILE *file = fopen(argv[1], "r");
     if (!file) {
         perror("Error al abrir el archivo");
         return 1;
     }
-
     yyin = file;
+    
+    // If an output file is provided, redirect stdout.
+    if (argc == 3) {
+        FILE *output = freopen(argv[2], "w", stdout);
+        if (!output) {
+            perror("Error al abrir el archivo de salida");
+            fclose(file);
+            return 1;
+        }
+    }
+    
+    // Process the input file.
     yylex();
     fclose(file);
     return 0;

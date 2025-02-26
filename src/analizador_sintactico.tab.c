@@ -1963,7 +1963,7 @@ int main(int argc, char **argv) {
             printf("Debug: Semantic analysis completed\n");
             
             printf("Debug: Generating intermediate code\n");
-            generate_intermediate_code(ast_root, "output.tac");
+            generate_intermediate_code(ast_root, "../archivos_salida/compilador.tac");
             printf("Debug: Intermediate code generation completed\n");
         } else {
             fprintf(stderr, "Debug: AST root is NULL despite successful parse\n");

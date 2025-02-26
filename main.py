@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
             temp_file_path = temp_file.name
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
-        flex_executable = "./compilados/preprocessor.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
+        flex_executable = "./compilados/preprocesador.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal

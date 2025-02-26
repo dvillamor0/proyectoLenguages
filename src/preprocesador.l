@@ -75,16 +75,22 @@ void process_import(const char* lib_name) {
 }
 
 int main(int argc, char** argv) {
-    if (argc > 1) {
-        FILE* input = fopen(argv[1], "r");
-        if (!input) {
-            fprintf(stderr, "Error: Cannot open input file %s\n", argv[1]);
-            return 1;
-        }
-        yyin = input;
+    // Require either one or two arguments.
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Usage: %s <input_file> [output_file]\n", argv[0]);
+        return 1;
     }
     
-    if (argc > 2) {
+    // Open the input file.
+    FILE* input = fopen(argv[1], "r");
+    if (!input) {
+        fprintf(stderr, "Error: Cannot open input file %s\n", argv[1]);
+        return 1;
+    }
+    yyin = input;
+    
+    // If an output file is provided, redirect stdout to it.
+    if (argc == 3) {
         FILE* output = freopen(argv[2], "w", stdout);
         if (!output) {
             fprintf(stderr, "Error: Cannot open output file %s\n", argv[2]);
@@ -92,11 +98,9 @@ int main(int argc, char** argv) {
         }
     }
     
+    // Run the lexer.
     yylex();
     
-    if (argc > 1) {
-        fclose(yyin);
-    }
-    
+    fclose(yyin);
     return 0;
 }

@@ -162,27 +162,8 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
     
-    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
-     *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE yylex.
-     *       One obvious solution it to make yy_act a global. I tried that, and saw
-     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
-     *       normally declared as a register variable-- so it is not worth it.
-     */
-    #define  YY_LESS_LINENO(n) \
-            do { \
-                int yyl;\
-                for ( yyl = n; yyl < yyleng; ++yyl )\
-                    if ( yytext[yyl] == '\n' )\
-                        --yylineno;\
-            }while(0)
-    #define YY_LINENO_REWIND_TO(dst) \
-            do {\
-                const char *p;\
-                for ( p = yy_cp-1; p >= (dst); --p)\
-                    if ( *p == '\n' )\
-                        --yylineno;\
-            }while(0)
+    #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -373,8 +354,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 29
-#define YY_END_OF_BUFFER 30
+#define YY_NUM_RULES 5
+#define YY_END_OF_BUFFER 6
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,32 +363,28 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[57] =
+static const flex_int16_t yy_accept[13] =
     {   0,
-        0,    0,   30,   28,    1,    1,   28,   28,   22,   23,
-       17,   15,   21,   16,   18,   27,   20,    9,   19,   13,
-       26,   26,   26,   26,   26,   26,   24,   25,    1,   12,
-        0,    2,    0,   27,    0,   10,   11,   14,   26,   26,
-       26,   26,    5,   26,   26,   27,    0,   27,    7,    8,
-        3,    4,   26,   26,    6,    0
+        0,    0,    6,    4,    1,    4,    4,    1,    2,    0,
+        3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    4,    1,    5,    1,    1,    1,    1,    6,
-        7,    8,    9,   10,   11,   12,   13,   14,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,    1,   15,   16,
-       17,   18,    1,    1,   19,   19,   19,   19,   20,   21,
-       19,   19,   22,   19,   19,   19,   19,   19,   19,   19,
-       19,   23,   19,   19,   19,   19,   24,   19,   19,   19,
-        1,    1,    1,    1,    1,    1,   19,   19,   19,   19,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    1,    1,    4,    1,    1,    1,    1,    5,
+        6,    1,    1,    1,    1,    1,    1,    7,    7,    7,
+        7,    7,    7,    7,    7,    7,    7,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-       25,   26,   19,   27,   28,   19,   19,   29,   19,   30,
-       31,   19,   19,   19,   19,   32,   33,   19,   19,   19,
-       19,   19,   34,    1,   35,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -424,73 +401,36 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[36] =
+static const YY_CHAR yy_meta[8] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    2,    1,    1,    1,    1,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    1,    1
+        1,    2,    2,    1,    1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[59] =
+static const flex_int16_t yy_base[14] =
     {   0,
-        0,    0,   81,   82,   34,   36,   63,   76,   82,   82,
-       82,   82,   82,   82,   82,   28,   82,   61,   60,   59,
-        0,   45,   12,   48,   48,   45,   82,   82,   41,   82,
-       68,   82,   56,   35,   43,   82,   82,   82,    0,   37,
-       37,   37,    0,   34,   37,   36,   50,   45,    0,    0,
-        0,    0,   29,   26,    0,   82,   61,   44
+        0,    0,   14,   15,    0,    6,    5,    0,    4,    2,
+       15,   15,    8
     } ;
 
-static const flex_int16_t yy_def[59] =
+static const flex_int16_t yy_def[14] =
     {   0,
-       56,    1,   56,   56,   56,   56,   56,   57,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       58,   58,   58,   58,   58,   58,   56,   56,   56,   56,
-       57,   56,   56,   56,   56,   56,   56,   56,   58,   58,
-       58,   58,   58,   58,   58,   56,   56,   56,   58,   58,
-       58,   58,   58,   58,   58,    0,   56,   56
+       12,    1,   12,   12,   13,   12,   12,   13,   12,   12,
+       12,    0,   12
     } ;
 
-static const flex_int16_t yy_nxt[118] =
+static const flex_int16_t yy_nxt[23] =
     {   0,
-        4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       14,    4,   15,   16,   17,   18,   19,   20,   21,   22,
-       23,   24,   25,   26,   21,   21,   21,   21,   21,   21,
-       21,   21,   21,   27,   28,   29,   29,   29,   29,   33,
-       41,   34,   29,   29,   42,   39,   33,   35,   34,   46,
-       55,   47,   35,   47,   35,   35,   48,   54,   48,   35,
-       35,   31,   31,   48,   53,   52,   51,   50,   49,   46,
-       32,   45,   44,   43,   40,   38,   37,   36,   32,   30,
-       56,    3,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56
+        4,    5,    5,    6,    7,    4,    4,   11,   10,    8,
+        9,   10,    9,   12,    3,   12,   12,   12,   12,   12,
+       12,   12
     } ;
 
-static const flex_int16_t yy_chk[118] =
+static const flex_int16_t yy_chk[23] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    5,    5,    6,    6,   16,
-       23,   16,   29,   29,   23,   58,   34,   16,   34,   46,
-       54,   35,   16,   35,   34,   46,   35,   53,   48,   34,
-       46,   57,   57,   47,   45,   44,   42,   41,   40,   33,
-       31,   26,   25,   24,   22,   20,   19,   18,    8,    7,
-        3,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56
+        1,    1,    1,    1,    1,    1,    1,   10,   10,   13,
+        9,    7,    6,    3,   12,   12,   12,   12,   12,   12,
+       12,   12
     } ;
-
-/* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[30] =
-    {   0,
-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -506,35 +446,90 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 ".\\analizador_lexico.l"
-#line 2 ".\\analizador_lexico.l"
+#line 1 ".\\linkerLoader.l"
+#line 2 ".\\linkerLoader.l"
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "analizador_sintactico.tab.h"
+#include <stdlib.h>
+#include <stdint.h>
 
-#define MAX_SYMBOLS 1000
+// Función para imprimir un número en binario con exactamente 21 bits
+void print_binary(FILE* output, int num) {
+    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20)
+    
+    // Imprimir los 21 bits
+    for (int i = 0; i < 21; i++) {
+        if (num & mask) {
+            fprintf(output, "1");
+        } else {
+            fprintf(output, "0");
+        }
+        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
+    }
+}
 
-#define SYMTAB_IDENTIFIER 1
-#define SYMTAB_NUMBER 2
+// Función para detectar si una línea contiene una dirección relativa
+int contains_relative_address(const char* line) {
+    return (strstr(line, "(") != NULL && strstr(line, ")") != NULL);
+}
 
-typedef struct {
-    char *name;
-    int type;
-    union {
-        double number_value;
-        char *string_value;
-    } value;
-} SymbolEntry;
+// Función para extraer el número entre paréntesis
+int extract_address(const char* line) {
+    const char* start = strchr(line, '(');
+    if (start == NULL) return 0;
+    
+    const char* end = strchr(start, ')');
+    if (end == NULL) return 0;
+    
+    // Crear una subcadena para el número
+    int len = end - start - 1;
+    char num_str[32] = {0};
+    strncpy(num_str, start + 1, len);
+    
+    return atoi(num_str);
+}
 
-SymbolEntry symbol_table[MAX_SYMBOLS];
-int symbol_count = 0;
+// Función para reemplazar la dirección relativa con la absoluta
+char* replace_address(const char* line, int rel_addr, int base_addr) {
+    static char result[1024];
+    const char* start = strchr(line, '(');
+    const char* end = strchr(line, ')');
+    
+    if (start == NULL || end == NULL) {
+        strcpy(result, line);
+        return result;
+    }
+    
+    // Calcular la dirección absoluta
+    int abs_addr = base_addr + rel_addr;
+    
+    // Copiar la parte antes del paréntesis
+    int prefix_len = start - line;
+    strncpy(result, line, prefix_len);
+    result[prefix_len] = '\0';
+    
+    // Añadir la dirección absoluta en binario
+    char binary[32] = {0};
+    sprintf(binary, "");
+    for (int i = 20; i >= 0; i--) {
+        binary[20-i] = ((abs_addr >> i) & 1) ? '1' : '0';
+    }
+    binary[21] = '\0';
+    
+    strcat(result, binary);
+    
+    // Añadir la parte después del paréntesis
+    strcat(result, end + 1);
+    
+    return result;
+}
 
-int install_id(char *lexeme);
-int install_num(char *lexeme);
-#line 535 "lex.yy.c"
+int direccionInicial = 0;  // Dirección base para la relocalización
+
+#line 530 "lex.yy.c"
 /* Regular definitions */
-#line 537 "lex.yy.c"
+#line 532 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -751,10 +746,9 @@ YY_DECL
 		}
 
 	{
-#line 39 ".\\analizador_lexico.l"
+#line 94 ".\\linkerLoader.l"
 
-
-#line 757 "lex.yy.c"
+#line 751 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -781,13 +775,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 57 )
+				if ( yy_current_state >= 13 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 82 );
+		while ( yy_base[yy_current_state] != 15 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -799,16 +793,6 @@ yy_find_action:
 			}
 
 		YY_DO_BEFORE_ACTION;
-
-		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
-			{
-			int yyl;
-			for ( yyl = 0; yyl < yyleng; ++yyl )
-				if ( yytext[yyl] == '\n' )
-					
-    yylineno++;
-;
-			}
 
 do_action:	/* This label is used only to access EOF actions. */
 
@@ -824,151 +808,38 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 41 ".\\analizador_lexico.l"
-{ /* Skip whitespace */ }
+#line 95 ".\\linkerLoader.l"
+{ fprintf(yyout, "\n"); }
 	YY_BREAK
 case 2:
-/* rule 2 can match eol */
 YY_RULE_SETUP
-#line 42 ".\\analizador_lexico.l"
-{ /* Skip comments */ }
+#line 97 ".\\linkerLoader.l"
+{ 
+    direccionInicial = atoi(yytext + 1); 
+    fprintf(yyout, "\n");  
+}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 44 ".\\analizador_lexico.l"
-{ return TOKEN_FUN; }
+#line 102 ".\\linkerLoader.l"
+{ 
+    int dir_value = atoi(yytext + 1); 
+    int suma = direccionInicial + dir_value;
+    print_binary(yyout, suma);  
+}
 	YY_BREAK
 case 4:
+/* rule 4 can match eol */
 YY_RULE_SETUP
-#line 45 ".\\analizador_lexico.l"
-{ return TOKEN_RET; }
+#line 108 ".\\linkerLoader.l"
+{ fprintf(yyout, "%s", yytext); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 46 ".\\analizador_lexico.l"
-{ return TOKEN_IF; }
-	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 47 ".\\analizador_lexico.l"
-{ return TOKEN_WHILE; }
-	YY_BREAK
-case 7:
-YY_RULE_SETUP
-#line 48 ".\\analizador_lexico.l"
-{ return TOKEN_ENT; }
-	YY_BREAK
-case 8:
-YY_RULE_SETUP
-#line 49 ".\\analizador_lexico.l"
-{ return TOKEN_FLO; }
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 51 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_LT; }
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 52 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_LE; }
-	YY_BREAK
-case 11:
-YY_RULE_SETUP
-#line 53 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_EQ; }  
-	YY_BREAK
-case 12:
-YY_RULE_SETUP
-#line 54 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_NE; }
-	YY_BREAK
-case 13:
-YY_RULE_SETUP
-#line 55 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_GT; }
-	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 56 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_GE; }
-	YY_BREAK
-case 15:
-YY_RULE_SETUP
-#line 58 ".\\analizador_lexico.l"
-{ return TOKEN_PLUS; }
-	YY_BREAK
-case 16:
-YY_RULE_SETUP
-#line 59 ".\\analizador_lexico.l"
-{ return TOKEN_MINUS; }
-	YY_BREAK
-case 17:
-YY_RULE_SETUP
-#line 60 ".\\analizador_lexico.l"
-{ return TOKEN_MULT; }
-	YY_BREAK
-case 18:
-YY_RULE_SETUP
-#line 61 ".\\analizador_lexico.l"
-{ return TOKEN_DIV; }
-	YY_BREAK
-case 19:
-YY_RULE_SETUP
-#line 62 ".\\analizador_lexico.l"
-{ return TOKEN_ASSIGN; }   
-	YY_BREAK
-case 20:
-YY_RULE_SETUP
-#line 63 ".\\analizador_lexico.l"
-{ return TOKEN_SEMICOLON; }
-	YY_BREAK
-case 21:
-YY_RULE_SETUP
-#line 64 ".\\analizador_lexico.l"
-{ return TOKEN_COMMA; }
-	YY_BREAK
-case 22:
-YY_RULE_SETUP
-#line 65 ".\\analizador_lexico.l"
-{ return TOKEN_LPAREN; }
-	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 66 ".\\analizador_lexico.l"
-{ return TOKEN_RPAREN; }
-	YY_BREAK
-case 24:
-YY_RULE_SETUP
-#line 67 ".\\analizador_lexico.l"
-{ return TOKEN_LBRACE; }
-	YY_BREAK
-case 25:
-YY_RULE_SETUP
-#line 68 ".\\analizador_lexico.l"
-{ return TOKEN_RBRACE; }
-	YY_BREAK
-case 26:
-YY_RULE_SETUP
-#line 70 ".\\analizador_lexico.l"
-{ yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
-	YY_BREAK
-case 27:
-YY_RULE_SETUP
-#line 71 ".\\analizador_lexico.l"
-{ yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
-	YY_BREAK
-case 28:
-YY_RULE_SETUP
-#line 73 ".\\analizador_lexico.l"
-{ printf("Lexical Error: Unexpected character %s\n", yytext); }
-	YY_BREAK
-case 29:
-YY_RULE_SETUP
-#line 75 ".\\analizador_lexico.l"
+#line 110 ".\\linkerLoader.l"
 ECHO;
 	YY_BREAK
-#line 971 "lex.yy.c"
+#line 842 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1265,7 +1136,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 57 )
+			if ( yy_current_state >= 13 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1293,11 +1164,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 57 )
+		if ( yy_current_state >= 13 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 56);
+	yy_is_jam = (yy_current_state == 12);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1335,10 +1206,6 @@ static int yy_get_next_buffer (void)
 		}
 
 	*--yy_cp = (char) c;
-
-    if ( c == '\n' ){
-        --yylineno;
-    }
 
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
@@ -1416,11 +1283,6 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
-
-	if ( c == '\n' )
-		
-    yylineno++;
-;
 
 	return c;
 }
@@ -1888,9 +1750,6 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
-    /* We do not touch yylineno unless the option is enabled. */
-    yylineno =  1;
-    
     (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -1985,37 +1844,79 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 75 ".\\analizador_lexico.l"
+#line 110 ".\\linkerLoader.l"
 
 
-int install_id(char *lexeme) {
-    if (symbol_count >= MAX_SYMBOLS) {
-        fprintf(stderr, "Symbol table full\n");
-        exit(1);
+// Función principal que procesa el archivo de entrada y genera el archivo de salida
+void process_file(const char* input_file, const char* output_file, int base_address) {
+    FILE* in = fopen(input_file, "r");
+    FILE* out = fopen(output_file, "w");
+    
+    if (!in || !out) {
+        fprintf(stderr, "Error opening files\n");
+        if (in) fclose(in);
+        if (out) fclose(out);
+        return;
     }
     
-    for (int i = 0; i < symbol_count; i++) {
-        if (symbol_table[i].type == SYMTAB_IDENTIFIER && 
-            strcmp(symbol_table[i].name, lexeme) == 0) {
-            return i;
+    char line[1024];
+    
+    // Establecer la dirección base
+    direccionInicial = base_address;
+    
+    while (fgets(line, sizeof(line), in)) {
+        // Eliminar el salto de línea final si existe
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n') {
+            line[len-1] = '\0';
+        }
+        
+        if (contains_relative_address(line)) {
+            // Esta línea contiene una dirección relativa
+            int rel_addr = extract_address(line);
+            char* new_line = replace_address(line, rel_addr, direccionInicial);
+            fprintf(out, "%s\n", new_line);
+        } else {
+            // Esta línea no contiene dirección relativa, copiarla tal cual
+            fprintf(out, "%s\n", line);
         }
     }
     
-    symbol_table[symbol_count].name = strdup(lexeme);
-    symbol_table[symbol_count].type = SYMTAB_IDENTIFIER;
-    return symbol_count++;
+    fclose(in);
+    fclose(out);
+    printf("Processing complete. Output written to %s\n", output_file);
 }
 
-int install_num(char *lexeme) {
-    if (symbol_count >= MAX_SYMBOLS) {
-        fprintf(stderr, "Symbol table full\n");
-        exit(1);
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s [base_address] [input_file] [output_file]\n", argv[0]);
+        printf("  base_address: Base address for relocation (default: 0)\n");
+        printf("  input_file: Binary input file (default: output.bin)\n");
+        printf("  output_file: Output file (default: executable.bin)\n");
+        return 1;
     }
     
-    symbol_table[symbol_count].name = strdup(lexeme);
-    symbol_table[symbol_count].type = SYMTAB_NUMBER;
-    symbol_table[symbol_count].value.number_value = atof(lexeme);
-    return symbol_count++;
+    int base_address = 0;
+    const char* input_file = "output.bin";
+    const char* output_file = "executable.bin";
+    
+    if (argc >= 2) {
+        base_address = atoi(argv[1]);
+    }
+    
+    if (argc >= 3) {
+        input_file = argv[2];
+    }
+    
+    if (argc >= 4) {
+        output_file = argv[3];
+    }
+    
+    printf("Loading from: %s\n", input_file);
+    printf("Base address: %d\n", base_address);
+    printf("Output file: %s\n", output_file);
+    
+    process_file(input_file, output_file, base_address);
+    
+    return 0;
 }
-
-
