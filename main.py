@@ -135,6 +135,15 @@ class MainWindow(QMainWindow):
                 item.setBackground(QColor(255, 255, 255))  # Blanco
 
             self.ui.table_memoria.setItem(i, 0, item)
+
+        # 🔹 Mostrar los últimos 100 registros de la memoria en `table_pila`
+        ultimas_100_direcciones = sorted(self.memoria.keys(), reverse=True)[:100]  # Obtener las últimas 100 direcciones
+        self.ui.table_pila.setRowCount(len(ultimas_100_direcciones))  # Ajustar tamaño de la tabla
+
+        for i, direccion in enumerate(ultimas_100_direcciones):
+            valor = self.memoria[direccion]
+            item = QtWidgets.QTableWidgetItem(str(valor))
+            self.ui.table_pila.setItem(i, 0, item)
  
     def guardar_en_registro(self, indice, value):
         temp_reg = self.registro

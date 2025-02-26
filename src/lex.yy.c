@@ -494,6 +494,7 @@ char *yytext;
 #include <string.h>
 #include <ctype.h> 
 #include <stdint.h>
+#include <math.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -512,21 +513,60 @@ void print_binary(int num) {
     }
 }
 
-void binary_to_float_21_bits(const char *str) {
-    float num = strtof(str, NULL);
-    uint32_t ieee_754_bin = *(uint32_t*)&num;
-    uint8_t sign = (ieee_754_bin >> 31) & 0x1;
-    int exponent_full = (ieee_754_bin >> 23) & 0xFF;  // Exponente de 8 bits
-    int exponent_adjusted = exponent_full - 127 + 63; // Nuevo sesgo de 7 bits
+void binary_from_float_21_bits(const char *str) {
+    double value = atof(str); // Convertir la cadena a un número flotante
 
-    if (exponent_adjusted < 0) exponent_adjusted = 0;
-    if (exponent_adjusted > 127) exponent_adjusted = 127;
-    uint16_t mantissa_reduced = (ieee_754_bin & 0x7FFFFF) >> 10;  // 13 bits más significativos
-    printf("%d", sign);
-    for (int i = 6; i >= 0; i--) 
-        printf("%d", (exponent_adjusted >> i) & 1);
-    for (int i = 12; i >= 0; i--) 
-        printf("%d", (mantissa_reduced >> i) & 1);
+    int sign_bit = (value < 0) ? 1 : 0;
+    value = fabs(value);  // Trabajar con el valor absoluto
+
+    // Convertir a string con 10 decimales para manipular los dígitos
+    char buffer[50];
+    sprintf(buffer, "%.10f", value);  
+
+    // Extraer los primeros 3 dígitos significativos (ignorando ceros iniciales)
+    char extracted_digits[4] = ""; // Buffer para almacenar 3 dígitos
+    int count = 0, i = 0, found_digit = 0, potencia = 0;
+
+    while (buffer[i] != '\0' && count < 3) {
+        if(buffer[i] == '.'){
+            potencia = 0;
+        }
+        if (buffer[i] >= '1' && buffer[i] <= '9') {
+            found_digit = 1;  // Detectamos el primer dígito no cero
+        }
+        if (found_digit && buffer[i] != '.') {
+            extracted_digits[count++] = buffer[i];  // Guardamos el dígito
+            potencia++;
+        }
+        i++;
+    }
+    extracted_digits[count] = '\0';  // Terminar la cadena
+
+    // Convertir a número truncado
+    double truncated_value = atof(extracted_digits) / pow(10, potencia);
+
+    int numerator = 0, denominator = 1023; // Inicializar variables
+
+    for (int i = 1023; i > 0; i--) {  // Probar denominadores desde 1023 hasta 1
+        double temp_num = truncated_value * i;  // Multiplicar el flotante por el denominador
+        if (temp_num >= 0 && temp_num <= 1023 && floor(temp_num) == temp_num) {  
+            // Verifica que el numerador es un número entero dentro del rango 0-1023
+            numerator = (int)temp_num;
+            denominator = i;
+            break;  // Salir cuando se encuentra la mejor fracción
+        }
+    }
+
+    // Imprimir en formato binario de 21 bits (1 signo + 10 numerador + 10 denominador)
+    printf("%d", sign_bit);
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (numerator >> i) & 1);  // Imprimir numerador (10 bits)
+    }
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (denominator >> i) & 1);  // Imprimir denominador (10 bits)
+    }
 }
 
 void print_binary_from_entero(int num) {
@@ -718,7 +758,7 @@ void printAscii(const char *str) {
     printf("\n");
 }
 
-#line 722 "lex.yy.c"
+#line 762 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -869,10 +909,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 243 ".\\ensamblador.l"
+#line 283 ".\\ensamblador.l"
 
 
-#line 876 "lex.yy.c"
+#line 916 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -957,7 +997,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 245 ".\\ensamblador.l"
+#line 285 ".\\ensamblador.l"
 {
     //printf("Reconocido 3 R : %s\n", yytext);
 
@@ -973,7 +1013,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 257 ".\\ensamblador.l"
+#line 297 ".\\ensamblador.l"
 {
     //printf("Reconocido 3 R : %s\n", yytext);
 
@@ -989,7 +1029,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 269 ".\\ensamblador.l"
+#line 309 ".\\ensamblador.l"
 {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
@@ -1004,7 +1044,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 280 ".\\ensamblador.l"
+#line 320 ".\\ensamblador.l"
 {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
@@ -1020,7 +1060,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 292 ".\\ensamblador.l"
+#line 332 ".\\ensamblador.l"
 {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
@@ -1036,7 +1076,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 304 ".\\ensamblador.l"
+#line 344 ".\\ensamblador.l"
 {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
@@ -1052,7 +1092,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 316 ".\\ensamblador.l"
+#line 356 ".\\ensamblador.l"
 {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
@@ -1067,21 +1107,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 328 ".\\ensamblador.l"
+#line 368 ".\\ensamblador.l"
 { /* No action */ }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 329 ".\\ensamblador.l"
+#line 369 ".\\ensamblador.l"
 {
     printf("00000000100");
-    binary_to_float_21_bits(yytext);
+    binary_from_float_21_bits(yytext);
     printf("\n");
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 334 ".\\ensamblador.l"
+#line 374 ".\\ensamblador.l"
 {
     int value = atoi(yytext);
     printf("00000000011");
@@ -1091,7 +1131,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 340 ".\\ensamblador.l"
+#line 380 ".\\ensamblador.l"
 {
     int value = atoi(yytext);
     printf("00000000010");
@@ -1101,7 +1141,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 346 ".\\ensamblador.l"
+#line 386 ".\\ensamblador.l"
 {
     if (strcmp(yytext, "TRUE") == 0) {
         printf("00000000001000000000000000000001");  // 20 ceros antes del 1
@@ -1116,7 +1156,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 357 ".\\ensamblador.l"
+#line 397 ".\\ensamblador.l"
 {
     int value = atoi(yytext);
     printf("00000000101");
@@ -1126,17 +1166,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 363 ".\\ensamblador.l"
+#line 403 ".\\ensamblador.l"
 {
     printf("%s\n", yytext);
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 366 ".\\ensamblador.l"
+#line 406 ".\\ensamblador.l"
 ECHO;
 	YY_BREAK
-#line 1140 "lex.yy.c"
+#line 1180 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2022,7 +2062,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 366 ".\\ensamblador.l"
+#line 406 ".\\ensamblador.l"
 
 
 int main(int argc, char **argv) {

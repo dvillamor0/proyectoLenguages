@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h> 
 #include <stdint.h>
+#include <math.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -22,21 +23,60 @@ void print_binary(int num) {
     }
 }
 
-void binary_to_float_21_bits(const char *str) {
-    float num = strtof(str, NULL);
-    uint32_t ieee_754_bin = *(uint32_t*)&num;
-    uint8_t sign = (ieee_754_bin >> 31) & 0x1;
-    int exponent_full = (ieee_754_bin >> 23) & 0xFF;  // Exponente de 8 bits
-    int exponent_adjusted = exponent_full - 127 + 63; // Nuevo sesgo de 7 bits
+void binary_from_float_21_bits(const char *str) {
+    double value = atof(str); // Convertir la cadena a un número flotante
 
-    if (exponent_adjusted < 0) exponent_adjusted = 0;
-    if (exponent_adjusted > 127) exponent_adjusted = 127;
-    uint16_t mantissa_reduced = (ieee_754_bin & 0x7FFFFF) >> 10;  // 13 bits más significativos
-    printf("%d", sign);
-    for (int i = 6; i >= 0; i--) 
-        printf("%d", (exponent_adjusted >> i) & 1);
-    for (int i = 12; i >= 0; i--) 
-        printf("%d", (mantissa_reduced >> i) & 1);
+    int sign_bit = (value < 0) ? 1 : 0;
+    value = fabs(value);  // Trabajar con el valor absoluto
+
+    // Convertir a string con 10 decimales para manipular los dígitos
+    char buffer[50];
+    sprintf(buffer, "%.10f", value);  
+
+    // Extraer los primeros 3 dígitos significativos (ignorando ceros iniciales)
+    char extracted_digits[4] = ""; // Buffer para almacenar 3 dígitos
+    int count = 0, i = 0, found_digit = 0, potencia = 0;
+
+    while (buffer[i] != '\0' && count < 3) {
+        if(buffer[i] == '.'){
+            potencia = 0;
+        }
+        if (buffer[i] >= '1' && buffer[i] <= '9') {
+            found_digit = 1;  // Detectamos el primer dígito no cero
+        }
+        if (found_digit && buffer[i] != '.') {
+            extracted_digits[count++] = buffer[i];  // Guardamos el dígito
+            potencia++;
+        }
+        i++;
+    }
+    extracted_digits[count] = '\0';  // Terminar la cadena
+
+    // Convertir a número truncado
+    double truncated_value = atof(extracted_digits) / pow(10, potencia);
+
+    int numerator = 0, denominator = 1023; // Inicializar variables
+
+    for (int i = 1023; i > 0; i--) {  // Probar denominadores desde 1023 hasta 1
+        double temp_num = truncated_value * i;  // Multiplicar el flotante por el denominador
+        if (temp_num >= 0 && temp_num <= 1023 && floor(temp_num) == temp_num) {  
+            // Verifica que el numerador es un número entero dentro del rango 0-1023
+            numerator = (int)temp_num;
+            denominator = i;
+            break;  // Salir cuando se encuentra la mejor fracción
+        }
+    }
+
+    // Imprimir en formato binario de 21 bits (1 signo + 10 numerador + 10 denominador)
+    printf("%d", sign_bit);
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (numerator >> i) & 1);  // Imprimir numerador (10 bits)
+    }
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (denominator >> i) & 1);  // Imprimir denominador (10 bits)
+    }
 }
 
 void print_binary_from_entero(int num) {
@@ -328,7 +368,7 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
 {delim} { /* No action */ }
 {simbol}?{digits}+.{digits}+ {
     printf("00000000100");
-    binary_to_float_21_bits(yytext);
+    binary_from_float_21_bits(yytext);
     printf("\n");
 }
 {simbol}{digits}+ {
