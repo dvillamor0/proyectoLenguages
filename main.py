@@ -271,10 +271,6 @@ class MainWindow(QMainWindow):
                 text=True
             )
 
-            # Si el compilador falla, mostrar el error
-            if result.returncode != 0:
-                self.ui.Output.setPlainText(f"[Error Compilador]: {result.stderr}")
-                return
 
             # Esperar a que se genere el archivo de salida (.tac)
             timeout = 5  # Tiempo máximo de espera en segundos
@@ -362,7 +358,7 @@ class MainWindow(QMainWindow):
             texto_modificado = f"#{direccion_referencia}\n{texto}"
 
             # Define el comando según el sistema operativo
-            comando = "./compilados/linkerLoader"
+            comando = "./compilados/linkerloader"
             if os.name != 'posix':  # Si es Windows, agrega ".exe"
                 comando += ".exe"
 
