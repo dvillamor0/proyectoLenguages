@@ -57,6 +57,8 @@ COMMENT     #[^\n]*\n
 "Ent"       { return TOKEN_ENT; }
 "Flo"       { return TOKEN_FLO; }
 "Nat"       { return TOKEN_NAT; }
+"Arreglo"   { return TOKEN_ARREGLO; }
+
 
 "<"         { return TOKEN_RELOP_LT; }
 "<="        { return TOKEN_RELOP_LE; }
@@ -76,6 +78,8 @@ COMMENT     #[^\n]*\n
 ")"         { return TOKEN_RPAREN; }
 "{"         { return TOKEN_LBRACE; }
 "}"         { return TOKEN_RBRACE; }
+"["         { return TOKEN_LBRACK; }
+"]"         { return TOKEN_RBRACK; }
 
 {ID}        { yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
 {NUMBER}    { yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }

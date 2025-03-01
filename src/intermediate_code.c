@@ -241,6 +241,91 @@ static char *process_function_call(Node *node, FILE *output) {
     return temp;
 }
 
+static char *process_array_literal(Node *node, FILE *output) {
+    // Count the elements in the array
+    int count = 0;
+    Node *element = node->left;
+    while (element) {
+        count++;
+        element = element->next;
+    }
+    
+    // Create a new temporary for the array
+    char *array_temp = new_temp();
+    
+    // Allocate space for the array
+    fprintf(output, "%s = new_array %d\n", array_temp, count);
+    LOG("%s = new_array %d\n", array_temp, count);
+    
+    // Initialize each element
+    element = node->left;
+    int index = 0;
+    
+    while (element) {
+        char *elem_value = generate_code(element, output);
+        fprintf(output, "%s[%d] = %s\n", array_temp, index, elem_value);
+        LOG("%s[%d] = %s\n", array_temp, index, elem_value);
+        
+        element = element->next;
+        index++;
+    }
+    
+    return array_temp;
+}
+
+static char *process_array_access(Node *node, FILE *output) {
+    char *array_name = get_symbol_name(node->left->symbol_index);
+    char *index = generate_code(node->right, output);
+    char *temp = new_temp();
+    
+    // Access the array element
+    fprintf(output, "%s = %s[%s]\n", temp, array_name, index);
+    LOG("%s = %s[%s]\n", temp, array_name, index);
+    
+    return temp;
+}
+
+static void process_array_assignment(Node *node, FILE *output) {
+    // Get the array access information
+    char *array_name = get_symbol_name(node->left->left->symbol_index);
+    char *index = generate_code(node->left->right, output);
+    
+    // Get the value to assign
+    char *value = generate_code(node->right, output);
+    
+    // Generate the assignment
+    fprintf(output, "%s[%s] = %s\n", array_name, index, value);
+    LOG("%s[%s] = %s\n", array_name, index, value);
+}
+
+// New function to process array declarations
+static void process_array_declaration(Node *node, FILE *output) {
+    char *array_name = get_symbol_name(node->left->symbol_index);
+    
+    // Check if this is a declaration with initialization
+    if (node->right && node->right->type == NODE_ARRAY_INIT) {
+        // Get size expression
+        char *size = generate_code(node->right->left->left, output);
+        
+        // Get initializer expression
+        char *init = generate_code(node->right->right, output);
+        
+        // Allocate and initialize
+        fprintf(output, "%s = new_array %s\n", array_name, size);
+        LOG("%s = new_array %s\n", array_name, size);
+        
+        fprintf(output, "%s = %s\n", array_name, init);
+        LOG("%s = %s\n", array_name, init);
+    } else {
+        // Simple declaration with size
+        char *size = generate_code(node->right, output);
+        
+        // Allocate array
+        fprintf(output, "%s = new_array %s\n", array_name, size);
+        LOG("%s = new_array %s\n", array_name, size);
+    }
+}
+
 // Funcion: generate_code
 // -----------------------
 // Genera el codigo intermedio de forma recursiva para el AST.
@@ -293,7 +378,7 @@ static char *generate_code(Node *node, FILE *output) {
             char *temp = new_temp();
             
             // Check if this is a natural number in the symbol table
-            if (symbol_table[node->symbol_index].type == 3) {  // 3 = SYMTAB_NATURAL from lexical analyzer
+            if (symbol_table[node->symbol_index].type == 3) {  // 3 = SYMTAB_NATURAL
                 // For natural numbers, use the numeric value directly
                 unsigned int natural_value = symbol_table[node->symbol_index].value.natural_value;
                 fprintf(output, "%s = %u\n", temp, natural_value);
@@ -307,6 +392,7 @@ static char *generate_code(Node *node, FILE *output) {
             
             return temp;
         }
+        
         case NODE_IDENTIFIER:
             result = get_symbol_name(node->symbol_index);
             break;
@@ -321,6 +407,28 @@ static char *generate_code(Node *node, FILE *output) {
             
         case NODE_WHILE:
             process_while_statement(node, output);
+            break;
+            
+        // New cases for array operations
+        case NODE_ARRAY_LITERAL:
+            result = process_array_literal(node, output);
+            break;
+            
+        case NODE_ARRAY_ACCESS:
+            result = process_array_access(node, output);
+            break;
+            
+        case NODE_ARRAY_ASSIGNMENT:
+            process_array_assignment(node, output);
+            break;
+            
+        case NODE_ARRAY_DECL:
+            process_array_declaration(node, output);
+            break;
+            
+        case NODE_ARRAY_SIZE:
+        case NODE_ARRAY_TYPE:
+            // These nodes are handled by their parent nodes
             break;
     }
     
