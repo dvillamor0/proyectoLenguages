@@ -462,11 +462,9 @@ def main():
     # escribir a un archivo
     output_file = tac_file.replace('.tac', '.asm')
     with open(output_file, 'w') as f:
-        f.write("; SECCION DE DATOS\n")
         for data in data_section:
             f.write(f"{data}\n")
         
-        f.write("\n; SECCION DE CODIGO\n")
         for instr in code_section:
             f.write(f"{instr}\n")
     
