@@ -19,6 +19,7 @@ extern struct {
     union {
         double number_value;
         char *string_value;
+        unsigned int natural_value;
     } value;
 } symbol_table[];
 
@@ -288,7 +289,24 @@ static char *generate_code(Node *node, FILE *output) {
             result = process_binary_op(node, output);
             break;
             
-        case NODE_NUMBER:
+        case NODE_NUMBER: {
+            char *temp = new_temp();
+            
+            // Check if this is a natural number in the symbol table
+            if (symbol_table[node->symbol_index].type == 3) {  // 3 = SYMTAB_NATURAL from lexical analyzer
+                // For natural numbers, use the numeric value directly
+                unsigned int natural_value = symbol_table[node->symbol_index].value.natural_value;
+                fprintf(output, "%s = %u\n", temp, natural_value);
+                LOG("%s = %u (natural)\n", temp, natural_value);
+            } else {
+                // For regular numbers, just use the string representation as before
+                const char *num_str = get_symbol_name(node->symbol_index);
+                fprintf(output, "%s = %s\n", temp, num_str);
+                LOG("%s = %s\n", temp, num_str);
+            }
+            
+            return temp;
+        }
         case NODE_IDENTIFIER:
             result = get_symbol_name(node->symbol_index);
             break;
