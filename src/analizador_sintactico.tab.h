@@ -87,7 +87,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 ".\\analizador_sintactico.y"
+#line 24 ".\\analizador_sintactico.y"
 
     int symbol_index;         // Unión para almacenar índices de símbolos.
     struct Node *node;        // Unión para almacenar nodos del AST.
