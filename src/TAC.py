@@ -85,560 +85,556 @@ def tac_to_assembly(tac_file):
     asm_position = 0  # Iniciar posición de código desde 0, separada de la sección de datos
     
     for i, line in enumerate(tac_lines):
-        # Skip function declarations and endings
+        # Saltar declaraciones de funciones y parámetros
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
             
-        # Record label positions in assembly
+        # Registrar posiciones de etiquetas en ensamblador
         if line.startswith('L') and ':' in line:
             label = line.split(':')[0]
             label_to_asm[label] = asm_position
             continue
         
-        # Handle binary operations with + - * / 
+        # Manejar operaciones binarias (las comparaciones extra se implementan a continuación)
         if '=' in line and any(op in line.split('=', 1)[1] for op in [' + ', ' - ', ' * ', ' / ', ' < ', ' > ', ' <= ', ' >= ', ' == ', ' != ']):
             target, expr = [part.strip() for part in line.split('=', 1)]
             
-            # Ensure target has an address
+            # Asegurar que el target tenga dirección
             if target not in variables:
                 variables[target] = next_addr
                 data_section.append("0")
                 next_addr += 1
-                
+            
             target_addr = variables.get(target)
             
-            # Parse binary operation
+            # Si la operación involucra alguna comparación, aseguramos las constantes 0 y 1
+            if any(op in expr for op in [' < ', ' > ', ' <= ', ' >= ', ' == ', ' != ']):
+                zero_addr = 0  # Ya tenemos 0 en dirección 0
+                one_addr = None
+                for addr, val in memory_values.items():
+                    if val == "1":
+                        one_addr = addr
+                        break
+                if one_addr is None:
+                    one_addr = next_addr
+                    memory_values[next_addr] = "1"
+                    data_section.append("1")
+                    next_addr += 1
+            
+            # Operaciones aritméticas
             if ' + ' in expr:
                 left, right = [part.strip() for part in expr.split(' + ')]
-                
-                # Ensure operands have addresses
                 for op in [left, right]:
                     if op not in variables and not op.replace('.', '', 1).isdigit():
                         variables[op] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                
-                # Get operand addresses
                 left_addr = variables.get(left)
                 right_addr = variables.get(right)
-                
-                # Load operands into registers
                 code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
-                
-                # Perform addition with registers only
-                code_section.append(f"ADD R2, R0, R1")
+                code_section.append("ADD R2, R0, R1")
                 asm_position += 1
-                
-                # Store result
                 code_section.append(f"STORE R2, [0x{target_addr:X}]")
                 asm_position += 1
                 
             elif ' - ' in expr:
                 left, right = [part.strip() for part in expr.split(' - ')]
-                
-                # Ensure operands have addresses
                 for op in [left, right]:
                     if op not in variables and not op.replace('.', '', 1).isdigit():
                         variables[op] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                
-                # Get operand addresses
                 left_addr = variables.get(left)
                 right_addr = variables.get(right)
-                
-                # Load operands into registers
                 code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
-                
-                # Perform subtraction with registers only
-                code_section.append(f"SUB R2, R0, R1")
+                code_section.append("SUB R2, R0, R1")
                 asm_position += 1
-                
-                # Store result
                 code_section.append(f"STORE R2, [0x{target_addr:X}]")
                 asm_position += 1
                 
             elif ' * ' in expr:
                 left, right = [part.strip() for part in expr.split(' * ')]
-                
-                # Ensure operands have addresses
                 for op in [left, right]:
                     if op not in variables and not op.replace('.', '', 1).isdigit():
                         variables[op] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                
-                # Get operand addresses
                 left_addr = variables.get(left)
                 right_addr = variables.get(right)
-                
-                # Load operands into registers
                 code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
-                
-                # Perform multiplication with registers only
-                code_section.append(f"MUL R2, R0, R1")
+                code_section.append("MUL R2, R0, R1")
                 asm_position += 1
-                
-                # Store result
                 code_section.append(f"STORE R2, [0x{target_addr:X}]")
                 asm_position += 1
                 
             elif ' / ' in expr:
                 left, right = [part.strip() for part in expr.split(' / ')]
-                
-                # Ensure operands have addresses
                 for op in [left, right]:
                     if op not in variables and not op.replace('.', '', 1).isdigit():
                         variables[op] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                
-                # Get operand addresses
                 left_addr = variables.get(left)
                 right_addr = variables.get(right)
-                
-                # Load operands into registers
                 code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
-                
-                # Perform division with registers only
-                code_section.append(f"DIV R2, R0, R1")
+                code_section.append("DIV R2, R0, R1")
                 asm_position += 1
-                
-                # Store result
                 code_section.append(f"STORE R2, [0x{target_addr:X}]")
                 asm_position += 1
             
-            # Comparison operations
+            # Operador menor que
             elif ' < ' in expr:
                 left, right = [part.strip() for part in expr.split(' < ')]
-                
-                # Ensure operands have addresses
                 for op in [left, right]:
                     if op not in variables and not op.replace('.', '', 1).isdigit():
                         variables[op] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                
-                # Get operand addresses
                 left_addr = variables.get(left)
                 right_addr = variables.get(right)
-                
-                # Load operands into registers
                 code_section.append(f"LOAD R0, [0x{left_addr:X}]")
                 asm_position += 1
                 code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                 asm_position += 1
-                
-                # Compare using CMP and BLT
-                code_section.append(f"CMP R0, R1")
+                code_section.append("CMP R0, R1")
                 asm_position += 1
-                
-                # Find or create memory locations for constant 0 and 1
-                zero_addr = 0  # We already have 0 at address 0
-                one_addr = next_addr
-                if "1" not in memory_values.values():
-                    memory_values[one_addr] = "1"
-                    data_section.append("1")
-                    next_addr += 1
-                else:
-                    for addr, val in memory_values.items():
-                        if val == "1":
-                            one_addr = addr
-                            break
-                
-                # For BLT, we jump 2 instructions ahead if less than (to load 1 - true)
-                jump_to_true = asm_position + 3
-                jump_to_end = asm_position + 5
-                
-                # First, load 0 (false) into R2
                 code_section.append(f"LOAD R2, [0x{zero_addr:X}]")
                 asm_position += 1
-                
-                # Jump to end if not less than
+                jump_to_true = asm_position + 3
+                jump_to_end = asm_position + 5
                 code_section.append(f"BLT R0, R1, [0x{jump_to_true:X}]")
                 asm_position += 1
-                
-                # Skip to the end (after the "true" part)
                 code_section.append(f"JUMP [0x{jump_to_end:X}]")
                 asm_position += 1
-                
-                # Load 1 (true) into R2 if condition is true
                 code_section.append(f"LOAD R2, [0x{one_addr:X}]")
                 asm_position += 1
-                
-                # Store the result
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
+
+            # Operador mayor que: x > y  ===>  (y < x)
+            elif ' > ' in expr:
+                left, right = [part.strip() for part in expr.split(' > ')]
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")
+                        next_addr += 1
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                code_section.append("CMP R0, R1")
+                asm_position += 1
+                code_section.append(f"LOAD R2, [0x{zero_addr:X}]")
+                asm_position += 1
+                jump_to_true = asm_position + 3
+                jump_to_end = asm_position + 5
+                # For x > y, check if y < x.
+                code_section.append(f"BLT R1, R0, [0x{jump_to_true:X}]")
+                asm_position += 1
+                code_section.append(f"JUMP [0x{jump_to_end:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R2, [0x{one_addr:X}]")
+                asm_position += 1
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
+
+            # Operador menor o igual: x <= y  ===>  NOT(x > y)
+            elif ' <= ' in expr:
+                left, right = [part.strip() for part in expr.split(' <= ')]
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")
+                        next_addr += 1
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                code_section.append("CMP R0, R1")
+                asm_position += 1
+                # Compute greater-than result into R3 (x > y)
+                code_section.append(f"LOAD R3, [0x{zero_addr:X}]")
+                asm_position += 1
+                jump_to_gt_true = asm_position + 3
+                jump_to_gt_end = asm_position + 5
+                code_section.append(f"BLT R1, R0, [0x{jump_to_gt_true:X}]")
+                asm_position += 1
+                code_section.append(f"JUMP [0x{jump_to_gt_end:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R3, [0x{one_addr:X}]")
+                asm_position += 1
+                # Now result for (x > y) is in R3; x <= y = 1 - (x > y)
+                code_section.append(f"LOAD R4, [0x{one_addr:X}]")
+                asm_position += 1
+                code_section.append("SUB R2, R4, R3")
+                asm_position += 1
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
+
+            # Operador mayor o igual: x >= y  ===>  NOT(x < y)
+            elif ' >= ' in expr:
+                left, right = [part.strip() for part in expr.split(' >= ')]
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")
+                        next_addr += 1
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                code_section.append("CMP R0, R1")
+                asm_position += 1
+                # Compute less-than result into R3 (x < y)
+                code_section.append(f"LOAD R3, [0x{zero_addr:X}]")
+                asm_position += 1
+                jump_to_lt_true = asm_position + 3
+                jump_to_lt_end = asm_position + 5
+                code_section.append(f"BLT R0, R1, [0x{jump_to_lt_true:X}]")
+                asm_position += 1
+                code_section.append(f"JUMP [0x{jump_to_lt_end:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R3, [0x{one_addr:X}]")
+                asm_position += 1
+                # x >= y = 1 - (x < y)
+                code_section.append(f"LOAD R4, [0x{one_addr:X}]")
+                asm_position += 1
+                code_section.append("SUB R2, R4, R3")
+                asm_position += 1
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
+
+            # Operador igualdad: x == y
+            elif ' == ' in expr:
+                left, right = [part.strip() for part in expr.split(' == ')]
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")
+                        next_addr += 1
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                code_section.append("CMP R0, R1")
+                asm_position += 1
+                code_section.append(f"LOAD R2, [0x{zero_addr:X}]")
+                asm_position += 1
+                jump_to_true = asm_position + 3
+                jump_to_end = asm_position + 5
+                code_section.append(f"BEQ R0, R1, [0x{jump_to_true:X}]")
+                asm_position += 1
+                code_section.append(f"JUMP [0x{jump_to_end:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R2, [0x{one_addr:X}]")
+                asm_position += 1
+                code_section.append(f"STORE R2, [0x{target_addr:X}]")
+                asm_position += 1
+
+            # Operador desigualdad: x != y  ===>  NOT(x == y)
+            elif ' != ' in expr:
+                left, right = [part.strip() for part in expr.split(' != ')]
+                for op in [left, right]:
+                    if op not in variables and not op.replace('.', '', 1).isdigit():
+                        variables[op] = next_addr
+                        data_section.append("0")
+                        next_addr += 1
+                left_addr = variables.get(left)
+                right_addr = variables.get(right)
+                code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                asm_position += 1
+                code_section.append("CMP R0, R1")
+                asm_position += 1
+                # Para !=, asumimos true por defecto y cambiamos a false si son iguales.
+                code_section.append(f"LOAD R2, [0x{one_addr:X}]")
+                asm_position += 1
+                jump_to_false = asm_position + 3
+                jump_to_end = asm_position + 5
+                code_section.append(f"BEQ R0, R1, [0x{jump_to_false:X}]")
+                asm_position += 1
+                code_section.append(f"JUMP [0x{jump_to_end:X}]")
+                asm_position += 1
+                code_section.append(f"LOAD R2, [0x{zero_addr:X}]")
+                asm_position += 1
                 code_section.append(f"STORE R2, [0x{target_addr:X}]")
                 asm_position += 1
                 
             else:
-                # For other binary operations, add as needed
                 code_section.append(f"# Unimplemented binary operation: {expr}")
                 asm_position += 1
                 
-        # Handle variable assignments (var = something)
+        # Manejar asignaciones de variables (var = algo)
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             target, expr = [part.strip() for part in line.split('=', 1)]
-            
-            # Ensure the target has an address
             if target not in variables:
                 variables[target] = next_addr
-                data_section.append("0")  # Add default value to memory
+                data_section.append("0")
                 next_addr += 1
-                
             target_addr = variables.get(target)
             
-            # Handle array allocation: var = new_array size
+            # Array allocation: var = new_array size
             if 'new_array' in expr:
                 size_match = re.search(r'new_array\s+(\w+)', expr)
                 if size_match:
                     size_var = size_match.group(1)
-                    
-                    # Check if size is a constant
                     if size_var.isdigit():
                         size = int(size_var)
-                        
-                        # Store the base address (which is the current target address + 1)
                         base_addr = target_addr + 1
                         code_section.append(f"LOAD R0, [0x{base_addr:X}]")
                         asm_position += 1
                         code_section.append(f"STORE R0, [0x{target_addr:X}]")
                         asm_position += 1
                     else:
-                        # Dynamic size - we need to load the size from a variable
                         if size_var not in variables:
                             variables[size_var] = next_addr
                             data_section.append("0")
                             next_addr += 1
-                        
                         size_addr = variables[size_var]
-                        
-                        # Load the size
                         code_section.append(f"LOAD R0, [0x{size_addr:X}]")
                         asm_position += 1
-                        
-                        # Calculate base address (target_addr + 1)
                         base_addr = target_addr + 1
                         code_section.append(f"LOAD R1, [0x{base_addr:X}]")
                         asm_position += 1
-                        
-                        # Store base address
                         code_section.append(f"STORE R1, [0x{target_addr:X}]")
                         asm_position += 1
             
-            # Handle array element access: var = array[index]
+            # Array element access: var = array[index]
             elif '[' in expr and ']' in expr:
                 array_access_match = re.search(r'(\w+)\[(\w+)\]', expr)
                 if array_access_match:
                     array_var = array_access_match.group(1)
                     index_var = array_access_match.group(2)
-                    
-                    # Get array base address
                     if array_var not in variables:
                         variables[array_var] = next_addr
-                        data_section.append("0")  # Initialize array base
+                        data_section.append("0")
                         next_addr += 1
-                    
                     array_addr = variables[array_var]
-                    
-                    # Handle index
                     if index_var.isdigit():
-                        # Constant index
                         index = int(index_var)
-                        
-                        # Calculate element address (base + index)
-                        element_addr = array_addr + 1 + index  # +1 because element 0 is at base+1
-                        
-                        # Load the element value
+                        element_addr = array_addr + 1 + index
                         code_section.append(f"LOAD R0, [0x{element_addr:X}]")
                         asm_position += 1
-                        
-                        # Store to target
                         code_section.append(f"STORE R0, [0x{target_addr:X}]")
                         asm_position += 1
                     else:
-                        # Dynamic index
                         if index_var not in variables:
                             variables[index_var] = next_addr
                             data_section.append("0")
                             next_addr += 1
-                        
                         index_addr = variables[index_var]
-                        
-                        # Load the base address of the array
                         code_section.append(f"LOAD R0, [0x{array_addr:X}]")
                         asm_position += 1
-                        
-                        # Load the index
                         code_section.append(f"LOAD R1, [0x{index_addr:X}]")
                         asm_position += 1
-                        
-                        # Find 1 in memory or add it
-                        one_addr = next_addr
-                        if "1" not in memory_values.values():
-                            memory_values[one_addr] = "1"
+                        one_addr = None
+                        for addr, val in memory_values.items():
+                            if val == "1":
+                                one_addr = addr
+                                break
+                        if one_addr is None:
+                            one_addr = next_addr
+                            memory_values[next_addr] = "1"
                             data_section.append("1")
                             next_addr += 1
-                        else:
-                            for addr, val in memory_values.items():
-                                if val == "1":
-                                    one_addr = addr
-                                    break
-                        
-                        # Load the constant 1 (for offset)
                         code_section.append(f"LOAD R2, [0x{one_addr:X}]")
                         asm_position += 1
-                        
-                        # Add 1 to index (element 0 is at base+1)
-                        code_section.append(f"ADD R1, R1, R2")
+                        code_section.append("ADD R1, R1, R2")
                         asm_position += 1
-                        
-                        # Calculate the element address (base + index + 1)
-                        code_section.append(f"ADD R2, R0, R1")
+                        code_section.append("ADD R2, R0, R1")
                         asm_position += 1
-                        
-                        # Load element using R2 as address
-                        code_section.append(f"LOAD R3, [0x0]")  # Temporary placeholder
+                        code_section.append("LOAD R3, [0x0]")  # Placeholder for loaded element
                         asm_position += 1
-                        
-                        # Need to convert this to use CMP and BEQ
-                        # Since we can't use register-indirect addressing directly
-                        
-                        # Store to target
                         code_section.append(f"STORE R3, [0x{target_addr:X}]")
                         asm_position += 1
                 else:
                     code_section.append(f"# Invalid array access: {line}")
                     asm_position += 1
             
-            # Handle numeric constants, variables, and other expressions
-            elif expr.replace('.', '', 1).isdigit():  # Numeric constant
-                # Find where the constant is stored
+            # Numeric constants
+            elif expr.replace('.', '', 1).isdigit():
                 const_addr = None
                 for addr, val in memory_values.items():
                     if val == expr:
                         const_addr = addr
                         break
-                
                 if const_addr is None:
-                    # Add the constant to memory
                     const_addr = next_addr
                     memory_values[next_addr] = expr
                     data_section.append(expr)
                     next_addr += 1
-                
-                # Load constant and store to target
                 code_section.append(f"LOAD R0, [0x{const_addr:X}]")
                 asm_position += 1
                 code_section.append(f"STORE R0, [0x{target_addr:X}]")
                 asm_position += 1
             
-            # Handle other expressions like var = another_var
+            # Función call: manejar llamadas a funciones
+            elif expr.startswith("call "):
+                # Ejemplo: "t73 = call factorial, 1"
+                call_expr = expr[5:].strip()  # Quitar "call "
+                parts = call_expr.split(',')
+                func_name = parts[0].strip()
+                num_args = parts[1].strip() if len(parts) > 1 else "0"
+                # Suponemos que los parámetros ya se han cargado (líneas 'param')
+                code_section.append(f"CALL {func_name}")
+                asm_position += 1
+                code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                asm_position += 1
+            
+            # Otras asignaciones: var = another_var
             else:
-                # Check if it's a variable
                 if expr in variables:
                     source_addr = variables[expr]
-                    
-                    # Load from source and store to target
                     code_section.append(f"LOAD R0, [0x{source_addr:X}]")
                     asm_position += 1
                     code_section.append(f"STORE R0, [0x{target_addr:X}]")
                     asm_position += 1
                 else:
-                    # Unknown expression
                     code_section.append(f"# Unrecognized expression: {expr}")
                     asm_position += 1
         
-        # Handle array element assignment: array[index] = value
+        # Manejar asignaciones a elementos de array: array[index] = value
         elif '[' in line and '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             array_assign_match = re.search(r'(\w+)\[(\w+)\]\s*=\s*(\w+)', line)
             if array_assign_match:
                 array_var = array_assign_match.group(1)
                 index_var = array_assign_match.group(2)
                 value_var = array_assign_match.group(3)
-                
-                # Get array base address
                 if array_var not in variables:
                     variables[array_var] = next_addr
-                    data_section.append("0")  # Initialize array base
+                    data_section.append("0")
                     next_addr += 1
-                
                 array_addr = variables[array_var]
-                
-                # Get value address
                 if value_var not in variables and not value_var.isdigit():
                     variables[value_var] = next_addr
                     data_section.append("0")
                     next_addr += 1
-                
                 value_addr = variables.get(value_var)
                 if value_var.isdigit():
-                    # Find constant address
                     for addr, val in memory_values.items():
                         if val == value_var:
                             value_addr = addr
                             break
-                    
                     if value_addr is None:
                         value_addr = next_addr
                         memory_values[next_addr] = value_var
                         data_section.append(value_var)
                         next_addr += 1
-                
-                # Handle index
                 if index_var.isdigit():
-                    # Constant index
                     index = int(index_var)
-                    
-                    # Calculate element address (base + index)
-                    element_addr = array_addr + 1 + index  # +1 because element 0 is at base+1
-                    
-                    # Load value and store to element
+                    element_addr = array_addr + 1 + index
                     code_section.append(f"LOAD R0, [0x{value_addr:X}]")
                     asm_position += 1
                     code_section.append(f"STORE R0, [0x{element_addr:X}]")
                     asm_position += 1
                 else:
-                    # Dynamic index - similar to array access, need to find the address
                     if index_var not in variables:
                         variables[index_var] = next_addr
                         data_section.append("0")
                         next_addr += 1
-                    
                     index_addr = variables[index_var]
-                    
-                    # Load the base address of the array
                     code_section.append(f"LOAD R0, [0x{array_addr:X}]")
                     asm_position += 1
-                    
-                    # Load the index
                     code_section.append(f"LOAD R1, [0x{index_addr:X}]")
                     asm_position += 1
-                    
-                    # Find 1 in memory or add it
-                    one_addr = next_addr
-                    if "1" not in memory_values.values():
-                        memory_values[one_addr] = "1"
+                    one_addr = None
+                    for addr, val in memory_values.items():
+                        if val == "1":
+                            one_addr = addr
+                            break
+                    if one_addr is None:
+                        one_addr = next_addr
+                        memory_values[next_addr] = "1"
                         data_section.append("1")
                         next_addr += 1
-                    else:
-                        for addr, val in memory_values.items():
-                            if val == "1":
-                                one_addr = addr
-                                break
-                    
-                    # Load the constant 1 (for offset)
                     code_section.append(f"LOAD R2, [0x{one_addr:X}]")
                     asm_position += 1
-                    
-                    # Add 1 to index (element 0 is at base+1)
-                    code_section.append(f"ADD R1, R1, R2")
+                    code_section.append("ADD R1, R1, R2")
                     asm_position += 1
-                    
-                    # Calculate the element address (base + index + 1)
-                    code_section.append(f"ADD R2, R0, R1")
+                    code_section.append("ADD R2, R0, R1")
                     asm_position += 1
-                    
-                    # Load the value to store
                     code_section.append(f"LOAD R3, [0x{value_addr:X}]")
                     asm_position += 1
-                    
-                    # Store value to element - since we can't use register-indirect, adjust this
-                    code_section.append(f"# Using calculated address in R2 to store from R3 - simulator should handle this")
+                    code_section.append("# Using calculated address in R2 to store from R3 - simulator should handle this")
                     asm_position += 1
-                    
-                    # This is a placeholder - would need to implement a sequence that stores to the calculated address
-                    code_section.append(f"STORE R3, [0x{array_addr+1+0:X}]")  # Example: store to first element
+                    code_section.append(f"STORE R3, [0x{array_addr+1:X}]  # Placeholder")
                     asm_position += 1
             else:
                 code_section.append(f"# Invalid array assignment: {line}")
                 asm_position += 1
         
-        # Handle conditional jumps (ifz t1 goto L2)
+        # Manejar saltos condicionales: ifz t1 goto L2
         elif line.startswith('ifz'):
             parts = line.split()
             condition_var = parts[1]
             goto_label = parts[3]
-            
-            # Ensure condition variable has an address
             if condition_var not in variables:
                 variables[condition_var] = next_addr
                 data_section.append("0")
                 next_addr += 1
-            
             condition_addr = variables.get(condition_var)
-            
-            # Load condition value
             code_section.append(f"LOAD R0, [0x{condition_addr:X}]")
             asm_position += 1
-            
-            # Load 0 for comparison
-            code_section.append(f"LOAD R1, [0x0]")
+            code_section.append("LOAD R1, [0x0]")
             asm_position += 1
-            
-            # Compare values
-            code_section.append(f"CMP R0, R1")
+            code_section.append("CMP R0, R1")
             asm_position += 1
-            
-            # Branch if equal (ifz means "if zero")
             if goto_label in label_to_asm:
                 code_section.append(f"BEQ R0, R1, [0x{label_to_asm[goto_label]:X}]")
             else:
-                # Store label for later resolution
                 code_section.append(f"BEQ R0, R1, [{goto_label}]")
             asm_position += 1
         
-        # Handle unconditional jumps (goto L1)
+        # Manejar saltos incondicionales: goto L1
         elif line.startswith('goto'):
             goto_label = line.split()[1]
-            
-            # Add the jump instruction
             if goto_label in label_to_asm:
                 code_section.append(f"JUMP [0x{label_to_asm[goto_label]:X}]")
             else:
-                # Store label for later resolution
                 code_section.append(f"JUMP [{goto_label}]")
             asm_position += 1
         
-        # Handle return statements
+        # Manejar instrucciones return
         elif line.startswith('return'):
             return_var = line.split()[1]
-            
-            # Ensure return variable has an address
             if return_var not in variables:
                 variables[return_var] = next_addr
                 data_section.append("0")
                 next_addr += 1
-            
             return_addr = variables.get(return_var)
-            
-            # Load return value to R0
             code_section.append(f"LOAD R0, [0x{return_addr:X}]")
             asm_position += 1
-            
-            # Return from function
             code_section.append("RET")
             asm_position += 1
     
-    # Last pass: resolve label references
+    # Última pasada: resolver referencias a etiquetas
     fixed_code_section = []
     for instr in code_section:
         if instr.startswith("#"):
-            # Keep comments as they are
             fixed_code_section.append(instr)
         else:
-            # Check for label references
             modified_instr = instr
             for label, pos in label_to_asm.items():
                 if f"[{label}]" in modified_instr:
@@ -650,23 +646,17 @@ def tac_to_assembly(tac_file):
 def main():
     """Función principal para ejecutar el convertidor de TAC a ensamblador."""
     import sys
-    
     if len(sys.argv) != 2:
         print("Uso: python TAC.py <archivo_entrada.tac>")
         sys.exit(1)
-    
     tac_file = sys.argv[1]
     data_section, code_section = tac_to_assembly(tac_file)
-    
-    # escribir a un archivo
     output_file = tac_file.replace('.tac', '.asm')
     with open(output_file, 'w') as f:
         for data in data_section:
             f.write(f"{data}\n")
-        
         for instr in code_section:
             f.write(f"{instr}\n")
-    
     print(f"\nCódigo ensamblador escrito en {output_file}")
 
 if __name__ == "__main__":

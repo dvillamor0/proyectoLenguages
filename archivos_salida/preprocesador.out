@@ -1,26 +1,107 @@
 Fun main() {
     
-    Arreglo Ent nums[5];
-
+    Ent x = 10;
+    Flo y = 3.14;
+    Nat z = 5;
     
-    nums[0] = 10;
-    nums[1] = 20;
-    nums[2] = 30;
-    nums[3] = 40;
-    nums[4] = 50;
-
     
-    Arreglo Flo prices[3] = [10.5, 20.75, 30.99];
-
+    Ent sum = x + 5;
+    Flo diff = y - 1.5;
+    Ent product = x * 2;
+    Flo quotient = y / 2.0;
     
-    Ent total = nums[0] + nums[4];
-
     
-    Ent i = 0;
-    While (i < 5) {
-        nums[i] = nums[i] * 2;
+    Ent complex_expr = (x + 5) * 2 / (1 + 1);
+    
+    
+    Arreglo Ent intArray[5] = [1, 2, 3, 4, 5];
+    Arreglo Flo floatArray[3] = [1.1, 2.2, 3.3];
+    Arreglo Nat natArray[4] = [10, 20, 30, 40];
+    
+    
+    Ent firstElement = intArray[0];
+    floatArray[1] = 5.5;
+    natArray[2] = natArray[0] + natArray[1];
+    
+    
+    If (x > 5) {
+        Ent inside_if = 42;
+        x = x + inside_if;
+    }
+    
+    
+    Nat counter = 0;
+    While (counter < 10) {
+        counter = counter + 1;
+        If (counter == 5) {
+            x = x + counter;
+        }
+    }
+    
+    
+    If (x <= y) {
+        x = x * 2;
+    }
+    
+    If (x != y) {
+        y = y + 1.0;
+    }
+    
+    If (x == 20) {
+        x = 30;
+    }
+    
+    If (x >= y) {
+        x = x - 1;
+    }
+    
+    
+    Nat fact_result = factorial(5);
+    
+    
+    Ent array_sum = sumArray(5);
+    
+    
+    Ret array_sum;
+}
+
+
+Fun factorial(Nat n) {
+    If (n <= 1) {
+        Ret 1;
+    }
+    Ret n * factorial(n - 1);
+}
+
+
+Fun calculate(Ent a, Flo b, Nat c) {
+    Flo temp = a + b;
+    temp = temp * c;
+    Ret temp / 2.0;
+}
+
+
+Fun sumArray(Ent size) {
+    Ent sum = 0;
+    Nat i = 0;
+    
+    While (i < size) {
+        sum = sum + intArray[i];
         i = i + 1;
     }
+    
+    Ret sum;
+}
 
-    Ret 0;
+
+Fun createAndFillArray(Ent size, Ent value) {
+    Arreglo Ent newArray[size];
+    Nat i = 0;
+    
+    While (i < size) {
+        newArray[i] = value * i;
+        i = i + 1;
+    }
+    
+    Ret newArray[size - 1];
 }
