@@ -19,6 +19,7 @@ typedef enum {
     TYPE_UNKNOWN,
     TYPE_INTEGER,
     TYPE_FLOAT,
+    TYPE_NATURAL,
     TYPE_VOID
 } DataType;
 
@@ -116,6 +117,8 @@ static DataType get_type_from_token(int token) {
             return TYPE_INTEGER;
         case TOKEN_FLO:
             return TYPE_FLOAT;
+        case TOKEN_NAT:
+            return TYPE_NATURAL;
         default:
             return TYPE_UNKNOWN;
     }
@@ -130,9 +133,12 @@ static DataType check_types(Node *node, SymbolTable *table) {
     
     switch (node->type) {
         case NODE_NUMBER: {
-            // Obtiene el string numerico desde la tabla de simbolos
+            if (symbol_table[node->symbol_index].type == 3) {  
+                return TYPE_NATURAL;
+            }
+            
+            // Otherwise, check for float or integer as before
             const char *num_str = symbol_table[node->symbol_index].name;
-            // Retorna TYPE_FLOAT si contiene punto o notacion exponencial, sino TYPE_INTEGER
             return (strchr(num_str, '.') || strchr(num_str, 'e') || strchr(num_str, 'E'))
                    ? TYPE_FLOAT : TYPE_INTEGER;
         }
