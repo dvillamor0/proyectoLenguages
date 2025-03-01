@@ -81,9 +81,6 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Al igual que en Windows, navega al directorio `src` y ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l
-    gcc -o ..\compilados\analizador lex.yy.c 
-
     flex ensamblador.l
     gcc -o ..\compilados\ensamblador lex.yy.c 
 
