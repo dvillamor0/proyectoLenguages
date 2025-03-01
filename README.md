@@ -105,3 +105,36 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    - El archivo `Diseño_GUI.ui` contiene el diseño visual de la interfaz que se puede modificar utilizando un editor visual compatible.
 
 ---
+
+## compilar
+
+- preprocesador
+
+  ```bash
+   flex preprocesador.l &&
+   mv lex.yy.c ../compilados/preprocesador.yy.c &&
+   gcc -o ../compilados/preprocesador ../compilados/preprocesador.yy.c -lfl
+
+- compilador
+
+  ```bash
+   flex analizador_lexico.l &&
+   mv lex.yy.c ../compilados/analizadorLexico.yy.c &&
+   gcc -o ../compilados/compiler -I. -I../compilados \
+   ../compilados/analizadorLexico.yy.c \
+   ../compilados/analizador_sintactico.tab.c \
+   ast.c \
+   analizador_semantico.c \
+   intermediate_code.c \
+   -lfl
+
+- ensamblador
+   ```bash
+   flex ensamblador.l &&
+   mv lex.yy.c ../compilados/ensamblador.yy.c &&
+   gcc -o ../compilados/ensamblador ../compilados/ensamblador.yy.c -lfl -lm
+- enlazador
+   ```bash
+   flex linkerLoader.l &&
+   mv lex.yy.c ../compilados/linkerLoader.yy.c &&
+   gcc -o ../compilados/linkerLoader ../compilados/linkerLoader.yy.c -lfl -lm
