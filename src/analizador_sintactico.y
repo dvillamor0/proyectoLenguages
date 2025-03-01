@@ -2,6 +2,7 @@
     // Inclusión de las bibliotecas estándar necesarias para la entrada/salida y manejo de memoria.
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
     
     // Inclusión de cabeceras del compilador para el manejo del AST, análisis semántico y generación de código intermedio.
     #include "ast.h"
@@ -367,7 +368,16 @@ int main(int argc, char **argv) {
             printf("Debug: Analisis semantico completado\n");
             
             printf("Debug: Generando codigo intermedio\n");
-            generate_intermediate_code(ast_root, "../archivos_salida/compilador.tac");
+            char output_file[256];
+            strncpy(output_file, argv[2], sizeof(output_file) - 1);
+            output_file[sizeof(output_file) - 1] = '\0';
+            char *dot = strrchr(output_file, '.');
+            if (dot) {
+                strcpy(dot, ".tac");
+            } else {
+                strcat(output_file, ".tac");
+            }
+            generate_intermediate_code(ast_root, output_file);
             printf("Debug: Generacion de codigo intermedio completada\n");
         } else {
             fprintf(stderr, "Debug: La raiz del AST es NULL a pesar de un analisis exitoso\n");

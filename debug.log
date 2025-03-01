@@ -1,0 +1,86 @@
+🔹 Código fuente escrito en C:\Users\JUANAN~1\AppData\Local\Temp\tmpqfqgxdit.out:
+Fun main() {
+    Flo number = 16.0;
+    Flo root = add(number);
+}
+Fun add(Flo num) {
+    Flo result = num;
+    Flo temp = 10;
+    result = num + temp;
+    Ret result;
+}
+
+🔹 Archivos temporales creados:
+OUT: C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.out
+ASM: C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.asm
+🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.tac:
+begin_func main
+number = 16.0
+param number
+t1 = call add, 1
+root = t1
+end_func
+
+begin_func add
+param num
+result = num
+temp = 10
+t2 = num + temp
+result = t2
+return result
+end_func
+
+
+🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.tac:
+begin_func main
+number = 16.0
+param number
+t1 = call add, 1
+root = t1
+end_func
+
+begin_func add
+param num
+result = num
+temp = 10
+t2 = num + temp
+result = t2
+return result
+end_func
+
+
+🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.asm:
+; SECCION DE DATOS
+0
+16.0
+10
+2
+0
+0
+0
+0
+0
+0
+0
+0
+
+; SECCION DE CODIGO
+LOAD R0, [0x2]
+STORE R0, [0x1]
+LOAD R0, [0xA]
+STORE R0, [0x3]
+LOAD R0, [0x3]
+STORE R0, [0x4]
+LOAD R0, [0xB]
+STORE R0, [0x5]
+LOAD R0, [0x7]
+STORE R0, [0x6]
+LOAD R0, [0xB]
+LOAD R1, [0x6]
+ADD R3, R0, R1
+STORE R3, [0x8]
+LOAD R0, [0x8]
+STORE R0, [0x5]
+LOAD R0, [0x5]
+RET
+

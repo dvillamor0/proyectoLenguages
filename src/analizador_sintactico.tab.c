@@ -72,6 +72,7 @@
     // Inclusión de las bibliotecas estándar necesarias para la entrada/salida y manejo de memoria.
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
     
     // Inclusión de cabeceras del compilador para el manejo del AST, análisis semántico y generación de código intermedio.
     #include "ast.h"
@@ -87,7 +88,7 @@
     // Declaración de la raíz del árbol de sintaxis abstracta.
     Node* ast_root = NULL;
 
-#line 91 "analizador_sintactico.tab.c"
+#line 92 "analizador_sintactico.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -550,11 +551,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    55,    55,    67,    68,    83,    98,    99,   100,   115,
-     128,   129,   138,   148,   149,   168,   169,   170,   171,   172,
-     181,   196,   211,   221,   231,   240,   252,   253,   254,   255,
-     256,   257,   266,   270,   274,   280,   284,   288,   292,   296,
-     306,   307,   308
+       0,    56,    56,    68,    69,    84,    99,   100,   101,   116,
+     129,   130,   139,   149,   150,   169,   170,   171,   172,   173,
+     182,   197,   212,   222,   232,   241,   253,   254,   255,   256,
+     257,   258,   267,   271,   275,   281,   285,   289,   293,   297,
+     307,   308,   309
 };
 #endif
 
@@ -1436,22 +1437,22 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: function_list  */
-#line 55 ".\\analizador_sintactico.y"
+#line 56 ".\\analizador_sintactico.y"
                        { 
         (yyval.node) = create_node(NODE_PROGRAM, (yyvsp[0].node), NULL);
         ast_root = (yyval.node);  // Asigna la raíz del AST para su posterior procesamiento.
     }
-#line 1445 "analizador_sintactico.tab.c"
+#line 1446 "analizador_sintactico.tab.c"
     break;
 
   case 3: /* function_list: function  */
-#line 67 ".\\analizador_sintactico.y"
+#line 68 ".\\analizador_sintactico.y"
                                       { (yyval.node) = (yyvsp[0].node); }
-#line 1451 "analizador_sintactico.tab.c"
+#line 1452 "analizador_sintactico.tab.c"
     break;
 
   case 4: /* function_list: function_list function  */
-#line 68 ".\\analizador_sintactico.y"
+#line 69 ".\\analizador_sintactico.y"
                                       { 
                                         (yyval.node) = (yyvsp[-1].node);
                                         // Se recorre la lista hasta el último nodo y se enlaza la nueva función.
@@ -1459,33 +1460,33 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1463 "analizador_sintactico.tab.c"
+#line 1464 "analizador_sintactico.tab.c"
     break;
 
   case 5: /* function: TOKEN_FUN TOKEN_ID TOKEN_LPAREN param_list TOKEN_RPAREN block  */
-#line 84 ".\\analizador_sintactico.y"
+#line 85 ".\\analizador_sintactico.y"
                                      { 
                                         Node *func = create_node(NODE_FUNCTION, (yyvsp[-2].node), (yyvsp[0].node));
                                         func->symbol_index = (yyvsp[-4].symbol_index);  // Asigna el índice del identificador de la función.
                                         (yyval.node) = func;
                                      }
-#line 1473 "analizador_sintactico.tab.c"
+#line 1474 "analizador_sintactico.tab.c"
     break;
 
   case 6: /* param_list: %empty  */
-#line 98 ".\\analizador_sintactico.y"
+#line 99 ".\\analizador_sintactico.y"
                                       { (yyval.node) = NULL; }
-#line 1479 "analizador_sintactico.tab.c"
+#line 1480 "analizador_sintactico.tab.c"
     break;
 
   case 7: /* param_list: param  */
-#line 99 ".\\analizador_sintactico.y"
+#line 100 ".\\analizador_sintactico.y"
                                       { (yyval.node) = (yyvsp[0].node); }
-#line 1485 "analizador_sintactico.tab.c"
+#line 1486 "analizador_sintactico.tab.c"
     break;
 
   case 8: /* param_list: param_list TOKEN_COMMA param  */
-#line 100 ".\\analizador_sintactico.y"
+#line 101 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = (yyvsp[-2].node);
                                         // Se recorre la lista de parámetros y se enlaza el nuevo parámetro.
@@ -1493,33 +1494,33 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1497 "analizador_sintactico.tab.c"
+#line 1498 "analizador_sintactico.tab.c"
     break;
 
   case 9: /* param: type TOKEN_ID  */
-#line 115 ".\\analizador_sintactico.y"
+#line 116 ".\\analizador_sintactico.y"
                                       {
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[0].symbol_index);  // Asigna el índice del identificador del parámetro.
                                         (yyval.node) = id;
                                      }
-#line 1507 "analizador_sintactico.tab.c"
+#line 1508 "analizador_sintactico.tab.c"
     break;
 
   case 12: /* block: TOKEN_LBRACE statement_list TOKEN_RBRACE  */
-#line 139 ".\\analizador_sintactico.y"
+#line 140 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_BLOCK, (yyvsp[-1].node), NULL); }
-#line 1513 "analizador_sintactico.tab.c"
+#line 1514 "analizador_sintactico.tab.c"
     break;
 
   case 13: /* statement_list: %empty  */
-#line 148 ".\\analizador_sintactico.y"
+#line 149 ".\\analizador_sintactico.y"
                                       { (yyval.node) = NULL; }
-#line 1519 "analizador_sintactico.tab.c"
+#line 1520 "analizador_sintactico.tab.c"
     break;
 
   case 14: /* statement_list: statement_list statement  */
-#line 149 ".\\analizador_sintactico.y"
+#line 150 ".\\analizador_sintactico.y"
                                       {
                                         if ((yyvsp[-1].node) == NULL) {
                                             (yyval.node) = (yyvsp[0].node);
@@ -1531,178 +1532,178 @@ yyreduce:
                                             last->next = (yyvsp[0].node);
                                         }
                                      }
-#line 1535 "analizador_sintactico.tab.c"
+#line 1536 "analizador_sintactico.tab.c"
     break;
 
   case 20: /* declaration_stmt: type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 182 ".\\analizador_sintactico.y"
+#line 183 ".\\analizador_sintactico.y"
                                      {
                                         // Se crea un nodo identificador y se asocia a la declaración.
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[-3].symbol_index);
                                         (yyval.node) = create_node(NODE_DECLARATION, id, (yyvsp[-1].node));
                                      }
-#line 1546 "analizador_sintactico.tab.c"
+#line 1547 "analizador_sintactico.tab.c"
     break;
 
   case 21: /* assignment_stmt: TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 197 ".\\analizador_sintactico.y"
+#line 198 ".\\analizador_sintactico.y"
                                      {
                                         // Se crea un nodo identificador para la variable a la que se asigna el valor.
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[-3].symbol_index);
                                         (yyval.node) = create_node(NODE_ASSIGNMENT, id, (yyvsp[-1].node));
                                      }
-#line 1557 "analizador_sintactico.tab.c"
+#line 1558 "analizador_sintactico.tab.c"
     break;
 
   case 22: /* if_stmt: TOKEN_IF TOKEN_LPAREN condition TOKEN_RPAREN block  */
-#line 212 ".\\analizador_sintactico.y"
+#line 213 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_IF, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1563 "analizador_sintactico.tab.c"
+#line 1564 "analizador_sintactico.tab.c"
     break;
 
   case 23: /* while_stmt: TOKEN_WHILE TOKEN_LPAREN condition TOKEN_RPAREN block  */
-#line 222 ".\\analizador_sintactico.y"
+#line 223 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_WHILE, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1569 "analizador_sintactico.tab.c"
+#line 1570 "analizador_sintactico.tab.c"
     break;
 
   case 24: /* return_stmt: TOKEN_RET expr TOKEN_SEMICOLON  */
-#line 231 ".\\analizador_sintactico.y"
+#line 232 ".\\analizador_sintactico.y"
                                       { (yyval.node) = create_node(NODE_RETURN, (yyvsp[-1].node), NULL); }
-#line 1575 "analizador_sintactico.tab.c"
+#line 1576 "analizador_sintactico.tab.c"
     break;
 
   case 25: /* condition: expr relop expr  */
-#line 240 ".\\analizador_sintactico.y"
+#line 241 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
                                         (yyval.node)->symbol_index = (yyvsp[-1].symbol_index);  // El índice del operador relacional.
                                      }
-#line 1584 "analizador_sintactico.tab.c"
+#line 1585 "analizador_sintactico.tab.c"
     break;
 
   case 26: /* relop: TOKEN_RELOP_LT  */
-#line 252 ".\\analizador_sintactico.y"
+#line 253 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_LT; }
-#line 1590 "analizador_sintactico.tab.c"
+#line 1591 "analizador_sintactico.tab.c"
     break;
 
   case 27: /* relop: TOKEN_RELOP_LE  */
-#line 253 ".\\analizador_sintactico.y"
+#line 254 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_LE; }
-#line 1596 "analizador_sintactico.tab.c"
+#line 1597 "analizador_sintactico.tab.c"
     break;
 
   case 28: /* relop: TOKEN_RELOP_EQ  */
-#line 254 ".\\analizador_sintactico.y"
+#line 255 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_EQ; }
-#line 1602 "analizador_sintactico.tab.c"
+#line 1603 "analizador_sintactico.tab.c"
     break;
 
   case 29: /* relop: TOKEN_RELOP_NE  */
-#line 255 ".\\analizador_sintactico.y"
+#line 256 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_NE; }
-#line 1608 "analizador_sintactico.tab.c"
+#line 1609 "analizador_sintactico.tab.c"
     break;
 
   case 30: /* relop: TOKEN_RELOP_GT  */
-#line 256 ".\\analizador_sintactico.y"
+#line 257 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_GT; }
-#line 1614 "analizador_sintactico.tab.c"
+#line 1615 "analizador_sintactico.tab.c"
     break;
 
   case 31: /* relop: TOKEN_RELOP_GE  */
-#line 257 ".\\analizador_sintactico.y"
+#line 258 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_GE; }
-#line 1620 "analizador_sintactico.tab.c"
+#line 1621 "analizador_sintactico.tab.c"
     break;
 
   case 32: /* expr: TOKEN_ID  */
-#line 266 ".\\analizador_sintactico.y"
+#line 267 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
                                      }
-#line 1629 "analizador_sintactico.tab.c"
+#line 1630 "analizador_sintactico.tab.c"
     break;
 
   case 33: /* expr: TOKEN_NUMBER  */
-#line 270 ".\\analizador_sintactico.y"
+#line 271 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = create_node(NODE_NUMBER, NULL, NULL);
                                         (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
                                      }
-#line 1638 "analizador_sintactico.tab.c"
+#line 1639 "analizador_sintactico.tab.c"
     break;
 
   case 34: /* expr: TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN  */
-#line 275 ".\\analizador_sintactico.y"
+#line 276 ".\\analizador_sintactico.y"
                                      {
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[-3].symbol_index);
                                         (yyval.node) = create_node(NODE_FUNCTION_CALL, id, (yyvsp[-1].node));
                                      }
-#line 1648 "analizador_sintactico.tab.c"
+#line 1649 "analizador_sintactico.tab.c"
     break;
 
   case 35: /* expr: expr TOKEN_PLUS expr  */
-#line 280 ".\\analizador_sintactico.y"
+#line 281 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node)); 
                                         (yyval.node)->symbol_index = TOKEN_PLUS;
                                      }
-#line 1657 "analizador_sintactico.tab.c"
+#line 1658 "analizador_sintactico.tab.c"
     break;
 
   case 36: /* expr: expr TOKEN_MINUS expr  */
-#line 284 ".\\analizador_sintactico.y"
+#line 285 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
                                         (yyval.node)->symbol_index = TOKEN_MINUS;
                                      }
-#line 1666 "analizador_sintactico.tab.c"
+#line 1667 "analizador_sintactico.tab.c"
     break;
 
   case 37: /* expr: expr TOKEN_MULT expr  */
-#line 288 ".\\analizador_sintactico.y"
+#line 289 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
                                         (yyval.node)->symbol_index = TOKEN_MULT;
                                      }
-#line 1675 "analizador_sintactico.tab.c"
+#line 1676 "analizador_sintactico.tab.c"
     break;
 
   case 38: /* expr: expr TOKEN_DIV expr  */
-#line 292 ".\\analizador_sintactico.y"
+#line 293 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
                                         (yyval.node)->symbol_index = TOKEN_DIV;
                                      }
-#line 1684 "analizador_sintactico.tab.c"
+#line 1685 "analizador_sintactico.tab.c"
     break;
 
   case 39: /* expr: TOKEN_LPAREN expr TOKEN_RPAREN  */
-#line 296 ".\\analizador_sintactico.y"
+#line 297 ".\\analizador_sintactico.y"
                                      { (yyval.node) = (yyvsp[-1].node); }
-#line 1690 "analizador_sintactico.tab.c"
+#line 1691 "analizador_sintactico.tab.c"
     break;
 
   case 40: /* arg_list: %empty  */
-#line 306 ".\\analizador_sintactico.y"
+#line 307 ".\\analizador_sintactico.y"
                                       { (yyval.node) = NULL; }
-#line 1696 "analizador_sintactico.tab.c"
+#line 1697 "analizador_sintactico.tab.c"
     break;
 
   case 41: /* arg_list: expr  */
-#line 307 ".\\analizador_sintactico.y"
+#line 308 ".\\analizador_sintactico.y"
                                       { (yyval.node) = (yyvsp[0].node); }
-#line 1702 "analizador_sintactico.tab.c"
+#line 1703 "analizador_sintactico.tab.c"
     break;
 
   case 42: /* arg_list: arg_list TOKEN_COMMA expr  */
-#line 308 ".\\analizador_sintactico.y"
+#line 309 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = (yyvsp[-2].node);
                                         // Se enlaza el nuevo argumento al final de la lista.
@@ -1710,11 +1711,11 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1714 "analizador_sintactico.tab.c"
+#line 1715 "analizador_sintactico.tab.c"
     break;
 
 
-#line 1718 "analizador_sintactico.tab.c"
+#line 1719 "analizador_sintactico.tab.c"
 
       default: break;
     }
@@ -1938,7 +1939,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 317 ".\\analizador_sintactico.y"
+#line 318 ".\\analizador_sintactico.y"
 
 
 /*
@@ -1992,7 +1993,16 @@ int main(int argc, char **argv) {
             printf("Debug: Analisis semantico completado\n");
             
             printf("Debug: Generando codigo intermedio\n");
-            generate_intermediate_code(ast_root, "../archivos_salida/compilador.tac");
+            char output_file[256];
+            strncpy(output_file, argv[2], sizeof(output_file) - 1);
+            output_file[sizeof(output_file) - 1] = '\0';
+            char *dot = strrchr(output_file, '.');
+            if (dot) {
+                strcpy(dot, ".tac");
+            } else {
+                strcat(output_file, ".tac");
+            }
+            generate_intermediate_code(ast_root, output_file);
             printf("Debug: Generacion de codigo intermedio completada\n");
         } else {
             fprintf(stderr, "Debug: La raiz del AST es NULL a pesar de un analisis exitoso\n");

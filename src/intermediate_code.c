@@ -3,6 +3,14 @@
 #include <string.h>
 #include "ast.h"
 #include "analizador_sintactico.tab.h"
+#define DEBUG 1  // Cambiar a 0 para desactivar la depuración
+
+#define LOG(fmt, ...) \
+    if (DEBUG) { \
+        FILE *debug_file = fopen("debug_intermediate.log", "a"); \
+        fprintf(debug_file, fmt, ##__VA_ARGS__); \
+        fclose(debug_file); \
+    }
 
 // Declaracion externa de la tabla de simbolos
 extern struct {
@@ -79,54 +87,70 @@ static char *process_binary_op(Node *node, FILE *output) {
     switch (node->type) {
         case NODE_ADD:
             fprintf(output, "%s = %s + %s\n", temp, left, right);
+            LOG("%s = %s + %s\n", temp, left, right);
             break;
         case NODE_SUB:
             fprintf(output, "%s = %s - %s\n", temp, left, right);
+            LOG("%s = %s - %s\n", temp, left, right);
             break;
         case NODE_MUL:
             fprintf(output, "%s = %s * %s\n", temp, left, right);
+            LOG("%s = %s * %s\n", temp, left, right);
             break;
         case NODE_DIV:
             fprintf(output, "%s = %s / %s\n", temp, left, right);
+            LOG("%s = %s / %s\n", temp, left, right);
             break;
         case NODE_BINARY_OP:
             switch (node->symbol_index) {
                 case TOKEN_RELOP_EQ:
                     fprintf(output, "%s = %s == %s\n", temp, left, right);
+                    LOG("%s = %s == %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_NE:
                     fprintf(output, "%s = %s != %s\n", temp, left, right);
+                    LOG("%s = %s != %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_LT:
                     fprintf(output, "%s = %s < %s\n", temp, left, right);
+                    LOG("%s = %s < %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_LE:
                     fprintf(output, "%s = %s <= %s\n", temp, left, right);
+                    LOG("%s = %s <= %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_GT:
                     fprintf(output, "%s = %s > %s\n", temp, left, right);
+                    LOG("%s = %s > %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_GE:
                     fprintf(output, "%s = %s >= %s\n", temp, left, right);
+                    LOG("%s = %s >= %s\n", temp, left, right);
                     break;
                 case TOKEN_PLUS:
                     fprintf(output, "%s = %s + %s\n", temp, left, right);
+                    LOG("%s = %s + %s\n", temp, left, right);
                     break;
                 case TOKEN_MINUS:
                     fprintf(output, "%s = %s - %s\n", temp, left, right);
+                    LOG("%s = %s - %s\n", temp, left, right);
                     break;
                 case TOKEN_MULT:
                     fprintf(output, "%s = %s * %s\n", temp, left, right);
+                    LOG("%s = %s * %s\n", temp, left, right);
                     break;
                 case TOKEN_DIV:
                     fprintf(output, "%s = %s / %s\n", temp, left, right);
+                    LOG("%s = %s / %s\n", temp, left, right);
                     break;
                 default:
                     fprintf(output, "%s = %s + %s\n", temp, left, right);
+                    LOG("%s = %s + %s\n", temp, left, right);
             }
             break;
         default:
             fprintf(output, "%s = %s + %s\n", temp, left, right);
+            LOG("%s = %s + %s\n", temp, left, right);
     }
     
     return temp;
@@ -299,6 +323,7 @@ void generate_intermediate_code(Node *ast, const char *output_file) {
     FILE *output = fopen(output_file, "w");
     if (!output) {
         fprintf(stderr, "Could not open output file %s\n", output_file);
+        LOG("Could not open output file %s\n", output_file);
         return;
     }
     

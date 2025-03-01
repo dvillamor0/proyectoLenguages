@@ -11,9 +11,10 @@
 
 import sys
 import struct
+import time
 import tempfile
 from assets.memoria import Memoria
-from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16, int_to_bin16, float_to_bin16
+from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16, int_to_bin16, float_to_bin16, ConvertirDatoBinario
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -168,7 +169,7 @@ class MainWindow(QMainWindow):
             elif isinstance(valor, float):
                 return float_to_bin16(valor)
             elif isinstance(valor, str):
-                    return float_to_bin16(bin(ord(valor))[2:].zfill(16))
+                return float_to_bin16(bin(ord(valor))[2:].zfill(16))
             elif isinstance(valor, bool):
                 if(valor):
                     return int_to_bin16(1)
@@ -230,59 +231,103 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
         
     def Compilador(self):
+        def log_debug(message):
+            """ Escribe en un archivo de depuración. """
+            with open("debug.log", "a", encoding="utf-8") as debug_file:
+                debug_file.write(message + "\n")
         # Obtener el código preprocesado de la UI
         codigo = self.ui.codigo_preprocesado_input.toPlainText()
 
-        # Definir rutas
-        compiler_executable = os.path.join(".", "compilados", "compiler.exe")
-        output_file = os.path.join(".", "archivos_salida", "compilador.out")
-        output_file_tac = os.path.join(".", "archivos_salida", "compilador.tac")
-        output_file_asm = os.path.join(".", "archivos_salida", "compilador.asm")
-        tac_script = os.path.join(".", "src", "TAC.py")
+        # Definir rutas absolutas para evitar problemas de ubicación
+        compiler_executable = os.path.abspath("./compilados/compiler.exe")
+        output_file = "./archivos_salida/compilador.out"
+        output_file_tac = "./archivos_salida/compilador.tac"
+        output_file_asm = "./archivos_salida/compilador.asm"
+        tac_script = os.path.abspath("./src/TAC.py")
 
         try:
             # Crear archivo temporal para la entrada
             with tempfile.NamedTemporaryFile(delete=False, suffix=".out", mode="w", encoding="utf-8") as temp_input:
                 temp_input.write(codigo)
-                temp_input.close()
+                temp_input.flush()  # Asegurar que se escribe antes de leer
+                temp_input_path = temp_input.name  # Guardar la ruta del archivo
+            
+            with open(temp_input_path, "r", encoding="utf-8") as source_file:
+                source_code = source_file.read()
+            log_debug(f"🔹 Código fuente escrito en {temp_input_path}:\n{source_code}")
+            
+            # Crear archivo temporal para la salida
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".tac", mode="w", encoding="utf-8") as temp_output:
+                temp_input_tac = temp_output.name  # Guardar la ruta del archivo
+                temp_output_path = temp_input_tac.replace(".tac", ".out")  
+                temp_asm_path = temp_input_tac.replace(".tac", ".asm")  
 
-                # Ejecutar el compilador con el archivo de salida fijo
-                result = subprocess.run(
-                    [compiler_executable, temp_input.name, output_file],
-                    capture_output=True,
-                    text=True
-                )
+            log_debug(f"🔹 Archivos temporales creados:\nOUT: {temp_output_path}\nASM: {temp_asm_path}")
 
-                # Verificar si la compilación fue exitosa
-                if result.returncode != 0:
-                    self.ui.assembler_input.setPlainText(f"[Error Compilador]: {result.stderr}")
+            # Ejecutar el compilador con archivos temporales
+            result = subprocess.run(
+                [compiler_executable, temp_input_path, temp_output_path],
+                capture_output=True,  # Captura salida para depuración
+                text=True
+            )
+
+            # Si el compilador falla, mostrar el error
+            if result.returncode != 0:
+                self.ui.Output.setPlainText(f"[Error Compilador]: {result.stderr}")
+                return
+
+            # Esperar a que se genere el archivo de salida (.tac)
+            timeout = 5  # Tiempo máximo de espera en segundos
+            start_time = time.time()
+
+            while not os.path.exists(temp_input_tac):
+                if time.time() - start_time > timeout:
+                    self.ui.Output.setPlainText("[Error]: Tiempo de espera agotado. El compilador no generó el archivo .tac")
                     return
+                time.sleep(0.1)  # Esperar 100ms antes de volver a comprobar
+            
+            with open(temp_input_tac, "r", encoding="utf-8") as source_file:
+                source_code = source_file.read()
+            log_debug(f"🔹 Contenido de {temp_input_tac}:\n{source_code}")
+            
+            with open(temp_input_tac, "r", encoding="utf-8") as source_file:
+                source_code = source_file.read()
+            log_debug(f"🔹 Contenido de {temp_input_tac}:\n{source_code}")
+            
+            # # Ejecutar TAC.py con el archivo de salida del compilador
+            result_tac = subprocess.run(
+                ["python", tac_script, temp_input_tac],
+                capture_output=False,
+                text=False
+            )
+            
+            timeout = 5  # Tiempo máximo de espera en segundos
+            start_time = time.time()
 
-                # Ejecutar TAC.py con el archivo de salida del compilador
-                result_tac = subprocess.run(
-                    ["python", tac_script, output_file_tac],
-                    capture_output=True,
-                    text=True
-                )
-                
-                # Verificar si la conversión TAC → ASM fue exitosa
-                if result_tac.returncode != 0:
-                    self.ui.Output.setPlainText(f"[Error TAC]: {result_tac.stderr}")
+            while not os.path.exists(temp_asm_path):
+                if time.time() - start_time > timeout:
+                    self.ui.Output.setPlainText("[Error]: Tiempo de espera agotado. El compilador no generó el archivo .tac")
                     return
+                time.sleep(0.1)  # Esperar 100ms antes de volver a comprobar
 
-                # Leer la salida generada en compilador.asm
-                if os.path.exists(output_file_asm):
-                    with open(output_file_asm, "r", encoding="utf-8") as f:
-                        asm_code = f.read()
-                    self.ui.assembler_input.setPlainText(asm_code)
-                else:
-                    self.ui.Output.setPlainText("[Error]: No se generó el archivo de ensamblador.")
+            # # Verificar si la conversión TAC → ASM fue exitosa
+            if result_tac.returncode != 0:
+                self.ui.Output.setPlainText(f"[Error TAC]: {result_tac.stderr}")
+                return
+            
+            with open(temp_asm_path, "r", encoding="utf-8") as asm_file:
+                asm_code = asm_file.read()
+            log_debug(f"🔹 Contenido de {temp_asm_path}:\n{asm_code}")
+            self.ui.assembler_input.setPlainText(asm_code)
+
         finally:
-            # Limpiar archivo temporal de entrada
-            try:
-                os.remove(temp_input.name)
-            except Exception:
-                pass
+            # Limpiar archivo temporal de entrada si aún existe
+            if os.path.exists(temp_input_path):
+                try:
+                    os.remove(temp_input_path)
+                except Exception as e:
+                    print(f"Error al eliminar archivo temporal: {e}")
+
         
     def Ensamblador(self):
         texto = self.ui.assembler_input.toPlainText()  # Obtener el texto del QTextEdit
@@ -388,6 +433,7 @@ class MainWindow(QMainWindow):
         
     def EjecutarComando(self,instruccion):
         nombre_comando = self.IdentificarComando(instruccion)
+        print("🚀 ~ nombre_comando:", nombre_comando)
         self.setDir(instruccion)
         funcion = self.funciones.get(nombre_comando)  # Obtener la función con el mismo nombre
             
@@ -398,7 +444,7 @@ class MainWindow(QMainWindow):
                 resto_instruccion = binario[5:]  # Convertir los 27 bits restantes a entero
                 return funcion(resto_instruccion)
             except ValueError:
-                print("Error: La instrucción debe ser un número entero.")
+                print("Error: La funcion debe ser un número entero.")
         else:
             print(f"Error: La función {nombre_comando} no está definida.")
 
@@ -422,12 +468,14 @@ class MainWindow(QMainWindow):
                 print(f"Error: Código de instrucción fuera de rango ({opcode}).")
                 return "ERROR"
         except ValueError:
-            print("Error: Las instrucción debe ser un número entero.")
+            print("Error: El comando debe ser un número entero.")
             return "ERROR"
 
     def NOP(self,instruccion):
         type_dato = instruccion[:6]
+        print("🚀 ~ instruccion:", instruccion)
         tipo_dato = int(type_dato, 2)
+        print("🚀 ~ tipo_dato:", tipo_dato)
         
         # Determinar el tipo de dato según el valor de los primeros 6 bits
         if tipo_dato == 1:
@@ -441,20 +489,23 @@ class MainWindow(QMainWindow):
         elif tipo_dato == 5:
             return GetCaracterUtf16(instruccion[6:])
         else:
-            print("Error: La instrucción debe ser un número entero.")
+            print("Error: La data debe ser un número entero.")
             return "ERROR"
         
     def LOAD(self,instruccion):
         reg_destino = int(instruccion[:2], 2)
+        print("🚀 ~ reg_destino:", reg_destino)
         dir_origen = int(instruccion[2:], 2)
+        print("🚀 ~ dir_origen:", dir_origen)
+        print("🚀 ~ self.LeerDato(dir_origen):", self.LeerDato(dir_origen))
+        print("🚀 ~ reg_destino: ", self.registro[reg_destino]," <-- self.LeerDato(dir_origen): ", self.LeerDato(dir_origen))
         self.guardar_en_registro(reg_destino,self.LeerDato(dir_origen))
       
     def STORE(self,instruccion):
         reg_origen = int(instruccion[:2], 2)
-        print("🚀 ~ reg_origen:", reg_origen)
         dir_destino = int(instruccion[2:], 2)
-        print("🚀 ~ dir_destino:", dir_destino)
-        self.memoria.escribir_memoria(reg_origen,self.LeerDato(dir_destino))
+        print("🚀 ~ reg_origen: ", self.registro[reg_origen]," --> dir_destino: ", dir_destino)
+        self.memoria.escribir_memoria(dir_destino,ConvertirDatoBinario(self.registro[reg_origen]))
         return 0
         
     def MOVE(self,instruccion):
