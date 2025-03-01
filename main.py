@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         self.memoria = Memoria(self.ui)
         self.ui.preprocesar_button.clicked.connect(self.Preprocesado)
         
+        self.ui.Compilar_button.clicked.connect(self.Compilador)
         self.ui.ensamblador_button.clicked.connect(self.Ensamblador)
         self.ui.Linker_button.clicked.connect(self.EnlazadorCargador)
         self.ui.Read_Next_Instruction.clicked.connect(self.LeerInstruccion)
@@ -227,6 +228,61 @@ class MainWindow(QMainWindow):
             self.ui.codigo_preprocesado_input.setPlainText(output)
         except Exception as e:
             self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
+        
+    def Compilador(self):
+        # Obtener el código preprocesado de la UI
+        codigo = self.ui.codigo_preprocesado_input.toPlainText()
+
+        # Definir rutas
+        compiler_executable = os.path.join(".", "compilados", "compiler.exe")
+        output_file = os.path.join(".", "archivos_salida", "compilador.out")
+        output_file_tac = os.path.join(".", "archivos_salida", "compilador.tac")
+        output_file_asm = os.path.join(".", "archivos_salida", "compilador.asm")
+        tac_script = os.path.join(".", "src", "TAC.py")
+
+        try:
+            # Crear archivo temporal para la entrada
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".out", mode="w", encoding="utf-8") as temp_input:
+                temp_input.write(codigo)
+                temp_input.close()
+
+                # Ejecutar el compilador con el archivo de salida fijo
+                result = subprocess.run(
+                    [compiler_executable, temp_input.name, output_file],
+                    capture_output=True,
+                    text=True
+                )
+
+                # Verificar si la compilación fue exitosa
+                if result.returncode != 0:
+                    self.ui.assembler_input.setPlainText(f"[Error Compilador]: {result.stderr}")
+                    return
+
+                # Ejecutar TAC.py con el archivo de salida del compilador
+                result_tac = subprocess.run(
+                    ["python", tac_script, output_file_tac],
+                    capture_output=True,
+                    text=True
+                )
+                
+                # Verificar si la conversión TAC → ASM fue exitosa
+                if result_tac.returncode != 0:
+                    self.ui.Output.setPlainText(f"[Error TAC]: {result_tac.stderr}")
+                    return
+
+                # Leer la salida generada en compilador.asm
+                if os.path.exists(output_file_asm):
+                    with open(output_file_asm, "r", encoding="utf-8") as f:
+                        asm_code = f.read()
+                    self.ui.assembler_input.setPlainText(asm_code)
+                else:
+                    self.ui.Output.setPlainText("[Error]: No se generó el archivo de ensamblador.")
+        finally:
+            # Limpiar archivo temporal de entrada
+            try:
+                os.remove(temp_input.name)
+            except Exception:
+                pass
         
     def Ensamblador(self):
         texto = self.ui.assembler_input.toPlainText()  # Obtener el texto del QTextEdit

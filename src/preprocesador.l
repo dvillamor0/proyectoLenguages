@@ -72,7 +72,7 @@ void process_import(const char* lib_name) {
     FILE* lib_file;
     char filename[120];
     
-    snprintf(filename, sizeof(filename), "%s.lib", lib_name);
+    snprintf(filename, sizeof(filename), "librerias/%s.lib", lib_name);
     
     lib_file = fopen(filename, "r");
     if (!lib_file) {

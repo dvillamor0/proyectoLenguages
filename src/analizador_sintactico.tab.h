@@ -87,10 +87,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 ".\\analizador_sintactico.y"
+#line 23 ".\\analizador_sintactico.y"
 
-    int symbol_index;
-    struct Node *node;
+    int symbol_index;         // Unión para almacenar índices de símbolos.
+    struct Node *node;        // Unión para almacenar nodos del AST.
 
 #line 96 "analizador_sintactico.tab.h"
 
