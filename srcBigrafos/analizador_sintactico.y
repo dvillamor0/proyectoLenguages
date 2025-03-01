@@ -2,6 +2,7 @@
     // Inclusión de las bibliotecas estándar necesarias para la entrada/salida y manejo de memoria.
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
     
     // Inclusión de cabeceras del compilador para el manejo del AST, análisis semántico y generación de código intermedio.
     #include "ast.h"
@@ -37,7 +38,6 @@
 %type <node> program function_list function param_list param
 %type <node> block statement_list statement declaration_stmt assignment_stmt
 %type <node> if_stmt while_stmt return_stmt condition expr arg_list
-%type <node> matrix_dimensions matrix_indices
 
 // Declaración de la precedencia y asociatividad de los operadores.
 %left TOKEN_PLUS TOKEN_MINUS
@@ -179,22 +179,13 @@ statement
  * Define una sentencia de declaración, con asignación inicial.
  */
 declaration_stmt
-    : type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON {
-          // Declaración normal (variable simple).
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $2;
-          $$ = create_node(NODE_DECLARATION, id, $4);
-      }
-    | type TOKEN_ID matrix_dimensions TOKEN_ASSIGN expr TOKEN_SEMICOLON {
-          // Declaración de matriz.
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $2;
-          // Aquí puedes llamar a una función que instale la matriz en la tabla de símbolos
-          // usando las dimensiones definidas en $3.
-          // Ejemplo: install_matrix_by_dims($2, $3);
-          $$ = create_node(NODE_MATRIX_DECLARATION, id, $5);
-          $$->matrix_dims = $3;  // Suponiendo que en la estructura Node tienes un campo para las dimensiones.
-      }
+    : type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON
+                                     {
+                                        // Se crea un nodo identificador y se asocia a la declaración.
+                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+                                        id->symbol_index = $2;
+                                        $$ = create_node(NODE_DECLARATION, id, $4);
+                                     }
     ;
 
 /*
@@ -203,19 +194,13 @@ declaration_stmt
  * Define una sentencia de asignación a una variable existente.
  */
 assignment_stmt
-    : TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON {
-          // Asignación simple a una variable.
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $1;
-          $$ = create_node(NODE_ASSIGNMENT, id, $3);
-      }
-    | TOKEN_ID matrix_indices TOKEN_ASSIGN expr TOKEN_SEMICOLON {
-          // Asignación a un elemento de matriz.
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $1;
-          $$ = create_node(NODE_MATRIX_ASSIGNMENT, id, $4);
-          $$->matrix_indices = $2;  // Asigna la lista de índices al nodo.
-      }
+    : TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON
+                                     {
+                                        // Se crea un nodo identificador para la variable a la que se asigna el valor.
+                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+                                        id->symbol_index = $1;
+                                        $$ = create_node(NODE_ASSIGNMENT, id, $3);
+                                     }
     ;
 
 /*
@@ -279,45 +264,38 @@ relop
  * Define las expresiones aritméticas y de llamada a función.
  */
 expr
-    : TOKEN_ID {
-          $$ = create_node(NODE_IDENTIFIER, NULL, NULL);
-          $$->symbol_index = $1;
-      }
-    | TOKEN_NUMBER {
-          $$ = create_node(NODE_NUMBER, NULL, NULL);
-          $$->symbol_index = $1;
-      }
-    | TOKEN_ID matrix_indices {
-          // Crea un nodo de acceso a matriz.
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $1;
-          $$ = create_node(NODE_MATRIX_ACCESS, id, $2);
-      }
-    | TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN {
-          Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-          id->symbol_index = $1;
-          $$ = create_node(NODE_FUNCTION_CALL, id, $3);
-      }
-    | expr TOKEN_PLUS expr {
-          $$ = create_node(NODE_BINARY_OP, $1, $3);
-          $$->symbol_index = TOKEN_PLUS;
-      }
-    | expr TOKEN_MINUS expr {
-          $$ = create_node(NODE_BINARY_OP, $1, $3);
-          $$->symbol_index = TOKEN_MINUS;
-      }
-    | expr TOKEN_MULT expr {
-          $$ = create_node(NODE_BINARY_OP, $1, $3);
-          $$->symbol_index = TOKEN_MULT;
-      }
-    | expr TOKEN_DIV expr {
-          $$ = create_node(NODE_BINARY_OP, $1, $3);
-          $$->symbol_index = TOKEN_DIV;
-      }
+    : TOKEN_ID                        {
+                                        $$ = create_node(NODE_IDENTIFIER, NULL, NULL);
+                                        $$->symbol_index = $1;
+                                     }
+    | TOKEN_NUMBER                    {
+                                        $$ = create_node(NODE_NUMBER, NULL, NULL);
+                                        $$->symbol_index = $1;
+                                     }
+    | TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN
+                                     {
+                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+                                        id->symbol_index = $1;
+                                        $$ = create_node(NODE_FUNCTION_CALL, id, $3);
+                                     }
+    | expr TOKEN_PLUS expr           { 
+                                        $$ = create_node(NODE_BINARY_OP, $1, $3); 
+                                        $$->symbol_index = TOKEN_PLUS;
+                                     }
+    | expr TOKEN_MINUS expr          { 
+                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
+                                        $$->symbol_index = TOKEN_MINUS;
+                                     }
+    | expr TOKEN_MULT expr           { 
+                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
+                                        $$->symbol_index = TOKEN_MULT;
+                                     }
+    | expr TOKEN_DIV expr            { 
+                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
+                                        $$->symbol_index = TOKEN_DIV;
+                                     }
     | TOKEN_LPAREN expr TOKEN_RPAREN { $$ = $2; }
     ;
-
-
 
 /*
  * Regla: arg_list
@@ -390,7 +368,16 @@ int main(int argc, char **argv) {
             printf("Debug: Analisis semantico completado\n");
             
             printf("Debug: Generando codigo intermedio\n");
-            generate_intermediate_code(ast_root, "../archivos_salida/compilador.tac");
+            char output_file[256];
+            strncpy(output_file, argv[2], sizeof(output_file) - 1);
+            output_file[sizeof(output_file) - 1] = '\0';
+            char *dot = strrchr(output_file, '.');
+            if (dot) {
+                strcpy(dot, ".tac");
+            } else {
+                strcat(output_file, ".tac");
+            }
+            generate_intermediate_code(ast_root, output_file);
             printf("Debug: Generacion de codigo intermedio completada\n");
         } else {
             fprintf(stderr, "Debug: La raiz del AST es NULL a pesar de un analisis exitoso\n");
