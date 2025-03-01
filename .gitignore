@@ -1,1 +1,6 @@
 /compilados/
+*/__pycache__/
+assets/__pycache__/IdentificarDato.cpython-313.pyc
+assets/__pycache__/memoria.cpython-313.pyc
+vista/__pycache__/Diseno_GUI.cpython-313.pyc
+vista/__pycache__/prueba.cpython-313.pyc

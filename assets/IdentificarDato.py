@@ -1,29 +1,37 @@
 import subprocess
 import struct
+from fractions import Fraction
 
 def GetEntero(numero_binario):
     return int(numero_binario) * -1
 
 def GetFloat(binary_str):
+    """Convierte un número binario de 21 bits (1 bit signo, 10 bits numerador, 10 bits denominador) en un flotante."""
+
+    # 1️⃣ Verificar que la cadena binaria tenga exactamente 21 bits
     if len(binary_str) != 21:
-        raise ValueError("El binario debe tener exactamente 22 bits (1 signo, 8 exponente, 12 mantisa)")
+        raise ValueError("El binario debe tener exactamente 21 bits (1 signo, 10 numerador, 10 denominador)")
 
-    # Extraer partes
-    sign = int(binary_str[0], 2)
-    exponent = int(binary_str[1:9], 2)  # 8 bits de exponente
-    mantissa_bits = binary_str[9:]  # 12 bits de mantisa
+    # 2️⃣ Extraer los bits individuales
+    sign_bit = binary_str[0]  # 1 bit de signo
+    numerator_bin = binary_str[1:11]  # 10 bits de numerador
+    denominator_bin = binary_str[11:]  # 10 bits de denominador
 
-    # Ajustar el sesgo del exponente (bias = 127 para 8 bits)
-    bias = 127
-    exponent_unbiased = exponent - bias
+    # 3️⃣ Convertir a enteros
+    numerator = int(numerator_bin, 2)
+    denominator = int(denominator_bin, 2)
 
-    # Reconstruir la mantisa con bit implícito (1.xxxxx)
-    mantissa = 1.0  # Bit implícito
-    for i, bit in enumerate(mantissa_bits):
-        mantissa += int(bit) * (2 ** -(i + 1))
+    # 4️⃣ Si el denominador es 0, evitamos la división por 0 (lo tratamos como 1)
+    if denominator == 0:
+        denominator = 1
 
-    # Calcular el valor final
-    float_value = ((-1) ** sign) * mantissa * (2 ** exponent_unbiased)
+    # 5️⃣ Calcular el valor de la fracción
+    fraction = Fraction(numerator, denominator)
+    float_value = float(fraction)
+
+    # 6️⃣ Aplicar el signo
+    if sign_bit == '1':
+        float_value *= -1
 
     return float_value
 
@@ -45,27 +53,28 @@ def GetCaracterUtf16(numero_binario):
     else:
         raise ValueError("El valor binario está fuera del rango UTF-16 válido.")
 
-def FloatToBinary21(num):
-    # Convertir a IEEE 754 estándar de 32 bits
-    ieee_754_bin = struct.unpack('!I', struct.pack('!f', num))[0]
+def FloatToBinary21(value):
+    """Convierte un flotante a una fracción y luego lo representa en 21 bits (1 bit signo, 10 numerador, 10 denominador)."""
 
-    # Extraer partes
-    sign = (ieee_754_bin >> 31) & 0x1
-    exponent_full = (ieee_754_bin >> 23) & 0xFF  # 8 bits de exponente IEEE 754
+    # 1️⃣ Determinar el signo (1 bit)
+    sign_bit = '0' if value >= 0 else '1'  # 0 para positivo, 1 para negativo
+    value = abs(value)  # Trabajar con el valor absoluto
 
-    # Ajustar el sesgo del exponente (bias = 127 en IEEE 754, nuevo bias = 127)
-    exponent_adjusted = exponent_full  # Mantiene el bias de 127
+    # 2️⃣ Convertir el flotante a fracción
+    frac = Fraction(value).limit_denominator(1023)  # Máximo denominador de 10 bits (1023)
+    
+    # 3️⃣ Obtener numerador y denominador en 10 bits
+    numerator = frac.numerator & 0x3FF  # 10 bits para el numerador
+    denominator = frac.denominator & 0x3FF  # 10 bits para el denominador
 
-    # Extraer la mantisa de 23 bits y reducirla a 12 bits
-    mantissa_full = ieee_754_bin & 0x7FFFFF  # 23 bits de mantisa
-    mantissa_reduced = mantissa_full >> 11  # Solo los 12 bits más significativos
+    # 4️⃣ Convertir a binario
+    numerator_bin = format(numerator, '010b')  # 10 bits
+    denominator_bin = format(denominator, '010b')  # 10 bits
 
-    # Convertir a binario
-    sign_bin = f"{sign:1b}"
-    exponent_bin = f"{exponent_adjusted:08b}"  # 8 bits
-    mantissa_bin = f"{mantissa_reduced:012b}"  # 12 bits
-
-    return f"{sign_bin}{exponent_bin}{mantissa_bin}"
+    # 5️⃣ Concatenar los bits en un solo string binario
+    binary_representation = sign_bit + numerator_bin + denominator_bin
+    
+    return binary_representation
 
 def ConvertirDatoBinario(dato):
     # 1. Inicialización de los primeros 5 bits en 0
@@ -98,4 +107,15 @@ def ConvertirDatoBinario(dato):
     # 3. Concatenar la cadena final
     # El binario debe ser de 5 bits (0s), seguido por los 6 bits del tipo de dato, y luego los bits del valor
     return binario + tipo_dato_binario + binario_dato
-    
+
+def int_to_bin16(numero):
+    if numero < 0:
+        numero = (1 << 16) + numero  # Convierte a complemento a dos si es negativo
+    return format(numero & 0xFFFF, '016b')  # Asegura 16 bits
+
+def float_to_bin16(value):
+    """Convierte un flotante en su representación IEEE 754 de 16 bits (half precision)."""
+    binary_21 = FloatToBinary21(value)
+    binary_16 = binary_21[:16]
+
+    return binary_16

@@ -14,6 +14,10 @@ class Memoria:
         self.ui.table_memoria.setColumnCount(1)
         self.ui.table_memoria.setHorizontalHeaderLabels(["Contenido"])
         self.ui.table_memoria.horizontalHeader().setStretchLastSection(True)
+        
+        self.ui.table_pila.setColumnCount(1)
+        self.ui.table_pila.setHorizontalHeaderLabels(["Pila"])
+        self.ui.table_pila.horizontalHeader().setStretchLastSection(True)
 
     def __len__(self):
         return len(self.memoria)
@@ -37,6 +41,16 @@ class Memoria:
                 item.setBackground(QColor(255, 255, 255))  # Blanco
 
             self.ui.table_memoria.setItem(fila, 0, item)
+
+        # 🔹 Mostrar los últimos 100 registros de la memoria en `table_pila`
+        ultimas_100_direcciones = range(900, 1000)  # Direcciones de 900 a 999
+        self.ui.table_pila.setRowCount(len(ultimas_100_direcciones))  # Ajustar tamaño de la tabla
+
+        for i, direccion in enumerate(ultimas_100_direcciones):
+            valor = self.memoria[direccion]
+            item = QTableWidgetItem(str(valor))
+            self.ui.table_pila.setItem(i, 0, item)
+
 
     def escribir_memoria(self, direccion, valor):
         """Escribe un valor en la memoria, no puede escribir en la pila."""

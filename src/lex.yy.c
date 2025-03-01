@@ -262,11 +262,15 @@ static void yy_flex_free YY_PROTO(( void * ));
 #define YY_AT_BOL() (yy_current_buffer->yy_at_bol)
 
 
+#define YY_USES_REJECT
+
 #define yywrap() 1
 #define YY_SKIP_YYWRAP
 typedef unsigned char YY_CHAR;
 FILE *yyin = (FILE *) 0, *yyout = (FILE *) 0;
 typedef int yy_state_type;
+extern int yylineno;
+int yylineno = 1;
 extern char *yytext;
 #define yytext_ptr yytext
 
@@ -285,40 +289,50 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 10
-#define YY_END_OF_BUFFER 11
-static yyconst short int yy_accept[109] =
+#define YY_NUM_RULES 29
+#define YY_END_OF_BUFFER 30
+static yyconst short int yy_acclist[102] =
     {   0,
-        0,    0,   11,    9,    7,    7,    8,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    9,    9,    9,    9,
-        9,    9,    7,    7,    8,    9,    9,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    9,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    9,    9,    9,    9,
-        9,    9,    9,    6,    9,    9,    9,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    5,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    9,    9,    9,    9,
-        9,    9,    9,    9,    9,    9,    9,    9,    9,    9,
-        9,    3,    9,    9,    9,    4,    9,    9,    9,    9,
+       30,   28,   29,    1,   28,   29,    1,   29,   28,   29,
+       28,   29,   22,   28,   29,   23,   28,   29,   17,   28,
+       29,   15,   28,   29,   21,   28,   29,   16,   28,   29,
+       18,   28,   29,   27,   28,   29,   20,   28,   29,    9,
+       28,   29,   19,   28,   29,   13,   28,   29,   26,   28,
+       29,   26,   28,   29,   26,   28,   29,   26,   28,   29,
+       26,   28,   29,   26,   28,   29,   24,   28,   29,   25,
+       28,   29,    1,   12,    2,   27,   10,   11,   14,   26,
+       26,   26,   26,    5,   26,   26,   26,   27,   27,    7,
+       26,    8,   26,    3,   26,    4,   26,   26,   26,    6,
 
-        9,    9,    1,    9,    9,    9,    2,    0
+       26
+    } ;
+
+static yyconst short int yy_accept[58] =
+    {   0,
+        1,    1,    1,    2,    4,    7,    9,   11,   13,   16,
+       19,   22,   25,   28,   31,   34,   37,   40,   43,   46,
+       49,   52,   55,   58,   61,   64,   67,   70,   73,   74,
+       75,   75,   76,   76,   77,   77,   78,   79,   80,   81,
+       82,   83,   84,   86,   87,   88,   89,   89,   90,   92,
+       94,   96,   98,   99,  100,  102,  102
     } ;
 
 static yyconst int yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
+        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    4,    1,    5,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    6,    1,    1,    1,    7,    8,    8,
-        8,    9,    9,    9,    9,    9,    9,    1,    1,    1,
-        1,    1,    1,    1,   10,   11,   12,   13,   14,   15,
-        1,   16,   17,   18,    1,   19,   20,   21,   22,   23,
-       24,   25,   26,   27,   28,   29,    1,    1,    1,    1,
-       30,    1,   31,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    4,    1,    5,    1,    1,    1,    1,    6,
+        7,    8,    9,   10,   11,   12,   13,   14,   14,   14,
+       14,   14,   14,   14,   14,   14,   14,    1,   15,   16,
+       17,   18,    1,    1,   19,   19,   19,   19,   20,   21,
+       19,   19,   22,   19,   19,   19,   19,   19,   19,   19,
+       19,   23,   19,   19,   19,   19,   24,   19,   19,   19,
+        1,    1,    1,    1,    1,    1,   19,   19,   19,   19,
 
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,   32,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+       25,   26,   19,   27,   28,   19,   19,   29,   19,   30,
+       31,   19,   19,   19,   19,   32,   33,   19,   19,   19,
+       19,   19,   34,    1,   35,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -335,303 +349,118 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst int yy_meta[33] =
+static yyconst int yy_meta[36] =
     {   0,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1
+        1,    1,    1,    2,    1,    1,    1,    1,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
+        2,    2,    2,    1,    1
     } ;
 
-static yyconst short int yy_base[110] =
+static yyconst short int yy_base[59] =
     {   0,
-        0,    0,  226,    0,   31,   34,   32,   29,   30,   33,
-      208,  214,  202,   26,  200,  193,  198,   28,   33,  205,
-       19,    0,   55,   60,   58,  205,  204,  192,  188,  200,
-      194,  187,  182,  191,   64,  195,  188,  197,  187,   47,
-       71,  178,  181,  177,  175,  158,  168,   73,  158,  148,
-       75,  151,  160,    0,   77,   79,  156,  144,   81,   83,
-       82,   66,   85,  154,   87,  135,    0,   90,  157,  157,
-      156,  154,  154,   99,   97,  103,   97,  105,  129,  107,
-      106,  120,  108,  139,  151,  110,  120,   95,  117,  115,
-       74,    0,   71,  153,  129,    0,  175,  166,  112,  162,
-
-       92,   42,    0,   39,  186,   29,    0,  227,   47
+        0,    0,   81,   82,   34,   36,   63,   76,   82,   82,
+       82,   82,   82,   82,   82,   28,   82,   61,   60,   59,
+        0,   45,   12,   48,   48,   45,   82,   82,   41,   82,
+       68,   82,   56,   35,   43,   82,   82,   82,    0,   37,
+       37,   37,    0,   34,   37,   36,   50,   45,    0,    0,
+        0,    0,   29,   26,    0,   82,   61,   44
     } ;
 
-static yyconst short int yy_def[110] =
+static yyconst short int yy_def[59] =
     {   0,
-      108,    1,  108,  109,  109,  108,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  108,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,   79,  109,  109,
-       84,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-
-      109,   97,  109,  109,  109,  105,  109,    0,  108
+       56,    1,   56,   56,   56,   56,   56,   57,   56,   56,
+       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+       58,   58,   58,   58,   58,   58,   56,   56,   56,   56,
+       57,   56,   56,   56,   56,   56,   56,   56,   58,   58,
+       58,   58,   58,   58,   58,   56,   56,   56,   58,   58,
+       58,   58,   58,   58,   58,    0,   56,   56
     } ;
 
-static yyconst short int yy_nxt[260] =
+static yyconst short int yy_nxt[118] =
     {   0,
-        4,    5,    6,    5,    4,    4,    7,    7,    7,    8,
-        9,   10,   11,    4,    4,   12,   13,   14,   15,   16,
-       17,   18,   19,    4,   20,   21,    4,    4,    4,    4,
-        4,    4,   23,   24,   23,   24,   24,   24,   25,   25,
-       25,   26,   31,   28,   36,   46,   47,   22,   29,   27,
-       30,   32,   41,   37,   43,   42,   23,   24,   23,  107,
-       44,   24,   24,   24,   25,   25,   25,   51,   51,   54,
-      105,   55,   92,   35,   56,   56,   59,   59,   51,   51,
-       62,   62,   56,   56,   59,   59,   66,   66,   67,   67,
-       68,   70,   70,   71,   71,   69,   73,   73,  104,   61,
+        4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
+       14,    4,   15,   16,   17,   18,   19,   20,   21,   22,
+       23,   24,   25,   26,   21,   21,   21,   21,   21,   21,
+       21,   21,   21,   27,   28,   29,   29,   29,   29,   33,
+       41,   34,   29,   29,   42,   39,   33,   35,   34,   46,
+       55,   47,   35,   47,   35,   35,   48,   54,   48,   35,
+       35,   31,   31,   48,   53,   52,   51,   50,   49,   46,
+       32,   45,   44,   43,   40,   38,   37,   36,   32,   30,
+       56,    3,   56,   56,   56,   56,   56,   56,   56,   56,
+       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
 
-       80,   80,   97,   63,   96,   65,   82,   82,   85,   85,
-       80,   80,   89,   89,   90,   90,   92,   92,  103,  103,
-       95,   81,   94,   82,   82,   73,   93,   83,   84,   86,
-       79,   81,  100,  100,   87,   88,   88,   88,   88,   88,
-       88,   88,   88,   88,   83,   91,   91,   91,   91,   91,
-       91,   91,   91,   91,   85,   85,   98,   98,  101,   78,
-       77,   76,   75,   74,   72,  100,  100,   55,   64,   98,
-       98,   35,   55,   60,   54,   86,   60,   99,   41,   58,
-       87,  102,  102,  102,  102,  102,  102,  102,  102,  102,
-       99,  101,  106,  106,  106,  106,  106,  106,  106,  106,
-
-      106,   54,   57,   35,   35,   41,   53,   52,   48,   50,
-       41,   35,   49,   48,   48,   48,   41,   41,   45,   40,
-       39,   38,   35,   34,   33,  108,    3,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108
+       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+       56,   56,   56,   56,   56,   56,   56
     } ;
 
-static yyconst short int yy_chk[260] =
+static yyconst short int yy_chk[118] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    5,    5,    5,    6,    6,    6,    7,    7,
-        7,    8,   10,    9,   14,   21,   21,  109,    9,    8,
-        9,   10,   18,   14,   19,   18,   23,   23,   23,  106,
-       19,   24,   24,   24,   25,   25,   25,   35,   35,   40,
-      104,   40,  102,   40,   41,   41,   48,   48,   51,   51,
-       55,   55,   56,   56,   59,   59,   60,   60,   61,   61,
-       62,   63,   63,   65,   65,   62,   68,   68,  101,   51,
+        1,    1,    1,    1,    1,    5,    5,    6,    6,   16,
+       23,   16,   29,   29,   23,   58,   34,   16,   34,   46,
+       54,   35,   16,   35,   34,   46,   35,   53,   48,   34,
+       46,   57,   57,   47,   45,   44,   42,   41,   40,   33,
+       31,   26,   25,   24,   22,   20,   19,   18,    8,    7,
+        3,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
 
-       75,   75,   93,   56,   91,   59,   76,   76,   78,   78,
-       80,   80,   81,   81,   83,   83,   86,   86,   99,   99,
-       90,   75,   89,   82,   82,   88,   87,   76,   77,   78,
-       74,   80,   95,   95,   78,   79,   79,   79,   79,   79,
-       79,   79,   79,   79,   82,   84,   84,   84,   84,   84,
-       84,   84,   84,   84,   85,   85,   94,   94,   95,   73,
-       72,   71,   70,   69,   66,  100,  100,   64,   58,   98,
-       98,   57,   53,   52,   50,   85,   49,   94,   47,   46,
-       85,   97,   97,   97,   97,   97,   97,   97,   97,   97,
-       98,  100,  105,  105,  105,  105,  105,  105,  105,  105,
-
-      105,   45,   44,   43,   42,   39,   38,   37,   36,   34,
-       33,   32,   31,   30,   29,   28,   27,   26,   20,   17,
-       16,   15,   13,   12,   11,    3,  108,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108,  108,
-      108,  108,  108,  108,  108,  108,  108,  108,  108
+       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+       56,   56,   56,   56,   56,   56,   56
     } ;
 
-static yy_state_type yy_last_accepting_state;
-static char *yy_last_accepting_cpos;
-
-/* The intent behind this definition is that it'll catch
- * any uses of REJECT which flex missed.
- */
-#define REJECT reject_used_but_not_detected
+static yy_state_type yy_state_buf[YY_BUF_SIZE + 2], *yy_state_ptr;
+static char *yy_full_match;
+static int yy_lp;
+#define REJECT \
+{ \
+*yy_cp = yy_hold_char; /* undo effects of setting up yytext */ \
+yy_cp = yy_full_match; /* restore poss. backed-over text */ \
+++yy_lp; \
+goto find_rule; \
+}
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
+#line 1 ".\\analizador_lexico.l"
 #define INITIAL 0
-#line 2 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h> 
+#line 2 ".\\analizador_lexico.l"
+    // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    // Inclusión del header generado por el analizador sintactico.
+    #include "analizador_sintactico.tab.h"
 
-#define TRUE 1
-#define FALSE 0
+    // Definicion del maximo de simbolos en la tabla.
+    #define MAX_SYMBOLS 1000
 
-void print_binary(int num) {
-    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
-    
-    // Imprimir los 21 bits
-    for (int i = 0; i < 21; i++) {
-        if (num & mask) {
-            printf("1");
-        } else {
-            printf("0");
-        }
-        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
-    }
-}
+    // Constantes para identificar el tipo de simbolo.
+    #define SYMTAB_IDENTIFIER 1
+    #define SYMTAB_NUMBER 2
 
-char* GetBinarioCommand(const char *command, int esRegistro) {
-    static char binary[6];
-    const char *commands[] = {
-        "NOP", "LOAD", "STORE", "MOVE", "ADD", "SUB", "MUL", "DIV", "AND", "OR", "NOR",
-        "NOT", "SHL", "SHR", "ROL", "ROR", "JUMP", "BEQ", "BNE", "BLT", "JLE", "PUSH", 
-        "POP", "CALL", "RET", "IN", "OUT", "CMP", "CLR", "ERROR", "ERROR", "HALT"
-    };
-    const int num_commands = sizeof(commands) / sizeof(commands[0]);
+    // Estructura que representa una entrada en la tabla de simbolos.
+    typedef struct {
+        char *name;   // Nombre del simbolo.
+        int type;     // Tipo de simbolo (identificador o numero).
+        union {
+            double number_value;  // Valor numerico (para numeros).
+            char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
+        } value;
+    } SymbolEntry;
 
-    if (esRegistro && (strcmp(command, "LOAD") == 0 || strcmp(command, "STORE") == 0)) {
-        if (strcmp(command, "LOAD") == 0) {
-            strcpy(binary, "11101");
-        } else {
-            strcpy(binary, "11110");
-        }
-        return binary;
-    }
+    // Declaracion de la tabla de simbolos y contador de entradas.
+    SymbolEntry symbol_table[MAX_SYMBOLS];
+    int symbol_count = 0;
 
-    for (int i = 0; i < num_commands; i++) {
-        if (strcmp(command, commands[i]) == 0) {
-            for (int j = 0; j < 5; j++) {
-                binary[4 - j] = (i & (1 << j)) ? '1' : '0';
-            }
-            binary[5] = '\0';  // Agregar el terminador nulo
-
-            return binary;
-        }
-    }
-    strcpy(binary, "00000");
-    return binary;
-}
-
-char* GetBinarioRegistro(const char *reg){
-    static char binary[3];
-    if (reg[0] == 'R' && reg[1] >= '0' && reg[1] <= '3' && reg[2] == '\0') {
-        int regNumber = reg[1] - '0'; // Convertir el caracter del número a un valor entero
-
-        // Convertir el número del registro a binario
-        switch (regNumber) {
-            case 0:
-                strcpy(binary, "00");
-                break;
-            case 1:
-                strcpy(binary, "01");
-                break;
-            case 2:
-                strcpy(binary, "10");
-                break;
-            case 3:
-                strcpy(binary, "11");
-                break;
-            default:
-                strcpy(binary, "00"); 
-                break;
-        }
-    }
-    return binary;
-}
-
-char* GetRelativeDirection(const char *reg){
-    static char result[20];
-    if (reg != NULL && reg[0] == '[' && reg[strlen(reg) - 1] == ']' && strncmp(reg + 1, "0x", 2) == 0) {
-        char hexValue[10]; // Espacio para algo como "3F"
-        strncpy(hexValue, reg + 3, strlen(reg) - 4);  // Copiar desde el cuarto carácter hasta antes del último
-        hexValue[strlen(reg) - 4] = '\0';  // Asegurarse de que la cadena esté terminada
-
-        long decimalValue = strtol(hexValue, NULL, 16);
-
-        snprintf(result, sizeof(result), "(%ld)", decimalValue);
-        
-        return result;
-    } else {
-        return "Formato Incorrecto Relative";
-    }
-}
-
-char* ConcatenarDireccion(const char *numero, const char *direccion) {
-    static char resultado[32];
-    int numero_len = strlen(numero);
-    int size_to_fill = 32 - numero_len - 8;  // 32 menos el largo de numero y los 8 bits para la dirección
-    resultado[0] = '\0';
-    /*
-    for (int i = 0; i < size_to_fill; i++) {
-        strcat(resultado, "0");
-    }
-    */
-    strcat(resultado, direccion);
-    return resultado;
-}
-
-char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
-    static char result[32];
-    int esRegistro = (reg[0] == 'R') ? TRUE : FALSE;
-    if (esRegistro) {
-        strcpy(result,GetBinarioRegistro(reg));
-    } else {
-        char direccion[33];  
-        strcpy(result,ConcatenarDireccion(numero, GetRelativeDirection(reg))); 
-    }
-    return result;
-}
-
-int contieneParentesis(const char *str) {
-    while (*str != '\0') {  // Mientras no lleguemos al final de la cadena
-        if (*str == '(') {   // Si encontramos '('
-            return 1;         // Retornamos 1
-        }
-        str++;  // Avanzamos al siguiente carácter
-    }
-    return 0;  // Si no se encontró '('
-}
-
-char* CompletarCeros(const char *numero){
-    static char resultado[32];
-    int numero_len = strlen(numero);
-    int size_to_fill = 32 - numero_len;
-    resultado[0] = '\0';
-
-    for (int i = 0; i < size_to_fill; i++) {
-        strcat(resultado, "0");
-    }
-    return resultado;
-}
-
-void GenerarBinarioParams(const char *command, const char *reg1, const char *reg2, const char *reg3) {
-    //printf("Comando: %s\n", command);
-    int esRegistro2 = (reg2[0] == 'R') ? TRUE : FALSE;
-    char numero[32] = "";
-    strcat(numero,GetBinarioCommand(command, esRegistro2));
-    int esRegistro1 = (reg1[0] == 'R') ? TRUE : FALSE;
-    if(!esRegistro1){
-        strcat(numero,"000000");
-    }
-    if (strcmp(reg1, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg1,numero));
-    }
-    if(!esRegistro2 && esRegistro1){
-        strcat(numero,"0000");
-    }
-    if (strcmp(reg2, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg2,numero));
-    }
-    int esRegistro3 = (reg3[0] == 'R') ? TRUE : FALSE;
-    if(!esRegistro3 && esRegistro1 && esRegistro2){
-        strcat(numero,"00");
-    }
-    if (strcmp(reg3, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg3,numero));
-    }
-    if(strlen(numero) < 32 && !contieneParentesis(numero)){
-        strcat(numero,CompletarCeros(numero));
-    }
-    printf("%s", numero);
-    printf("\n"); 
-}
-
-#line 635 "lex.yy.c"
+    // Declaracion de las funciones para instalar identificadores y numeros.
+    int install_id(char *lexeme);
+    int install_num(char *lexeme);
+/* Definiciones de expresiones regulares */
+#line 464 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -782,10 +611,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 190 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
+#line 46 ".\\analizador_lexico.l"
 
-
-#line 789 "lex.yy.c"
+#line 617 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -824,175 +652,206 @@ YY_DECL
 		yy_bp = yy_cp;
 
 		yy_current_state = yy_start;
+		yy_state_ptr = yy_state_buf;
+		*yy_state_ptr++ = yy_current_state;
 yy_match:
 		do
 			{
 			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
-			if ( yy_accept[yy_current_state] )
-				{
-				yy_last_accepting_state = yy_current_state;
-				yy_last_accepting_cpos = yy_cp;
-				}
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 109 )
+				if ( yy_current_state >= 57 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+			*yy_state_ptr++ = yy_current_state;
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 227 );
+		while ( yy_base[yy_current_state] != 82 );
 
 yy_find_action:
-		yy_act = yy_accept[yy_current_state];
-		if ( yy_act == 0 )
-			{ /* have to back up */
-			yy_cp = yy_last_accepting_cpos;
-			yy_current_state = yy_last_accepting_state;
-			yy_act = yy_accept[yy_current_state];
+		yy_current_state = *--yy_state_ptr;
+		yy_lp = yy_accept[yy_current_state];
+find_rule: /* we branch to this label when backing up */
+		for ( ; ; ) /* until we find what rule we matched */
+			{
+			if ( yy_lp && yy_lp < yy_accept[yy_current_state + 1] )
+				{
+				yy_act = yy_acclist[yy_lp];
+					{
+					yy_full_match = yy_cp;
+					break;
+					}
+				}
+			--yy_cp;
+			yy_current_state = *--yy_state_ptr;
+			yy_lp = yy_accept[yy_current_state];
 			}
 
 		YY_DO_BEFORE_ACTION;
 
+		if ( yy_act != YY_END_OF_BUFFER )
+			{
+			int yyl;
+			for ( yyl = 0; yyl < yyleng; ++yyl )
+				if ( yytext[yyl] == '\n' )
+					++yylineno;
+			}
 
 do_action:	/* This label is used only to access EOF actions. */
 
 
 		switch ( yy_act )
 	{ /* beginning of action switch */
-			case 0: /* must back up */
-			/* undo the effects of YY_DO_BEFORE_ACTION */
-			*yy_cp = yy_hold_char;
-			yy_cp = yy_last_accepting_cpos;
-			yy_current_state = yy_last_accepting_state;
-			goto yy_find_action;
-
 case 1:
 YY_RULE_SETUP
-#line 192 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 3 R : %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
-    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
-        GenerarBinarioParams(command, reg1, reg2, reg3);
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 47 ".\\analizador_lexico.l"
+{ /* Skip whitespace */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 204 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 3 R : %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
-    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
-        GenerarBinarioParams(command, reg1, reg2, reg3);
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 48 ".\\analizador_lexico.l"
+{ /* Skip comments */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 216 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10], reg2[15];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1, reg2) == 3) {
-        GenerarBinarioParams(command, reg1, reg2, "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 50 ".\\analizador_lexico.l"
+{ return TOKEN_FUN; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 228 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
-        GenerarBinarioParams(command, reg1, "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 51 ".\\analizador_lexico.l"
+{ return TOKEN_RET; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 240 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
-        GenerarBinarioParams(command, reg1, "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 52 ".\\analizador_lexico.l"
+{ return TOKEN_IF; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 252 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command) == 1) {
-        GenerarBinarioParams(command, "", "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 53 ".\\analizador_lexico.l"
+{ return TOKEN_WHILE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 264 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{ /* No action */ }
+#line 54 ".\\analizador_lexico.l"
+{ return TOKEN_ENT; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 265 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    int value = atoi(yytext);
-    printf("00000000001");
-    print_binary(value);
-    printf("\n");
-}
+#line 55 ".\\analizador_lexico.l"
+{ return TOKEN_FLO; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 271 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
-{
-    printf("%s\n", yytext);
-}
+#line 57 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_LT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 274 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
+#line 58 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_LE; }
+	YY_BREAK
+case 11:
+YY_RULE_SETUP
+#line 59 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_EQ; }  
+	YY_BREAK
+case 12:
+YY_RULE_SETUP
+#line 60 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_NE; }
+	YY_BREAK
+case 13:
+YY_RULE_SETUP
+#line 61 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_GT; }
+	YY_BREAK
+case 14:
+YY_RULE_SETUP
+#line 62 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_GE; }
+	YY_BREAK
+case 15:
+YY_RULE_SETUP
+#line 64 ".\\analizador_lexico.l"
+{ return TOKEN_PLUS; }
+	YY_BREAK
+case 16:
+YY_RULE_SETUP
+#line 65 ".\\analizador_lexico.l"
+{ return TOKEN_MINUS; }
+	YY_BREAK
+case 17:
+YY_RULE_SETUP
+#line 66 ".\\analizador_lexico.l"
+{ return TOKEN_MULT; }
+	YY_BREAK
+case 18:
+YY_RULE_SETUP
+#line 67 ".\\analizador_lexico.l"
+{ return TOKEN_DIV; }
+	YY_BREAK
+case 19:
+YY_RULE_SETUP
+#line 68 ".\\analizador_lexico.l"
+{ return TOKEN_ASSIGN; }   
+	YY_BREAK
+case 20:
+YY_RULE_SETUP
+#line 69 ".\\analizador_lexico.l"
+{ return TOKEN_SEMICOLON; }
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 70 ".\\analizador_lexico.l"
+{ return TOKEN_COMMA; }
+	YY_BREAK
+case 22:
+YY_RULE_SETUP
+#line 71 ".\\analizador_lexico.l"
+{ return TOKEN_LPAREN; }
+	YY_BREAK
+case 23:
+YY_RULE_SETUP
+#line 72 ".\\analizador_lexico.l"
+{ return TOKEN_RPAREN; }
+	YY_BREAK
+case 24:
+YY_RULE_SETUP
+#line 73 ".\\analizador_lexico.l"
+{ return TOKEN_LBRACE; }
+	YY_BREAK
+case 25:
+YY_RULE_SETUP
+#line 74 ".\\analizador_lexico.l"
+{ return TOKEN_RBRACE; }
+	YY_BREAK
+case 26:
+YY_RULE_SETUP
+#line 76 ".\\analizador_lexico.l"
+{ yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
+	YY_BREAK
+case 27:
+YY_RULE_SETUP
+#line 77 ".\\analizador_lexico.l"
+{ yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
+	YY_BREAK
+case 28:
+YY_RULE_SETUP
+#line 79 ".\\analizador_lexico.l"
+{ printf("Lexical Error: Unexpected character %s\n", yytext); }
+	YY_BREAK
+case 29:
+YY_RULE_SETUP
+#line 80 ".\\analizador_lexico.l"
 ECHO;
 	YY_BREAK
-#line 994 "lex.yy.c"
-case YY_STATE_EOF(INITIAL):
-	yyterminate();
+#line 853 "lex.yy.c"
+			case YY_STATE_EOF(INITIAL):
+				yyterminate();
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1270,22 +1129,20 @@ static yy_state_type yy_get_previous_state()
 	register char *yy_cp;
 
 	yy_current_state = yy_start;
+	yy_state_ptr = yy_state_buf;
+	*yy_state_ptr++ = yy_current_state;
 
 	for ( yy_cp = yytext_ptr + YY_MORE_ADJ; yy_cp < yy_c_buf_p; ++yy_cp )
 		{
 		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
-		if ( yy_accept[yy_current_state] )
-			{
-			yy_last_accepting_state = yy_current_state;
-			yy_last_accepting_cpos = yy_cp;
-			}
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 109 )
+			if ( yy_current_state >= 57 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+		*yy_state_ptr++ = yy_current_state;
 		}
 
 	return yy_current_state;
@@ -1306,22 +1163,18 @@ yy_state_type yy_current_state;
 #endif
 	{
 	register int yy_is_jam;
-	register char *yy_cp = yy_c_buf_p;
 
 	register YY_CHAR yy_c = 1;
-	if ( yy_accept[yy_current_state] )
-		{
-		yy_last_accepting_state = yy_current_state;
-		yy_last_accepting_cpos = yy_cp;
-		}
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 109 )
+		if ( yy_current_state >= 57 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 108);
+	yy_is_jam = (yy_current_state == 56);
+	if ( ! yy_is_jam )
+		*yy_state_ptr++ = yy_current_state;
 
 	return yy_is_jam ? 0 : yy_current_state;
 	}
@@ -1364,6 +1217,8 @@ register char *yy_bp;
 
 	*--yy_cp = (char) c;
 
+	if ( c == '\n' )
+		--yylineno;
 
 	yytext_ptr = yy_bp;
 	yy_hold_char = *yy_cp;
@@ -1440,6 +1295,8 @@ static int input()
 	*yy_c_buf_p = '\0';	/* preserve yytext */
 	yy_hold_char = *++yy_c_buf_p;
 
+	if ( c == '\n' )
+		++yylineno;
 
 	return c;
 	}
@@ -1876,12 +1733,67 @@ int main()
 	return 0;
 	}
 #endif
-#line 274 "C:\\Users\\dmriv\\Documents\\GitHub\\proyectoLenguages\\src\\ensamblador.l"
+#line 80 ".\\analizador_lexico.l"
 
 
-int main() {
-    while (yylex() != 0) {
-        /* Cada llamada a yylex() lee un token */
+/*
+ * Funcion: install_id
+ * ---------------------
+ * Instala un identificador en la tabla de simbolos.
+ *
+ * Parametro:
+ *   lexeme - Cadena que representa el identificador.
+ *
+ * Retorna:
+ *   Indice del simbolo en la tabla.
+ *
+ * Procedimiento:
+ *   - Verifica si la tabla esta llena.
+ *   - Busca si el identificador ya existe.
+ *   - Si no existe, lo agrega y aumenta el contador.
+ */
+int install_id(char *lexeme) {
+    if (symbol_count >= MAX_SYMBOLS) {
+        fprintf(stderr, "Symbol table full\n");
+        exit(1);
     }
-    return 0;
+    
+    for (int i = 0; i < symbol_count; i++) {
+        if (symbol_table[i].type == SYMTAB_IDENTIFIER && 
+            strcmp(symbol_table[i].name, lexeme) == 0) {
+            return i;
+        }
+    }
+    
+    symbol_table[symbol_count].name = strdup(lexeme);
+    symbol_table[symbol_count].type = SYMTAB_IDENTIFIER;
+    return symbol_count++;
+}
+
+/*
+ * Funcion: install_num
+ * ----------------------
+ * Instala un numero en la tabla de simbolos.
+ *
+ * Parametro:
+ *   lexeme - Cadena que representa el numero.
+ *
+ * Retorna:
+ *   Indice del simbolo en la tabla.
+ *
+ * Procedimiento:
+ *   - Verifica si la tabla esta llena.
+ *   - Agrega el numero, convirtiendo la cadena a valor numerico.
+ *   - Aumenta el contador y retorna el indice.
+ */
+int install_num(char *lexeme) {
+    if (symbol_count >= MAX_SYMBOLS) {
+        fprintf(stderr, "Symbol table full\n");
+        exit(1);
+    }
+    
+    symbol_table[symbol_count].name = strdup(lexeme);
+    symbol_table[symbol_count].type = SYMTAB_NUMBER;
+    symbol_table[symbol_count].value.number_value = atof(lexeme);
+    return symbol_count++;
 }

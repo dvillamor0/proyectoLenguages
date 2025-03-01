@@ -4,9 +4,21 @@
 #include <string.h>
 #include <ctype.h> 
 #include <stdint.h>
+#include <math.h>
 
 #define TRUE 1
 #define FALSE 0
+
+void binary_from_char(const char *c) {
+    unsigned short utf16 = (unsigned char)c[0]; 
+
+    printf("00000");  
+
+    for (int i = 15; i >= 0; i--) {
+        printf("%d", (utf16 >> i) & 1);
+    }
+    printf("\n");
+}
 
 void print_binary(int num) {
     unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
@@ -22,21 +34,60 @@ void print_binary(int num) {
     }
 }
 
-void binary_to_float_21_bits(const char *str) {
-    float num = strtof(str, NULL);
-    uint32_t ieee_754_bin = *(uint32_t*)&num;
-    uint8_t sign = (ieee_754_bin >> 31) & 0x1;
-    int exponent_full = (ieee_754_bin >> 23) & 0xFF;  // Exponente de 8 bits
-    int exponent_adjusted = exponent_full - 127 + 63; // Nuevo sesgo de 7 bits
+void binary_from_float_21_bits(const char *str) {
+    double value = atof(str); // Convertir la cadena a un número flotante
 
-    if (exponent_adjusted < 0) exponent_adjusted = 0;
-    if (exponent_adjusted > 127) exponent_adjusted = 127;
-    uint16_t mantissa_reduced = (ieee_754_bin & 0x7FFFFF) >> 10;  // 13 bits más significativos
-    printf("%d", sign);
-    for (int i = 6; i >= 0; i--) 
-        printf("%d", (exponent_adjusted >> i) & 1);
-    for (int i = 12; i >= 0; i--) 
-        printf("%d", (mantissa_reduced >> i) & 1);
+    int sign_bit = (value < 0) ? 1 : 0;
+    value = fabs(value);  // Trabajar con el valor absoluto
+
+    // Convertir a string con 10 decimales para manipular los dígitos
+    char buffer[50];
+    sprintf(buffer, "%.10f", value);  
+
+    // Extraer los primeros 3 dígitos significativos (ignorando ceros iniciales)
+    char extracted_digits[4] = ""; // Buffer para almacenar 3 dígitos
+    int count = 0, i = 0, found_digit = 0, potencia = 0;
+
+    while (buffer[i] != '\0' && count < 3) {
+        if(buffer[i] == '.'){
+            potencia = 0;
+        }
+        if (buffer[i] >= '1' && buffer[i] <= '9') {
+            found_digit = 1;  // Detectamos el primer dígito no cero
+        }
+        if (found_digit && buffer[i] != '.') {
+            extracted_digits[count++] = buffer[i];  // Guardamos el dígito
+            potencia++;
+        }
+        i++;
+    }
+    extracted_digits[count] = '\0';  // Terminar la cadena
+
+    // Convertir a número truncado
+    double truncated_value = atof(extracted_digits) / pow(10, potencia);
+
+    int numerator = 0, denominator = 1023; // Inicializar variables
+
+    for (int i = 1023; i > 0; i--) {  // Probar denominadores desde 1023 hasta 1
+        double temp_num = truncated_value * i;  // Multiplicar el flotante por el denominador
+        if (temp_num >= 0 && temp_num <= 1023 && floor(temp_num) == temp_num) {  
+            // Verifica que el numerador es un número entero dentro del rango 0-1023
+            numerator = (int)temp_num;
+            denominator = i;
+            break;  // Salir cuando se encuentra la mejor fracción
+        }
+    }
+
+    // Imprimir en formato binario de 21 bits (1 signo + 10 numerador + 10 denominador)
+    printf("%d", sign_bit);
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (numerator >> i) & 1);  // Imprimir numerador (10 bits)
+    }
+
+    for (int i = 9; i >= 0; i--) {
+        printf("%d", (denominator >> i) & 1);  // Imprimir denominador (10 bits)
+    }
 }
 
 void print_binary_from_entero(int num) {
@@ -238,7 +289,7 @@ spaces      [" "]
 R_REGISTER  "R"[0-3]
 HEX_ADDRESS \[0x[0-9A-F]+\]
 digits       [0-9]+
-boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
+boolean     (F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e)
 
 %%
 
@@ -266,7 +317,7 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
         //printf("Error al analizar la instrucción: %s\n", yytext);
     }
 }
-(LOAD|STORE){spaces}+({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}){spaces}* {
+(LOAD|STORE|CMP){spaces}+({R_REGISTER}|{HEX_ADDRESS}),{spaces}*({R_REGISTER}|{HEX_ADDRESS}){spaces}* {
     //printf("Reconocido 1 R 1 H: %s\n", yytext);
 
     char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
@@ -326,9 +377,9 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
 }
 
 {delim} { /* No action */ }
-{simbol}{digits}+.{digits}+ {
+{simbol}?{digits}+.{digits}+ {
     printf("00000000100");
-    binary_to_float_21_bits(yytext);
+    binary_from_float_21_bits(yytext);
     printf("\n");
 }
 {simbol}{digits}+ {
@@ -355,29 +406,91 @@ boolean     ((F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e))
     }
 }
 [A-Za-z] {
-    int value = atoi(yytext);
     printf("00000000101");
-    print_binary(value);
+    binary_from_char(yytext);
     printf("\n");
 }
+\[((({simbol}?{digits}+.{digits}+)|({simbol}{digits}+)|{digits}+|{boolean}|'[A-Za-z]')(,)?)+\] {
+    printf("00000000110");
+
+    char array_content[strlen(yytext) - 1];
+    strncpy(array_content, yytext + 1, strlen(yytext) - 2);
+    array_content[strlen(yytext) - 2] = '\0';
+
+    int count = 0;
+    char copy[strlen(array_content) + 1];  // Copia para contar tokens
+    strcpy(copy, array_content);
+
+    char *temp_token = strtok(copy, ",");
+    while (temp_token != NULL) {
+        count++;
+        temp_token = strtok(NULL, ",");
+    }
+
+    print_binary(count);
+    printf("\n");
+
+    char *token = strtok(array_content, ",");
+
+    while (token != NULL) {
+        // Determinar si es entero o flotante
+        if (strchr(token, '.') != NULL) {
+            printf("00000000100");
+            binary_from_float_21_bits(token);
+            printf("\n");
+        } else if (strcasecmp(token, "TRUE") == 0) {
+            printf("00000000001000000000000000000001\n");  // 32 bits con 1 al final
+        } else if (strcasecmp(token, "FALSE") == 0) {
+            printf("00000000001000000000000000000000\n");  // 32 bits con 0 al final
+        } else if (token[0] == '\'' && token[1] != '\0' && token[2] == '\'' && token[3] == '\0') {
+            char character = token[1];  // Extraer el carácter
+            printf("00000000101");  
+            print_binary(character);  // Convierte el carácter a binario
+            printf("\n");
+        } else if (token[0] == '+' || token[0] == '-'){
+            int value = atoi(token);
+            printf("00000000011");
+            print_binary_from_entero(value);
+            printf("\n");
+        } else {
+            int value = atoi(token);
+            printf("00000000010");
+            print_binary(value);
+            printf("\n");
+        }
+        token = strtok(NULL, ",");
+    }
+}
 .+ {
-    printf("%s\n", yytext);
+    printf("[Error ensamblador ]%s\n", yytext);
 }
 %%
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Uso: %s <archivo_python>\n", argv[0]);
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Uso: %s <archivo_python> [archivo_salida]\n", argv[0]);
         return 1;
     }
 
+    // Open the input file.
     FILE *file = fopen(argv[1], "r");
     if (!file) {
         perror("Error al abrir el archivo");
         return 1;
     }
-
     yyin = file;
+    
+    // If an output file is provided, redirect stdout.
+    if (argc == 3) {
+        FILE *output = freopen(argv[2], "w", stdout);
+        if (!output) {
+            perror("Error al abrir el archivo de salida");
+            fclose(file);
+            return 1;
+        }
+    }
+    
+    // Process the input file.
     yylex();
     fclose(file);
     return 0;

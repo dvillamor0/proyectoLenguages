@@ -10,9 +10,10 @@
 # sys.exit(app.exec_())
 
 import sys
+import struct
 import tempfile
 from assets.memoria import Memoria
-from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16
+from assets.IdentificarDato import GetEntero, GetFloat, GetNatural, GetBooleano, GetCaracterUtf16, int_to_bin16, float_to_bin16
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.cp = 0
-        self.registro = [0,0,0,0]
+        self.registro = [0] * 4
         self.carry = 0
         self.zero = 0
         self.negative = 0
@@ -41,6 +42,8 @@ class MainWindow(QMainWindow):
         self.ui.input_button.setDisabled(True)
         self.memoria = Memoria(self.ui)
         self.ui.preprocesar_button.clicked.connect(self.Preprocesado)
+        
+        self.ui.Compilar_button.clicked.connect(self.Compilador)
         self.ui.ensamblador_button.clicked.connect(self.Ensamblador)
         self.ui.Linker_button.clicked.connect(self.EnlazadorCargador)
         self.ui.Read_Next_Instruction.clicked.connect(self.LeerInstruccion)
@@ -93,7 +96,7 @@ class MainWindow(QMainWindow):
              
     def getInput(self):
         valor = self.ui.Input.toPlainText()
-        self.guardar_en_registro(self.config_input["reg_input"], int(valor))
+        self.guardar_en_registro(self.config_input["reg_input"], float(valor))
         Llama_all = self.config_input['Exxecute_all']
         self.config_input = {"text": "", "reg_input": 0, "Exxecute_all": False}
         self.ui.Read_Next_Instruction.setDisabled(False)
@@ -110,6 +113,14 @@ class MainWindow(QMainWindow):
         except ValueError as e:
             print(f"Error: '{new_cp}' no es un número válido.")
             self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
+            
+    def setDir(self,new_dir):
+        try:
+            self.dir = new_dir
+            self.ui.DIR.setPlainText(str(new_dir))
+        except ValueError as e:
+            print(f"Error: '{new_dir}' no es un número válido.")
+            self.ui.Output.setPlainText("[Error Instruccion]: "+ str(e))
         
     def actualizarTablaMemoria(self):
         """ Actualiza la tabla de memoria en la interfaz. """
@@ -125,13 +136,17 @@ class MainWindow(QMainWindow):
                 item.setBackground(QColor(255, 255, 255))  # Blanco
 
             self.ui.table_memoria.setItem(i, 0, item)
-       
-    def int_to_bin16(self,numero):
-        if numero < 0:
-            numero = (1 << 16) + numero  # Convierte a complemento a dos si es negativo
-        return format(numero & 0xFFFF, '016b')  # Asegura 16 bits
+
+        # 🔹 Mostrar los últimos 100 registros de la memoria en `table_pila`
+        ultimas_100_direcciones = sorted(self.memoria.keys(), reverse=True)[:100]  # Obtener las últimas 100 direcciones
+        self.ui.table_pila.setRowCount(len(ultimas_100_direcciones))  # Ajustar tamaño de la tabla
+
+        for i, direccion in enumerate(ultimas_100_direcciones):
+            valor = self.memoria[direccion]
+            item = QtWidgets.QTableWidgetItem(str(valor))
+            self.ui.table_pila.setItem(i, 0, item)
  
-    def guardar_en_registro(self,indice,value):
+    def guardar_en_registro(self, indice, value):
         temp_reg = self.registro
         temp_reg[indice] = value
         self.set_REG_Values(temp_reg)
@@ -145,26 +160,52 @@ class MainWindow(QMainWindow):
         self.ui.REG_B.setText(str(arreglo[1]))
         self.ui.REG_C.setText(str(arreglo[2]))
         self.ui.REG_D.setText(str(arreglo[3]))
-        self.ui.BIN_A.setText(self.int_to_bin16(arreglo[0]))
-        self.ui.BIN_B.setText(self.int_to_bin16(arreglo[1]))
-        self.ui.BIN_C.setText(self.int_to_bin16(arreglo[2]))
-        self.ui.BIN_D.setText(self.int_to_bin16(arreglo[3]))
+        
+        def convertir_a_binario(valor):
+            """Convierte un valor a binario según su tipo (int o float)."""
+            if isinstance(valor, int):
+                return int_to_bin16(valor)
+            elif isinstance(valor, float):
+                return float_to_bin16(valor)
+            elif isinstance(valor, str):
+                    return float_to_bin16(bin(ord(valor))[2:].zfill(16))
+            elif isinstance(valor, bool):
+                if(valor):
+                    return int_to_bin16(1)
+                else:
+                    return int_to_bin16(0)
+            else:
+                return "ERROR"  # Manejo de error en caso de tipo desconocido
+        self.ui.BIN_A.setText(convertir_a_binario(arreglo[0]))
+        self.ui.BIN_B.setText(convertir_a_binario(arreglo[1]))
+        self.ui.BIN_C.setText(convertir_a_binario(arreglo[2]))
+        self.ui.BIN_D.setText(convertir_a_binario(arreglo[3]))
       
     def setCarry(self,caryy):
         self.carry = caryy
         self.ui.REG_Carry.setText(str(caryy))
+        self.ui.BIN_Carry.setText(int_to_bin16(caryy))
       
     def setZero(self,zero):
         self.zero = zero
         self.ui.REG_Zero.setText(str(zero))
+        self.ui.BIN_Zero.setText(int_to_bin16(zero))
         
     def setNegative(self,negative):
         self.negative = negative
         self.ui.REG_Neg.setText(str(negativo))
+        self.ui.BIN_Neg.setText(int_to_bin16(negativo))
         
     def setDesb(self,desbordamiento):
         self.desbordamiento = desbordamiento
         self.ui.REG_Desb.setText(str(desbordamiento))
+        self.ui.BIN_Desb.setText(int_to_bin16(desbordamiento))
+    
+    def resetBanderas(self):
+        self.setCarry(0)
+        self.setZero(0)
+        self.setNegative(0)
+        self.setDesb(0)
         
     def Preprocesado(self):
         texto = self.ui.codigofuente_input.toPlainText()  # Obtener el texto del QTextEdit
@@ -175,7 +216,7 @@ class MainWindow(QMainWindow):
             temp_file_path = temp_file.name
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
-        flex_executable = "./compilados/preprocessor.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
+        flex_executable = "./compilados/preprocesador.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal
@@ -188,6 +229,61 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
         
+    def Compilador(self):
+        # Obtener el código preprocesado de la UI
+        codigo = self.ui.codigo_preprocesado_input.toPlainText()
+
+        # Definir rutas
+        compiler_executable = os.path.join(".", "compilados", "compiler.exe")
+        output_file = os.path.join(".", "archivos_salida", "compilador.out")
+        output_file_tac = os.path.join(".", "archivos_salida", "compilador.tac")
+        output_file_asm = os.path.join(".", "archivos_salida", "compilador.asm")
+        tac_script = os.path.join(".", "src", "TAC.py")
+
+        try:
+            # Crear archivo temporal para la entrada
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".out", mode="w", encoding="utf-8") as temp_input:
+                temp_input.write(codigo)
+                temp_input.close()
+
+                # Ejecutar el compilador con el archivo de salida fijo
+                result = subprocess.run(
+                    [compiler_executable, temp_input.name, output_file],
+                    capture_output=True,
+                    text=True
+                )
+
+                # Verificar si la compilación fue exitosa
+                if result.returncode != 0:
+                    self.ui.assembler_input.setPlainText(f"[Error Compilador]: {result.stderr}")
+                    return
+
+                # Ejecutar TAC.py con el archivo de salida del compilador
+                result_tac = subprocess.run(
+                    ["python", tac_script, output_file_tac],
+                    capture_output=True,
+                    text=True
+                )
+                
+                # Verificar si la conversión TAC → ASM fue exitosa
+                if result_tac.returncode != 0:
+                    self.ui.Output.setPlainText(f"[Error TAC]: {result_tac.stderr}")
+                    return
+
+                # Leer la salida generada en compilador.asm
+                if os.path.exists(output_file_asm):
+                    with open(output_file_asm, "r", encoding="utf-8") as f:
+                        asm_code = f.read()
+                    self.ui.assembler_input.setPlainText(asm_code)
+                else:
+                    self.ui.Output.setPlainText("[Error]: No se generó el archivo de ensamblador.")
+        finally:
+            # Limpiar archivo temporal de entrada
+            try:
+                os.remove(temp_input.name)
+            except Exception:
+                pass
+        
     def Ensamblador(self):
         texto = self.ui.assembler_input.toPlainText()  # Obtener el texto del QTextEdit
 
@@ -197,7 +293,9 @@ class MainWindow(QMainWindow):
             temp_file_path = temp_file.name
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
-        flex_executable = "./compilados/ensamblador.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
+        flex_executable = "./compilados/ensamblador"
+        if os.name != 'posix':
+            flex_executable += ".exe"
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal
@@ -208,7 +306,7 @@ class MainWindow(QMainWindow):
             output = result.stdout  # Obtener la salida del scanner
             self.ui.binary_input.setPlainText(output)
         except Exception as e:
-            self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
+            self.ui.Output.setPlainText("[Error Ensamblador]: "+ str(e))
         
     def EnlazadorCargador(self):
         direccion_referencia = self.ui.linker_input.toPlainText()
@@ -268,7 +366,6 @@ class MainWindow(QMainWindow):
         instruccion = self.memoria.leer_memoria(self.cp)
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
-            #Ejecuta instruccion
             self.EjecutarComando(instruccion)
             self.setCp(self.cp+1)      
         except ValueError as e:
@@ -291,13 +388,13 @@ class MainWindow(QMainWindow):
         
     def EjecutarComando(self,instruccion):
         nombre_comando = self.IdentificarComando(instruccion)
+        self.setDir(instruccion)
         funcion = self.funciones.get(nombre_comando)  # Obtener la función con el mismo nombre
             
         if funcion:
             try:
                 # Asegurar que la instrucción se maneje como cadena binaria y tenga 32 bits
                 binario = str(instruccion).zfill(32)  # Asegurar que tenga 32 bits, rellenando con ceros a la izquierda
-                print("🚀 ~ instruccion:", str(funcion))
                 resto_instruccion = binario[5:]  # Convertir los 27 bits restantes a entero
                 return funcion(resto_instruccion)
             except ValueError:
@@ -325,7 +422,7 @@ class MainWindow(QMainWindow):
                 print(f"Error: Código de instrucción fuera de rango ({opcode}).")
                 return "ERROR"
         except ValueError:
-            print("Error: La instrucción debe ser un número entero.")
+            print("Error: Las instrucción debe ser un número entero.")
             return "ERROR"
 
     def NOP(self,instruccion):
@@ -354,7 +451,9 @@ class MainWindow(QMainWindow):
       
     def STORE(self,instruccion):
         reg_origen = int(instruccion[:2], 2)
+        print("🚀 ~ reg_origen:", reg_origen)
         dir_destino = int(instruccion[2:], 2)
+        print("🚀 ~ dir_destino:", dir_destino)
         self.memoria.escribir_memoria(reg_origen,self.LeerDato(dir_destino))
         return 0
         
@@ -368,28 +467,48 @@ class MainWindow(QMainWindow):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] + self.registro[reg_2])
+        suma = self.registro[reg_1] + self.registro[reg_2]
+        if suma > 2097151:
+            self.setDesb(1)
+            self.setCarry(1)
+        if suma == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,suma)
         return 0
         
     def SUB(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] - self.registro[reg_2])
+        resta = self.registro[reg_1] - self.registro[reg_2]
+        if resta == 0:
+            self.setZero(1)
+        if resta < 0:
+            self.setNegative(1)
+        self.guardar_en_registro(reg_destino,resta)
         return 0
         
     def MUL(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] * self.registro[reg_2])
+        multi = self.registro[reg_1] * self.registro[reg_2]
+        if multi > 2097151:
+            self.setDesb(1)
+            self.setCarry(1)
+        if multi == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,multi)
         return 0
         
     def DIV(self,instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
-        self.guardar_en_registro(reg_destino,self.registro[reg_1] / self.registro[reg_2])
+        div = self.registro[reg_1] / self.registro[reg_2]
+        if div == 0:
+            self.setZero(1)
+        self.guardar_en_registro(reg_destino,div)
         return 0
         
     def AND(self,instruccion):
@@ -468,6 +587,7 @@ class MainWindow(QMainWindow):
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
         if(self.registro[reg_1] == self.registro[reg_2]):
+            self.setZero(1)
             self.setCp(dir_destino)
 
     def BNE(self, instruccion):
@@ -476,6 +596,7 @@ class MainWindow(QMainWindow):
         dir_destino = int(instruccion[4:], 2)
         
         if self.registro[reg_1] != self.registro[reg_2]:
+            self.setNegative(1)
             self.setCp(dir_destino)
 
     def BLT(self, instruccion):
@@ -484,12 +605,18 @@ class MainWindow(QMainWindow):
         dir_destino = int(instruccion[4:], 2)
         
         if self.registro[reg_1] < self.registro[reg_2]:
+            self.setNegative(1)
             self.setCp(dir_destino)
 
     def JLE(self, instruccion):
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
+        
+        if self.registro[reg_1] < self.registro[reg_2]:
+            self.setNegative(1)            
+        if self.registro[reg_1] == self.registro[reg_2]:
+            self.setZero(1)
         
         if self.registro[reg_1] <= self.registro[reg_2]:
             self.setCp(dir_destino)
