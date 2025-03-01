@@ -354,50 +354,62 @@ class MainWindow(QMainWindow):
         try:
             direccion_referencia = int(direccion_referencia)
             # Lee el código reubicable desde la UI
-            texto = self.ui.binary_input.toPlainText()  
+            texto = self.ui.binary_input.toPlainText()
             texto_modificado = f"#{direccion_referencia}\n{texto}"
 
-            # Define el comando según el sistema operativo
+            # Crear un archivo temporal para la entrada (similar a compilador.bin)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".bin", mode="w", encoding="utf-8") as temp_in:
+                temp_in.write(texto_modificado)
+                temp_in_path = temp_in.name
+
+            # Crear un nombre de archivo temporal para la salida (similar a executable.bin)
+            temp_out_path = tempfile.mktemp(suffix=".bin")
+
+            # Definir el comando y agregar la extensión si es Windows
             comando = "./compilados/linkerloader"
-            if os.name != 'posix':  # Si es Windows, agrega ".exe"
+            if os.name != 'posix':
                 comando += ".exe"
 
-            try:
-                # Ejecuta el comando pasando los datos como entrada estándar
-                proceso = subprocess.run(
-                    [comando, str(direccion_referencia)],  # Argumentos
-                    input=texto_modificado,  # Envía el código reubicable como entrada
-                    text=True,  # Modo texto
-                    capture_output=True  # Captura la salida del proceso
-                )
+            # Ejecutar el linkerloader pasando los tres parámetros:
+            # 1. La dirección de referencia
+            # 2. El archivo de entrada generado temporalmente
+            # 3. El archivo de salida donde se almacenará el ejecutable
+            proceso = subprocess.run(
+                [comando, str(direccion_referencia), temp_in_path, temp_out_path],
+                capture_output=True,
+                text=True
+            )
 
-                # Divide la salida en líneas
-                resultado = proceso.stdout.strip().split("\n")
+            # Si hay errores en stderr, mostrarlos en la UI
+            if proceso.stderr:
+                self.ui.Output.append("[Error Linker]: " + proceso.stderr)
 
-                # Mostrar la salida en el campo de texto
-                self.ui.binary_input.setPlainText(proceso.stdout.strip())
+            # Leer el contenido del archivo de salida generado
+            if os.path.exists(temp_out_path):
+                with open(temp_out_path, "r", encoding="utf-8") as out_file:
+                    salida = out_file.read().strip()
+                # Mostrar la salida en el campo de texto de la UI
+                self.ui.binary_input.setPlainText(salida)
 
-                # Escribir la salida en la dirección relativa en la memoria
-                for i, valor in enumerate(resultado):
-                    direccion = direccion_referencia + i  # Ajusta la dirección según la salida
+                # Escribir la salida en la memoria a partir de la dirección de referencia
+                for i, linea in enumerate(salida.splitlines()):
+                    direccion = direccion_referencia + i
                     if direccion < len(self.memoria):
-                        self.memoria[direccion] = valor  # Almacena en la memoria
+                        self.memoria[direccion] = linea
 
-                # Actualizar la tabla de memoria en la UI
+                # Actualizar el contador de programa
                 self.setCp(direccion_referencia)
 
-                # Si hay errores, también los muestra
-                if proceso.stderr:
-                    print(f"Error en linkerLoader: {proceso.stderr}")
-                    self.ui.Output.append("[Error Linker]: " + proceso.stderr)
+            # Limpiar el archivo temporal de entrada
+            if os.path.exists(temp_in_path):
+                os.remove(temp_in_path)
+            # Puedes optar por eliminar el archivo de salida si no lo necesitas después:
+            # if os.path.exists(temp_out_path):
+            #     os.remove(temp_out_path)
 
-            except FileNotFoundError:
-                self.ui.Output.setPlainText("[Error]: No se encontró el ejecutable del linkerLoader.")
-            except Exception as e:
-                self.ui.Output.setPlainText("[Error inesperado]: " + str(e))
         except ValueError as e:
-            print(f"Error: '{direccion_referencia}' no es un número válido.")
-            self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
+            self.ui.Output.setPlainText("[Error Enlazador]: " + str(e))
+
         
     def LeerDato(self,direccion):
         instruccion = self.memoria.leer_memoria(direccion)

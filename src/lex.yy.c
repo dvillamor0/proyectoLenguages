@@ -354,8 +354,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 16
-#define YY_END_OF_BUFFER 17
+#define YY_NUM_RULES 5
+#define YY_END_OF_BUFFER 6
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -363,27 +363,10 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[172] =
+static const flex_int16_t yy_accept[13] =
     {   0,
-        0,    0,   17,   15,    8,    8,   15,   11,   13,   13,
-       13,   13,   13,   13,   13,   13,   13,   13,   13,   13,
-       13,   13,   13,   13,   13,   15,   15,    8,    8,   10,
-       15,   11,   15,   15,   15,   15,   15,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,   15,   15,   15,
-       15,   15,   10,    9,    9,   15,   15,   15,   15,   15,
-       15,   15,   15,   15,    7,   15,   15,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,   15,   14,   15,
-       15,    9,   15,   15,   15,   15,   15,   15,   15,    7,
-
-       15,   15,   12,   15,   15,   15,   15,   15,   14,   15,
-       15,   15,   15,   15,   15,   12,    6,   15,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,    6,   15,   15,
-       15,   15,   15,   15,   15,   15,   15,   15,   15,   15,
-       15,   15,   15,   15,   15,    5,   15,   15,   15,    3,
-       15,    5,   15,   15,    4,    3,   15,   15,   15,   15,
-       15,    4,   15,    1,   15,    1,   15,   15,    2,    2,
-        0
+        0,    0,    6,    4,    1,    4,    4,    1,    2,    0,
+        3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -391,17 +374,17 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    4,    1,    5,    1,    1,    1,    1,    6,    1,
-        1,    1,    7,    8,    9,    1,    1,   10,   11,   11,
-       11,   12,   12,   12,   12,   12,   12,    1,    1,    1,
-        1,    1,    1,    1,   13,   14,   15,   16,   17,   18,
-       19,   20,   21,   22,   19,   23,   24,   25,   26,   27,
-       28,   29,   30,   31,   32,   33,   19,   19,   19,   19,
-       34,    1,   35,    1,    1,    1,   36,   19,   19,   19,
+        1,    2,    1,    1,    4,    1,    1,    1,    1,    5,
+        6,    1,    1,    1,    1,    1,    1,    7,    7,    7,
+        7,    7,    7,    7,    7,    7,    7,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-       37,   38,   19,   19,   19,   19,   19,   39,   19,   19,
-       19,   19,   19,   40,   41,   42,   43,   19,   19,   44,
-       19,   19,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -418,177 +401,35 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[45] =
+static const YY_CHAR yy_meta[8] =
     {   0,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1
+        1,    2,    2,    1,    1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[176] =
+static const flex_int16_t yy_base[14] =
     {   0,
-        0,    0,  454,    0,   43,   46,   41,   44,   41,   42,
-       45,  432,    0,   47,  439,  426,   38,  424,  417,  422,
-       42,   46,  430,   31,   35,   78,    0,   77,   89,   87,
-       90,   93,  430,  429,  416,  412,  425,  418,  411,  412,
-      405,   71,  414,   72,  419,  411,  421,  410,   84,  102,
-      401,  404,  400,  398,  402,  413,   76,  120,  123,  150,
-       82,   83,  126,  129,  132,  141,  403,  143,  145,  122,
-      394,  160,  397,  407,  162,  166,  402,  392,  136,  414,
-      190,  164,  232,  167,  172,  193,  199,  219,  203,  167,
-      137,  206,  218,  182,  222,  241,  232,  209,  409,  248,
-
-      244,  401,    0,  242,  246,  252,  261,  268,    0,  235,
-      244,  272,  383,  274,  406,    0,  284,  350,  385,  357,
-      280,  257,  260,  383,  380,  381,  343,  292,  288,  303,
-      278,  305,  342,  307,  332,  326,  310,  306,  322,  308,
-      342,  333,  310,  330,  300,  318,  325,  285,  189,  320,
-      149,  324,  359,  361,  326,  364,  386,  376,  360,  372,
-      181,  368,  137,  370,  107,  374,  397,   82,  378,  380,
-      455,  113,   85,   81,   72
+        0,    0,   14,   15,    0,    6,    5,    0,    4,    2,
+       15,   15,    8
     } ;
 
-static const flex_int16_t yy_def[176] =
+static const flex_int16_t yy_def[14] =
     {   0,
-      171,    1,  171,  172,  172,  171,  172,  173,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  171,  173,
-      172,  173,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  174,  172,  175,
-      172,  172,  173,  172,  173,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      175,  172,  174,  172,   26,   81,  172,  172,  172,  172,
-      172,  173,  172,  172,  172,  172,  172,  172,  172,  172,
-
-      172,  172,  172,   26,   81,   26,   81,   81,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,   26,
-       81,  172,   26,  172,  172,  172,  172,  172,  172,  172,
-       26,  172,  172,  172,  172,  129,  172,  172,  172,  172,
-      172,  172,  172,  172,  135,  172,  172,  172,  141,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  157,  172,  172,  172,  172,  167,  172,  172,
-        0,  171,  171,  171,  171
+       12,    1,   12,   12,   13,   12,   12,   13,   12,   12,
+       12,    0,   12
     } ;
 
-static const flex_int16_t yy_nxt[500] =
+static const flex_int16_t yy_nxt[23] =
     {   0,
-        4,    5,    6,    5,    4,    4,    7,    4,    7,    8,
-        8,    8,    9,   10,   11,   12,   13,   14,   13,   15,
-       16,   17,   18,   19,   20,   21,   22,   13,   23,   24,
-       25,   13,   13,   26,    4,   13,   13,   14,   13,   13,
-       13,   25,   13,   13,   28,   29,   28,   29,   29,   29,
-       30,   30,   30,   32,   32,   32,   33,   38,   35,   42,
-       45,   55,   56,   57,   36,   34,   37,   39,   40,   46,
-       50,   52,   82,   51,   57,   72,   72,   53,   28,   29,
-       28,   80,   42,   58,   59,   31,   59,   60,   60,   60,
-       29,   29,   29,   70,   90,   61,   63,   63,   63,   64,
-
-       64,   64,   65,   65,   65,   76,   76,   79,   62,   70,
-       75,   91,   50,   27,   68,   61,  169,   90,   79,   62,
-       27,   27,   91,   27,   27,   27,   27,   27,   27,   27,
-       27,   27,   81,   81,   81,   92,   92,   92,   64,   64,
-       64,   65,   65,   65,   93,   93,   95,   95,   96,   96,
-      167,   97,  103,   27,   27,   83,   84,   85,   84,   86,
-       86,   86,   97,   72,   72,  100,  100,   87,  111,   76,
-       76,  150,  103,  106,  106,  106,  107,  107,  107,  111,
-       88,  108,  108,  108,   89,  113,  113,   87,   98,  110,
-      165,   88,  157,   99,  101,   83,   84,   85,   84,  105,
-
-      105,  105,  108,  108,  108,  110,  109,   87,  106,  106,
-      106,   90,  106,  106,  106,   92,   92,   92,  117,  117,
-       88,   93,   93,  155,   89,   95,   95,   87,  106,  106,
-      106,   88,   27,   27,   90,   27,   27,   27,   27,   27,
-       27,  106,  106,  106,   96,   96,  112,   91,  116,  120,
-       98,  100,  100,  119,  119,  121,  121,  121,   91,  120,
-      123,  108,  108,  108,  122,   27,   27,  120,  116,  114,
-      121,  121,  121,  131,  115,  122,  109,  108,  108,  108,
-      123,  124,  124,  126,  126,  120,  109,  128,  128,  121,
-      121,  121,  154,  131,  109,  128,  128,  136,  136,  136,
-
-      136,  136,  136,  136,  136,  136,  137,  137,  139,  139,
-      142,  142,  109,  137,  137,  147,  147,  148,  148,  150,
-      150,  152,  152,  156,  156,  139,  139,  152,  152,  162,
-      162,  138,  153,  140,  126,  143,  142,  142,  138,  151,
-      144,  145,  145,  145,  145,  145,  145,  145,  145,  145,
-      140,  149,  149,  149,  149,  149,  149,  149,  149,  149,
-      146,  143,  158,  158,  160,  160,  144,  156,  156,  164,
-      164,  162,  162,  166,  166,  160,  160,  166,  166,  158,
-      158,  170,  170,  170,  170,  141,  135,  159,  134,  133,
-      132,  109,  130,  129,  161,  163,  163,  163,  163,  163,
-
-      163,  163,  163,  163,  159,  161,  168,  168,  168,  168,
-      168,  168,  168,  168,  168,  127,  125,   69,  118,  104,
-      102,   68,   69,   94,   75,   94,   50,   78,   75,   77,
-       68,   68,   50,   74,   73,   66,   71,   50,   69,   68,
-       67,   66,   66,   66,   50,   50,   54,   49,   48,   47,
-       44,   43,   41,  171,    3,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171
-
+        4,    5,    5,    6,    7,    4,    4,   11,   10,    8,
+        9,   10,    9,   12,    3,   12,   12,   12,   12,   12,
+       12,   12
     } ;
 
-static const flex_int16_t yy_chk[500] =
+static const flex_int16_t yy_chk[23] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    5,    5,    5,    6,    6,    6,
-        7,    7,    7,    8,    8,    8,    9,   11,   10,   14,
-       17,   24,   24,   25,   10,    9,   10,   11,   11,   17,
-       21,   22,  175,   21,   25,   44,   44,   22,   28,   28,
-       28,  174,   14,   26,   26,  173,   26,   26,   26,   26,
-       29,   29,   29,   42,   61,   26,   30,   30,   30,   31,
-
-       31,   31,   32,   32,   32,   50,   50,   57,   26,   42,
-       49,   62,   49,  172,   49,   26,  168,   61,   57,   26,
-       58,   58,   62,   58,   58,   58,   58,   58,   58,   58,
-       58,   58,   59,   59,   59,   63,   63,   63,   64,   64,
-       64,   65,   65,   65,   66,   66,   68,   68,   69,   69,
-      165,   70,   79,   58,   58,   60,   60,   60,   60,   60,
-       60,   60,   70,   72,   72,   75,   75,   60,   91,   76,
-       76,  163,   79,   82,   82,   82,   84,   84,   84,   91,
-       60,   85,   85,   85,   60,   94,   94,   60,   72,   90,
-      161,   60,  151,   72,   76,   81,   81,   81,   81,   81,
-
-       81,   81,   86,   86,   86,   90,   85,   81,   87,   87,
-       87,   87,   89,   89,   89,   92,   92,   92,   98,   98,
-       81,   93,   93,  149,   81,   95,   95,   81,   88,   88,
-       88,   81,   83,   83,   87,   83,   83,   83,   83,   83,
-       83,   83,   83,   83,   96,   96,   93,   88,   97,  104,
-       95,  100,  100,  101,  101,  105,  105,  105,   88,  106,
-      111,  106,  106,  106,  110,   83,   83,  123,   97,   96,
-      107,  107,  107,  122,   96,  110,  104,  108,  108,  108,
-      111,  112,  112,  114,  114,  131,  106,  117,  117,  121,
-      121,  121,  148,  122,  123,  128,  128,  129,  129,  129,
-
-      129,  129,  129,  129,  129,  129,  130,  130,  132,  132,
-      134,  134,  131,  137,  137,  138,  138,  140,  140,  143,
-      143,  146,  146,  150,  150,  139,  139,  152,  152,  155,
-      155,  130,  147,  132,  145,  134,  142,  142,  137,  144,
-      134,  135,  135,  135,  135,  135,  135,  135,  135,  135,
-      139,  141,  141,  141,  141,  141,  141,  141,  141,  141,
-      136,  142,  153,  153,  154,  154,  142,  156,  156,  159,
-      159,  162,  162,  164,  164,  160,  160,  166,  166,  158,
-      158,  169,  169,  170,  170,  133,  127,  153,  126,  125,
-      124,  120,  119,  118,  154,  157,  157,  157,  157,  157,
-
-      157,  157,  157,  157,  158,  160,  167,  167,  167,  167,
-      167,  167,  167,  167,  167,  115,  113,  102,   99,   80,
-       78,   77,   74,   73,   71,   67,   56,   55,   54,   53,
-       52,   51,   48,   47,   46,   45,   43,   41,   40,   39,
-       38,   37,   36,   35,   34,   33,   23,   20,   19,   18,
-       16,   15,   12,    3,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171,  171,
-      171,  171,  171,  171,  171,  171,  171,  171,  171
-
+        1,    1,    1,    1,    1,    1,    1,   10,   10,   13,
+        9,    7,    6,    3,   12,   12,   12,   12,   12,   12,
+       12,   12
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -605,290 +446,89 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 ".\\ensamblador.l"
-#line 2 ".\\ensamblador.l"
+#line 1 ".\\linkerLoader.l"
+#line 2 ".\\linkerLoader.l"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <ctype.h> 
+#include <stdlib.h>
 #include <stdint.h>
-#include <math.h>
 
-#define TRUE 1
-#define FALSE 0
-
-void binary_from_char(const char *c) {
-    unsigned short utf16 = (unsigned char)c[0]; 
-
-    printf("00000");  
-
-    for (int i = 15; i >= 0; i--) {
-        printf("%d", (utf16 >> i) & 1);
-    }
-    printf("\n");
-}
-
-void print_binary(int num) {
-    unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
+// Funcion para imprimir un numero en binario con exactamente 21 bits
+void print_binary(FILE* output, int num) {
+    unsigned int mask = 1 << 20; // Mascara para el bit mas significativo (bit 20)
     
     // Imprimir los 21 bits
     for (int i = 0; i < 21; i++) {
         if (num & mask) {
-            printf("1");
+            fprintf(output, "1");
         } else {
-            printf("0");
+            fprintf(output, "0");
         }
-        mask >>= 1;  // Desplazamos la máscara para el siguiente bit
+        mask >>= 1;  // Desplazar la mascara para el siguiente bit
     }
 }
 
-void binary_from_float_21_bits(const char *str) {
-    double value = atof(str); // Convertir la cadena a un número flotante
-
-    int sign_bit = (value < 0) ? 1 : 0;
-    value = fabs(value);  // Trabajar con el valor absoluto
-
-    // Convertir a string con 10 decimales para manipular los dígitos
-    char buffer[50];
-    sprintf(buffer, "%.10f", value);  
-
-    // Extraer los primeros 3 dígitos significativos (ignorando ceros iniciales)
-    char extracted_digits[4] = ""; // Buffer para almacenar 3 dígitos
-    int count = 0, i = 0, found_digit = 0, potencia = 0;
-
-    while (buffer[i] != '\0' && count < 3) {
-        if(buffer[i] == '.'){
-            potencia = 0;
-        }
-        if (buffer[i] >= '1' && buffer[i] <= '9') {
-            found_digit = 1;  // Detectamos el primer dígito no cero
-        }
-        if (found_digit && buffer[i] != '.') {
-            extracted_digits[count++] = buffer[i];  // Guardamos el dígito
-            potencia++;
-        }
-        i++;
-    }
-    extracted_digits[count] = '\0';  // Terminar la cadena
-
-    // Convertir a número truncado
-    double truncated_value = atof(extracted_digits) / pow(10, potencia);
-
-    int numerator = 0, denominator = 1023; // Inicializar variables
-
-    for (int i = 1023; i > 0; i--) {  // Probar denominadores desde 1023 hasta 1
-        double temp_num = truncated_value * i;  // Multiplicar el flotante por el denominador
-        if (temp_num >= 0 && temp_num <= 1023 && floor(temp_num) == temp_num) {  
-            // Verifica que el numerador es un número entero dentro del rango 0-1023
-            numerator = (int)temp_num;
-            denominator = i;
-            break;  // Salir cuando se encuentra la mejor fracción
-        }
-    }
-
-    // Imprimir en formato binario de 21 bits (1 signo + 10 numerador + 10 denominador)
-    printf("%d", sign_bit);
-
-    for (int i = 9; i >= 0; i--) {
-        printf("%d", (numerator >> i) & 1);  // Imprimir numerador (10 bits)
-    }
-
-    for (int i = 9; i >= 0; i--) {
-        printf("%d", (denominator >> i) & 1);  // Imprimir denominador (10 bits)
-    }
+// Funcion para detectar si una linea contiene una direccion relativa
+int contains_relative_address(const char* line) {
+    return (strstr(line, "(") != NULL && strstr(line, ")") != NULL);
 }
 
-void print_binary_from_entero(int num) {
-    // Asegurar que el número cabe en 21 bits con signo (-1048576 a 1048575)
-    if (num < -1048576 || num > 1048575) {
-        printf("Error: Número fuera del rango de 21 bits (-1048576 a 1048575)\n");
-    }
-
-    // Convertir a un entero sin signo de 21 bits (manejo del complemento a 2)
-    uint32_t binary_rep = (num < 0) ? (num & 0x1FFFFF) : num;
-
-    // Imprimir la representación binaria de 21 bits
-    for (int i = 20; i >= 0; i--) {
-        printf("%d", (binary_rep >> i) & 1);
-    }
+// Funcion para extraer el numero entre parentesis
+int extract_address(const char* line) {
+    const char* start = strchr(line, '(');
+    if (start == NULL) return 0;
+    
+    const char* end = strchr(start, ')');
+    if (end == NULL) return 0;
+    
+    // Crear una subcadena para el numero
+    int len = end - start - 1;
+    char num_str[32] = {0};
+    strncpy(num_str, start + 1, len);
+    
+    return atoi(num_str);
 }
 
-char* GetBinarioCommand(const char *command, int esRegistro) {
-    static char binary[6];
-    const char *commands[] = {
-        "NOP", "LOAD", "STORE", "MOVE", "ADD", "SUB", "MUL", "DIV", "AND", "OR", "NOR",
-        "NOT", "SHL", "SHR", "ROL", "ROR", "JUMP", "BEQ", "BNE", "BLT", "JLE", "PUSH", 
-        "POP", "CALL", "RET", "IN", "OUT", "CMP", "CLR", "ERROR", "ERROR", "HALT"
-    };
-    const int num_commands = sizeof(commands) / sizeof(commands[0]);
-
-    if (esRegistro && (strcmp(command, "LOAD") == 0 || strcmp(command, "STORE") == 0)) {
-        if (strcmp(command, "LOAD") == 0) {
-            strcpy(binary, "11101");
-        } else {
-            strcpy(binary, "11110");
-        }
-        return binary;
-    }
-
-    for (int i = 0; i < num_commands; i++) {
-        if (strcmp(command, commands[i]) == 0) {
-            for (int j = 0; j < 5; j++) {
-                binary[4 - j] = (i & (1 << j)) ? '1' : '0';
-            }
-            binary[5] = '\0';  // Agregar el terminador nulo
-
-            return binary;
-        }
-    }
-    strcpy(binary, "00000");
-    return binary;
-}
-
-char* GetBinarioRegistro(const char *reg){
-    static char binary[3];
-
-    if (reg[0] == 'R' && reg[1] >= '0' && reg[1] <= '3' && reg[2] == '\0') {
-        int regNumber = reg[1] - '0'; // Convertir el caracter del número a un valor entero
-
-        // Convertir el número del registro a binario
-        switch (regNumber) {
-            case 0:
-                strcpy(binary, "00");
-                break;
-            case 1:
-                strcpy(binary, "01");
-                break;
-            case 2:
-                strcpy(binary, "10");
-                break;
-            case 3:
-                strcpy(binary, "11");
-                break;
-            default:
-                strcpy(binary, "00"); 
-                break;
-        }
-    }
-    return binary;
-}
-
-char* GetRelativeDirection(const char *reg){
-    static char result[20];
-
-    if (reg == NULL || strlen(reg) < 5) {
-        return "Formato Incorrecto Relative";
-    }
-
-    size_t len = strlen(reg);
-
-    if (reg[0] == '[' && reg[len - 1] == ']' && strncmp(reg + 1, "0x", 2) == 0) {
-        char hexValue[10]; // Para almacenar el número hexadecimal
-        strncpy(hexValue, reg + 3, len - 4); // Extraer solo los dígitos hexadecimales
-        hexValue[len - 4] = '\0'; // Terminar la cadena
-
-        long decimalValue = strtol(hexValue, NULL, 16); // Convertir a decimal
-
-        snprintf(result, sizeof(result), "(%ld)", decimalValue);
+// Funcion para reemplazar la direccion relativa con la absoluta
+char* replace_address(const char* line, int rel_addr, int base_addr) {
+    static char result[1024];
+    const char* start = strchr(line, '(');
+    const char* end = strchr(line, ')');
+    
+    if (start == NULL || end == NULL) {
+        strcpy(result, line);
         return result;
-    } else {
-        return "Formato Incorrecto Relative";
     }
-}
-
-char* ConcatenarDireccion(const char *numero, const char *direccion) {
-    static char resultado[32];
-    int numero_len = strlen(numero);
-    int size_to_fill = 32 - numero_len - 8;  // 32 menos el largo de numero y los 8 bits para la dirección
-    resultado[0] = '\0';
-    /*
-    for (int i = 0; i < size_to_fill; i++) {
-        strcat(resultado, "0");
+    
+    // Calcular la direccion absoluta
+    int abs_addr = base_addr + rel_addr;
+    
+    // Copiar la parte antes del parentesis
+    int prefix_len = start - line;
+    strncpy(result, line, prefix_len);
+    result[prefix_len] = '\0';
+    
+    // Anadir la direccion absoluta en binario
+    char binary[32] = {0};
+    sprintf(binary, "");
+    for (int i = 20; i >= 0; i--) {
+        binary[20-i] = ((abs_addr >> i) & 1) ? '1' : '0';
     }
-    */
-    strcat(resultado, direccion);
-    return resultado;
-}
-
-char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
-    static char result[32];
-    char limpio[32];
-
-    sscanf(reg, "%s", limpio);  // O usa otra opción de limpieza
-
-    int esRegistro = (limpio[0] == 'R') ? TRUE : FALSE;
-    if (esRegistro) {
-        strcpy(result, GetBinarioRegistro(limpio));
-    } else {
-        strcpy(result, ConcatenarDireccion(numero, GetRelativeDirection(limpio)));
-    }
+    binary[21] = '\0';
+    
+    strcat(result, binary);
+    
+    // Anadir la parte despues del parentesis
+    strcat(result, end + 1);
+    
     return result;
 }
 
-int contieneParentesis(const char *str) {
-    while (*str != '\0') {  // Mientras no lleguemos al final de la cadena
-        if (*str == '(') {   // Si encontramos '('
-            return 1;         // Retornamos 1
-        }
-        str++;  // Avanzamos al siguiente carácter
-    }
-    return 0;  // Si no se encontró '('
-}
+int direccionInicial = 0;  // Direccion base para la relocalizacion
 
-char* CompletarCeros(const char *numero){
-    static char resultado[32];
-    int numero_len = strlen(numero);
-    int size_to_fill = 32 - numero_len;
-    resultado[0] = '\0';
-
-    for (int i = 0; i < size_to_fill; i++) {
-        strcat(resultado, "0");
-    }
-    return resultado;
-}
-
-void GenerarBinarioParams(const char *command, const char *reg1, const char *reg2, const char *reg3) {
-    //printf("Comando: %s\n", command);
-    int esRegistro2 = (reg2[0] == 'R') ? TRUE : FALSE;
-    char numero[32] = "";
-    strcat(numero,GetBinarioCommand(command, esRegistro2));
-    int esRegistro1 = (reg1[0] == 'R') ? TRUE : FALSE;
-    if(!esRegistro1){
-        strcat(numero,"000000");
-    }
-    if (strcmp(reg1, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg1,numero));
-    }
-    if(!esRegistro2 && esRegistro1){
-        strcat(numero,"0000");
-    }
-    if (strcmp(reg2, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg2,numero));
-    }
-    int esRegistro3 = (reg3[0] == 'R') ? TRUE : FALSE;
-    if(!esRegistro3 && esRegistro1 && esRegistro2){
-        strcat(numero,"00");
-    }
-    if (strcmp(reg3, "") != 0){
-        strcat(numero, GetBinarioSecondRegistro(reg3,numero));
-    }
-    if(strlen(numero) < 32 && !contieneParentesis(numero)){
-        strcat(numero,CompletarCeros(numero));
-    }
-    printf("%s", numero);
-    printf("\n"); 
-}
-
-void printAscii(const char *str) {
-    printf("ASCII: ");
-    for (int i = 0; str[i] != '\0'; i++) {
-        printf("[%d]", str[i]);
-    }
-    printf("\n");
-}
-
-#line 890 "lex.yy.c"
-#line 891 "lex.yy.c"
+#line 529 "lex.yy.c"
+/* Regular definitions */
+#line 531 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -1105,10 +745,9 @@ YY_DECL
 		}
 
 	{
-#line 294 ".\\ensamblador.l"
+#line 93 ".\\linkerLoader.l"
 
-
-#line 1111 "lex.yy.c"
+#line 750 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1135,13 +774,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 172 )
+				if ( yy_current_state >= 13 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 455 );
+		while ( yy_base[yy_current_state] != 15 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -1166,242 +805,40 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
+/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 296 ".\\ensamblador.l"
-{
-    //printf("Reconocido 3 R : %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
-    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
-    
-    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
-        GenerarBinarioParams(command, reg1, reg2, reg3);
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 94 ".\\linkerLoader.l"
+{ fprintf(yyout, "\n"); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 308 ".\\ensamblador.l"
-{
-    //printf("Reconocido 3 R : %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (ADD, SUB, etc.)
-    char reg1[10], reg2[10], reg3[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,], %9s", command, reg1, reg2, reg3) == 4) {
-        GenerarBinarioParams(command, reg1, reg2, reg3);
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
+#line 96 ".\\linkerLoader.l"
+{ 
+    direccionInicial = atoi(yytext + 1); 
+    fprintf(yyout, "\n");  
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 320 ".\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10], reg2[15];  // Para guardar los registros
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1, reg2) == 3) {
-        GenerarBinarioParams(command, reg1, reg2, "");
-    } else {
-        printf("Error al analizar la instrucción: %s\n", yytext);
-    }
+#line 101 ".\\linkerLoader.l"
+{ 
+    int dir_value = atoi(yytext + 1); 
+    int suma = direccionInicial + dir_value;
+    print_binary(yyout, suma);  
 }
 	YY_BREAK
 case 4:
+/* rule 4 can match eol */
 YY_RULE_SETUP
-#line 331 ".\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
-        GenerarBinarioParams(command, reg1, "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
+#line 107 ".\\linkerLoader.l"
+{ fprintf(yyout, "%s", yytext); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 343 ".\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
-        GenerarBinarioParams(command, reg1, "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
-	YY_BREAK
-case 6:
-YY_RULE_SETUP
-#line 355 ".\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-    char reg1[10];  // Para guardar los registros
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command, reg1) == 2) {
-        GenerarBinarioParams(command, reg1, "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
-	YY_BREAK
-case 7:
-YY_RULE_SETUP
-#line 367 ".\\ensamblador.l"
-{
-    //printf("Reconocido 1 R 1 H: %s\n", yytext);
-
-    char command[10];  // Para guardar el comando (LOAD, STORE, etc.)
-
-    if (sscanf(yytext, "%9s %[^,], %[^,]", command) == 1) {
-        GenerarBinarioParams(command, "", "", "");
-    } else {
-        //printf("Error al analizar la instrucción: %s\n", yytext);
-    }
-}
-	YY_BREAK
-case 8:
-/* rule 8 can match eol */
-YY_RULE_SETUP
-#line 379 ".\\ensamblador.l"
-{ /* No action */ }
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 380 ".\\ensamblador.l"
-{
-    printf("00000000100");
-    binary_from_float_21_bits(yytext);
-    printf("\n");
-}
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 385 ".\\ensamblador.l"
-{
-    int value = atoi(yytext);
-    printf("00000000011");
-    print_binary_from_entero(value);
-    printf("\n");
-}
-	YY_BREAK
-case 11:
-YY_RULE_SETUP
-#line 391 ".\\ensamblador.l"
-{
-    int value = atoi(yytext);
-    printf("00000000010");
-    print_binary(value);
-    printf("\n");
-}
-	YY_BREAK
-case 12:
-YY_RULE_SETUP
-#line 397 ".\\ensamblador.l"
-{
-    if (strcmp(yytext, "TRUE") == 0) {
-        printf("00000000001000000000000000000001");  // 20 ceros antes del 1
-        printf("\n");
-    }
-    // Si es FALSE, imprimir 20 ceros seguidos de 0
-    else if (strcmp(yytext, "FALSE") == 0) {
-        printf("00000000001000000000000000000000");  // 20 ceros antes del 0
-        printf("\n");
-    }
-}
-	YY_BREAK
-case 13:
-YY_RULE_SETUP
-#line 408 ".\\ensamblador.l"
-{
-    printf("00000000101");
-    binary_from_char(yytext);
-    printf("\n");
-}
-	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 413 ".\\ensamblador.l"
-{
-    printf("00000000110");
-
-    char array_content[strlen(yytext) - 1];
-    strncpy(array_content, yytext + 1, strlen(yytext) - 2);
-    array_content[strlen(yytext) - 2] = '\0';
-
-    int count = 0;
-    char copy[strlen(array_content) + 1];  // Copia para contar tokens
-    strcpy(copy, array_content);
-
-    char *temp_token = strtok(copy, ",");
-    while (temp_token != NULL) {
-        count++;
-        temp_token = strtok(NULL, ",");
-    }
-
-    print_binary(count);
-    printf("\n");
-
-    char *token = strtok(array_content, ",");
-
-    while (token != NULL) {
-        // Determinar si es entero o flotante
-        if (strchr(token, '.') != NULL) {
-            printf("00000000100");
-            binary_from_float_21_bits(token);
-            printf("\n");
-        } else if (strcasecmp(token, "TRUE") == 0) {
-            printf("00000000001000000000000000000001\n");  // 32 bits con 1 al final
-        } else if (strcasecmp(token, "FALSE") == 0) {
-            printf("00000000001000000000000000000000\n");  // 32 bits con 0 al final
-        } else if (token[0] == '\'' && token[1] != '\0' && token[2] == '\'' && token[3] == '\0') {
-            char character = token[1];  // Extraer el carácter
-            printf("00000000101");  
-            print_binary(character);  // Convierte el carácter a binario
-            printf("\n");
-        } else if (token[0] == '+' || token[0] == '-'){
-            int value = atoi(token);
-            printf("00000000011");
-            print_binary_from_entero(value);
-            printf("\n");
-        } else {
-            int value = atoi(token);
-            printf("00000000010");
-            print_binary(value);
-            printf("\n");
-        }
-        token = strtok(NULL, ",");
-    }
-}
-	YY_BREAK
-case 15:
-YY_RULE_SETUP
-#line 464 ".\\ensamblador.l"
-{
-    printf("[Error ensamblador ]%s\n", yytext);
-}
-	YY_BREAK
-case 16:
-YY_RULE_SETUP
-#line 467 ".\\ensamblador.l"
+#line 109 ".\\linkerLoader.l"
 ECHO;
 	YY_BREAK
-#line 1404 "lex.yy.c"
+#line 841 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1698,7 +1135,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 172 )
+			if ( yy_current_state >= 13 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1726,11 +1163,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 172 )
+		if ( yy_current_state >= 13 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 171);
+	yy_is_jam = (yy_current_state == 12);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2406,36 +1843,80 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 467 ".\\ensamblador.l"
+#line 109 ".\\linkerLoader.l"
 
 
-int main(int argc, char **argv) {
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Uso: %s <archivo_python> [archivo_salida]\n", argv[0]);
-        return 1;
-    }
-
-    // Open the input file.
-    FILE *file = fopen(argv[1], "r");
-    if (!file) {
-        perror("Error al abrir el archivo");
-        return 1;
-    }
-    yyin = file;
+// Funcion principal que procesa el archivo de entrada y genera el archivo de salida
+void process_file(const char* input_file, const char* output_file, int base_address) {
+    FILE* in = fopen(input_file, "r");
+    FILE* out = fopen(output_file, "w");
     
-    // If an output file is provided, redirect stdout.
-    if (argc == 3) {
-        FILE *output = freopen(argv[2], "w", stdout);
-        if (!output) {
-            perror("Error al abrir el archivo de salida");
-            fclose(file);
-            return 1;
+    if (!in || !out) {
+        fprintf(stderr, "Error opening files\n");
+        if (in) fclose(in);
+        if (out) fclose(out);
+        return;
+    }
+    
+    char line[1024];
+    
+    // Establecer la direccion base
+    direccionInicial = base_address;
+    
+    while (fgets(line, sizeof(line), in)) {
+        // Eliminar el salto de linea final si existe
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n') {
+            line[len-1] = '\0';
+        }
+        
+        if (contains_relative_address(line)) {
+            // La linea contiene una direccion relativa
+            int rel_addr = extract_address(line);
+            char* new_line = replace_address(line, rel_addr, direccionInicial);
+            fprintf(out, "%s\n", new_line);
+        } else {
+            // La linea no contiene direccion relativa, copiarla tal cual
+            fprintf(out, "%s\n", line);
         }
     }
     
-    // Process the input file.
-    yylex();
-    fclose(file);
+    fclose(in);
+    fclose(out);
+    printf("Processing complete. Output written to %s\n", output_file);
+}
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s [base_address] [input_file] [output_file]\n", argv[0]);
+        printf("  base_address: Base address for relocation (default: 0)\n");
+        printf("  input_file: Binary input file (default: output.bin)\n");
+        printf("  output_file: Output file (default: executable.bin)\n");
+        return 1;
+    }
+    
+    int base_address = 0;
+    const char* input_file = "output.bin";
+    const char* output_file = "executable.bin";
+    
+    if (argc >= 2) {
+        base_address = atoi(argv[1]);
+    }
+    
+    if (argc >= 3) {
+        input_file = argv[2];
+    }
+    
+    if (argc >= 4) {
+        output_file = argv[3];
+    }
+    
+    printf("Loading from: %s\n", input_file);
+    printf("Base address: %d\n", base_address);
+    printf("Output file: %s\n", output_file);
+    
+    process_file(input_file, output_file, base_address);
+    
     return 0;
 }
 
