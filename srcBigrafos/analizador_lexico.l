@@ -15,13 +15,19 @@
 
     // Estructura que representa una entrada en la tabla de simbolos.
     typedef struct {
-        char *name;   // Nombre del simbolo.
-        int type;     // Tipo de simbolo (identificador o numero).
+        char *name;   
+        int type;    
         union {
-            double number_value;  // Valor numerico (para numeros).
-            char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
+            double number_value;  
+            char *string_value;   
+            struct {  
+                int dimensions;      // Número de dimensiones
+                int *sizes;          // Tamaño de cada dimensión
+                double *data;        // Valores almacenados en la matriz
+            } matrix;
         } value;
     } SymbolEntry;
+
 
     // Declaracion de la tabla de simbolos y contador de entradas.
     SymbolEntry symbol_table[MAX_SYMBOLS];
@@ -42,7 +48,7 @@ ID          {LETTER}({LETTER}|{DIGIT})*
 NUMBER      {DIGIT}+(\.{DIGIT}+)?([Ee][+-]?{DIGIT}+)?  
 WHITESPACE  [ \t\n\r]+
 COMMENT     #[^\n]*\n
-
+MATRIX_ELEMENT \[[0-9]+\]
 %%
 {WHITESPACE}    { /* Skip whitespace */ }
 {COMMENT}       { /* Skip comments */ }
@@ -53,6 +59,12 @@ COMMENT     #[^\n]*\n
 "While"     { return TOKEN_WHILE; }
 "Ent"       { return TOKEN_ENT; }
 "Flo"       { return TOKEN_FLO; }
+
+"enl"       { return TOKEN_EDGE; }
+"tipo"      { return TOKEN_TYPE; }
+"hijo"      { return TOKEN_CHILD; }
+"lnk"       { return TOKEN_LNK; }
+"nod"       { return TOKEN_NODE; }
 
 "<"         { return TOKEN_RELOP_LT; }
 "<="        { return TOKEN_RELOP_LE; }
@@ -75,6 +87,8 @@ COMMENT     #[^\n]*\n
 
 {ID}        { yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
 {NUMBER}    { yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
+{MATRIX_ELEMENT} {yylval.symbol_index = install_id(yytext); return TOKEN_MATRIX_ELEMENT; }
+
 
 .           { printf("Lexical Error: Unexpected character %s\n", yytext); }
 %%
