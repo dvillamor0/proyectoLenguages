@@ -20,7 +20,10 @@ typedef enum {
     TYPE_INTEGER,
     TYPE_FLOAT,
     TYPE_NATURAL,
-    TYPE_VOID
+    TYPE_VOID,
+    TYPE_ARRAY_INTEGER,  
+    TYPE_ARRAY_FLOAT,    
+    TYPE_ARRAY_NATURAL   
 } DataType;
 
 // Estructura que contiene la informacion de un simbolo
@@ -31,6 +34,8 @@ typedef struct {
     DataType return_type;
     DataType *param_types;
     int param_count;
+    int array_size;     
+    DataType element_type; 
 } SymbolInfo;
 
 // Estructura que representa la tabla de simbolos
@@ -72,6 +77,7 @@ static void add_symbol(SymbolTable *table, const char *name, DataType type) {
     table->entries[table->size].name = strdup(name);
     table->entries[table->size].type = type;
     table->entries[table->size].is_function = 0;
+    table->entries[table->size].array_size = 0;  
     table->size++;
 }
 
@@ -91,6 +97,37 @@ static void add_function(SymbolTable *table, const char *name, DataType return_t
     table->entries[table->size].return_type = return_type;
     table->entries[table->size].param_types = NULL;
     table->entries[table->size].param_count = 0;
+    table->size++;
+}
+
+static void add_array_symbol(SymbolTable *table, const char *name, DataType elemType, int size) {
+    if (table->size >= table->capacity) {
+        table->capacity *= 2;
+        table->entries = realloc(table->entries, sizeof(SymbolInfo) * table->capacity);
+    }
+    
+    // Determine array type based on element type
+    DataType arrayType;
+    switch (elemType) {
+        case TYPE_INTEGER:
+            arrayType = TYPE_ARRAY_INTEGER;
+            break;
+        case TYPE_FLOAT:
+            arrayType = TYPE_ARRAY_FLOAT;
+            break;
+        case TYPE_NATURAL:
+            arrayType = TYPE_ARRAY_NATURAL;
+            break;
+        default:
+            fprintf(stderr, "Semantic Error: Cannot create array of type %d\n", elemType);
+            arrayType = TYPE_UNKNOWN;
+    }
+    
+    table->entries[table->size].name = strdup(name);
+    table->entries[table->size].type = arrayType;
+    table->entries[table->size].element_type = elemType;
+    table->entries[table->size].is_function = 0;
+    table->entries[table->size].array_size = size;
     table->size++;
 }
 
@@ -124,6 +161,18 @@ static DataType get_type_from_token(int token) {
     }
 }
 
+static DataType get_element_type(DataType arrayType) {
+    switch (arrayType) {
+        case TYPE_ARRAY_INTEGER:
+            return TYPE_INTEGER;
+        case TYPE_ARRAY_FLOAT:
+            return TYPE_FLOAT;
+        case TYPE_ARRAY_NATURAL:
+            return TYPE_NATURAL;
+        default:
+            return TYPE_UNKNOWN;
+    }
+}
 // Funcion: check_types
 // ---------------------
 // Realiza el analisis de tipos de una expresion representada por un nodo del AST.
@@ -195,6 +244,80 @@ static DataType check_types(Node *node, SymbolTable *table) {
             
             return func->return_type;
         }
+
+        case NODE_ARRAY_ACCESS: {
+            // Check that the identifier is an array
+            const char *id_name = symbol_table[node->left->symbol_index].name;
+            SymbolInfo *info = lookup_symbol(table, id_name);
+            if (!info) {
+                fprintf(stderr, "Semantic Error: Undefined identifier '%s'\n", id_name);
+                return TYPE_UNKNOWN;
+            }
+            
+            // Verify it's an array type
+            if (info->type != TYPE_ARRAY_INTEGER && 
+                info->type != TYPE_ARRAY_FLOAT && 
+                info->type != TYPE_ARRAY_NATURAL) {
+                fprintf(stderr, "Semantic Error: '%s' is not an array\n", id_name);
+                return TYPE_UNKNOWN;
+            }
+            
+            // Check that the index is an integer or natural
+            DataType index_type = check_types(node->right, table);
+            if (index_type != TYPE_INTEGER && index_type != TYPE_NATURAL) {
+                fprintf(stderr, "Semantic Error: Array index must be integer or natural, got %d\n", index_type);
+            }
+            
+            // Return the element type of the array
+            return info->element_type;
+        }
+        
+        case NODE_ARRAY_LITERAL: {
+            // Check that all elements have the same type
+            DataType element_type = TYPE_UNKNOWN;
+            Node *element = node->left;
+            
+            if (element) {
+                element_type = check_types(element, table);
+                element = element->next;
+                
+                while (element) {
+                    DataType current_type = check_types(element, table);
+                    if (current_type != element_type) {
+                        fprintf(stderr, "Semantic Error: Array elements must have the same type\n");
+                        break;
+                    }
+                    element = element->next;
+                }
+            }
+            
+            // Return the appropriate array type based on element type
+            switch (element_type) {
+                case TYPE_INTEGER:
+                    return TYPE_ARRAY_INTEGER;
+                case TYPE_FLOAT:
+                    return TYPE_ARRAY_FLOAT;
+                case TYPE_NATURAL:
+                    return TYPE_ARRAY_NATURAL;
+                default:
+                    return TYPE_UNKNOWN;
+            }
+        }
+        
+        case NODE_ARRAY_ASSIGNMENT: {
+            // Check the array access
+            DataType element_type = check_types(node->left, table);
+            
+            // Check the value being assigned
+            DataType value_type = check_types(node->right, table);
+            
+            // Check type compatibility
+            if (element_type != value_type) {
+                fprintf(stderr, "Semantic Error: Type mismatch in array assignment\n");
+            }
+            
+            return element_type;
+        }
         
         default:
             return TYPE_UNKNOWN;
@@ -258,9 +381,75 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
             break;
         }
         
+        case NODE_ARRAY_DECL: {
+            const char *array_name = symbol_table[root->left->symbol_index].name;
+            
+            // Check if this is a declaration with initialization
+            if (root->right && root->right->type == NODE_ARRAY_INIT) {
+                // Get the type and size
+                Node *size_and_type = root->right->left;
+                Node *init_value = root->right->right;
+                
+                // Check the size expression
+                DataType size_type = check_types(size_and_type->left, table);
+                if (size_type != TYPE_INTEGER && size_type != TYPE_NATURAL) {
+                    fprintf(stderr, "Semantic Error: Array size must be an integer or natural\n");
+                }
+                
+                // Get the element type from the NODE_ARRAY_TYPE node
+                DataType elem_type = get_type_from_token(size_and_type->right->symbol_index);
+                
+                // Check the initializer
+                DataType init_type = check_types(init_value, table);
+                
+                // Determine expected array type based on element type
+                DataType expected_array_type;
+                switch (elem_type) {
+                    case TYPE_INTEGER:
+                        expected_array_type = TYPE_ARRAY_INTEGER;
+                        break;
+                    case TYPE_FLOAT:
+                        expected_array_type = TYPE_ARRAY_FLOAT;
+                        break;
+                    case TYPE_NATURAL:
+                        expected_array_type = TYPE_ARRAY_NATURAL;
+                        break;
+                    default:
+                        expected_array_type = TYPE_UNKNOWN;
+                }
+                
+                // Check if initializer type matches expected array type
+                if (init_type != expected_array_type) {
+                    fprintf(stderr, "Semantic Error: Array initializer type mismatch\n");
+                }
+                
+                // Add the array to the symbol table
+                // For simplicity, we're not calculating exact size at compile time
+                add_array_symbol(table, array_name, elem_type, 0);
+            } else {
+                // Simple array declaration without initialization
+                DataType elem_type = get_type_from_token(root->right->symbol_index);
+                
+                // Check the size expression
+                DataType size_type = check_types(root->right, table);
+                if (size_type != TYPE_INTEGER && size_type != TYPE_NATURAL) {
+                    fprintf(stderr, "Semantic Error: Array size must be an integer or natural\n");
+                }
+                
+                // Add the array to the symbol table
+                add_array_symbol(table, array_name, elem_type, 0);
+            }
+            break;
+        }
+        
+        case NODE_ARRAY_ASSIGNMENT: {
+            // The array access semantics are checked in check_types
+            check_types(root, table);
+            break;
+        }
+        
         case NODE_IF:
         case NODE_WHILE: {
-            // Procesa estructuras de control: if y while
             DataType cond_type = check_types(root->left, table);
             if (cond_type != TYPE_INTEGER && cond_type != TYPE_FLOAT) {
                 fprintf(stderr, "Semantic Error: Condition must be numeric\n");
@@ -270,11 +459,13 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
         }
         
         case NODE_RETURN: {
-            // Procesa una sentencia de retorno
             DataType return_type = check_types(root->left, table);
             break;
         }
+
+        
     }
+    
     
     if (root->next) {
         analyze_semantics(root->next, table);
