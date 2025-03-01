@@ -81,19 +81,30 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Al igual que en Windows, navega al directorio `src` y ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l &&
-    gcc -o ../compilados/analizador lex.yy.c -lfl &&
-    
-    flex ensamblador.l &&
-    gcc -o ../compilados/ensamblador lex.yy.c -lfl &&
+    flex analizador.l
+    gcc -o ..\compilados\analizador lex.yy.c 
 
-    flex linkerLoader.l &&
-    gcc -o ../compilados/linkerLoader lex.yy.c -lfl &&
-    
-    flex preprocessor.l &&
-    gcc -o ../compilados/preprocessor lex.yy.c -lfl
+    flex ensamblador.l
+    gcc -o ..\compilados\ensamblador lex.yy.c 
+
+    flex linkerLoader.l
+    gcc -o ..\compilados\linkerLoader lex.yy.c 
+
+    flex preprocesador.l
+    gcc -o ..\compilados\preprocesador lex.yy.c 
+
+    bison -d .\analizador_sintactico.y
+    flex .\analizador_lexico.l
+    gcc -c .\ast.c
+    gcc -c lex.yy.c analizador_sintactico.tab.c analizador_semantico.c intermediate_code.c
+    gcc -o ..\compilados\compiler ast.o lex.yy.o analizador_sintactico.tab.o analizador_semantico.o intermediate_code.o
 
     ```
+   Exclusivo para ususario JuanXo375
+   
+   ```bash
+   $env:Path = "C:\msys64\usr\bin;" + $env:Path
+   ```
 
 ### 2. **Pruebas**
 
