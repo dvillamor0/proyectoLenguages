@@ -26,15 +26,17 @@ def tac_to_assembly(tac_file):
             expr = parts[1]
             
             # Si es un operando solo (no una operación)
-            if '+' not in expr and '-' not in expr and '*' not in expr and '/' not in expr:
+            if '+' not in expr and '-' not in expr and '*' not in expr and '/' not in expr and '==' not in expr and '!=' not in expr and '<' not in expr and '<=' not in expr and '>' not in expr and '>=' not in expr:
                 if expr.replace('.', '', 1).isdigit() and expr not in const_table:
                     const_table[expr] = next_const_addr
                     next_const_addr += 1
             # Si es una operación, buscar constantes en los operandos
             else:
-                for op in re.split(r'[+\-*/]', expr):
+                # Manejar operadores de comparación también
+                operators = r'[+\-*/=<>!]+'
+                for op in re.split(operators, expr):
                     op = op.strip()
-                    if op.replace('.', '', 1).isdigit() and op not in const_table:
+                    if op and op.replace('.', '', 1).isdigit() and op not in const_table:
                         const_table[op] = next_const_addr
                         next_const_addr += 1
 
@@ -56,6 +58,17 @@ def tac_to_assembly(tac_file):
             if target not in var_table:
                 var_table[target] = next_var_addr
                 next_var_addr += 1
+                
+            # Procesar también variables en expresiones de comparación
+            if '==' in expr or '!=' in expr or '<' in expr or '<=' in expr or '>' in expr or '>=' in expr:
+                # Extraer los operandos de la comparación
+                comp_parts = re.split(r'(==|!=|<=|>=|<|>)', expr)
+                for part in comp_parts:
+                    part = part.strip()
+                    if part and not part in ['==', '!=', '<=', '>=', '<', '>'] and not part.replace('.', '', 1).isdigit() and part not in var_table:
+                        var_table[part] = next_var_addr
+                        next_var_addr += 1
+                        
         elif line.startswith('return'):
             ret_var = line.split()[1]
             if ret_var not in var_table and not ret_var.replace('.', '', 1).isdigit():
@@ -95,6 +108,18 @@ def tac_to_assembly(tac_file):
             current_position += 4  # LOAD, LOAD, MUL, STORE
         elif '=' in line and ' / ' in line:
             current_position += 4  # LOAD, LOAD, DIV, STORE
+        elif '=' in line and ' == ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
+        elif '=' in line and ' != ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
+        elif '=' in line and ' < ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
+        elif '=' in line and ' <= ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
+        elif '=' in line and ' > ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
+        elif '=' in line and ' >= ' in line:
+            current_position += 4  # LOAD, LOAD, CMP, STORE
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             current_position += 2  # LOAD, STORE
         elif line.startswith('ifz'):
@@ -195,13 +220,63 @@ def tac_to_assembly(tac_file):
             
             code_section.append(f"STORE R2, [0x{target_addr:X}]")
             asm_position += 1
+        
+        # Manejar operaciones de comparación
+        elif '=' in line and ' == ' in line:
+            target, expr = [x.strip() for x in line.split('=', 1)]
+            target_addr = var_table[target]
+            left, right = [x.strip() for x in expr.split(' == ')]
+            
+            left_addr = const_table[left] if left.replace('.', '', 1).isdigit() else var_table[left]
+            right_addr = const_table[right] if right.replace('.', '', 1).isdigit() else var_table[right]
+            
+            code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+            asm_position += 1
+            code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+            asm_position += 1
+            code_section.append("CMP R0, R1")
+            asm_position += 1
+            # Almacenar el resultado de la comparación (1 si igual, 0 si diferente)
+            code_section.append(f"BEQ R0, R1, [0x{asm_position+2:X}]")
+            asm_position += 1
+            code_section.append(f"STORE R0, [0x{target_addr:X}]")  # Almacenar 0
+            asm_position += 1
+            code_section.append(f"LOAD R2, [0x1]")  # Cargar 1
+            asm_position += 1
+            code_section.append(f"STORE R2, [0x{target_addr:X}]")  # Almacenar 1
+            asm_position += 1
 
         # Manejar asignaciones simples: var = literal o var = otra_var
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
             
-            if expr.replace('.', '', 1).isdigit():
+            # Manejo de expresiones de comparación
+            if '==' in expr or '!=' in expr or '<' in expr or '<=' in expr or '>' in expr or '>=' in expr:
+                # Aquí implementar la lógica para manejar comparaciones
+                # Este sería el punto donde necesitamos manejar "a == b" y similares
+                op_match = re.search(r'(==|!=|<=|>=|<|>)', expr)
+                if op_match:
+                    op = op_match.group(1)
+                    left, right = [x.strip() for x in expr.split(op)]
+                    
+                    # Obtener direcciones de los operandos
+                    left_addr = const_table[left] if left.replace('.', '', 1).isdigit() else var_table.get(left, 0)
+                    right_addr = const_table[right] if right.replace('.', '', 1).isdigit() else var_table.get(right, 0)
+                    
+                    # Generar código para la comparación
+                    code_section.append(f"LOAD R0, [0x{left_addr:X}]")
+                    asm_position += 1
+                    code_section.append(f"LOAD R1, [0x{right_addr:X}]")
+                    asm_position += 1
+                    code_section.append("CMP R0, R1")
+                    asm_position += 1
+                    code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                    asm_position += 1
+                else:
+                    code_section.append(f"# Expresión de comparación no reconocida: {expr}")
+                    asm_position += 1
+            elif expr.replace('.', '', 1).isdigit():
                 const_addr = const_table[expr]
                 code_section.append(f"LOAD R0, [0x{const_addr:X}]")
                 asm_position += 1
