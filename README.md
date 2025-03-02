@@ -80,23 +80,38 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
 2. **Generación de los archivos fuente en C**:
    Al igual que en Windows, navega al directorio `src` y ejecuta el siguiente comando para cada archivo `.l`:
 
-   ```bash
-    flex ensamblador.l
-    gcc -o ..\compilados\ensamblador lex.yy.c 
+   - preprocesador
 
-    flex linkerLoader.l
-    gcc -o ..\compilados\linkerLoader lex.yy.c 
+      ```bash
+         flex preprocesador.l &&
+         mv lex.yy.c ../compilados/preprocesador.yy.c &&
+         gcc -o ../compilados/preprocesador ../compilados/preprocesador.yy.c -lfl
+         
+   - compilador
 
-    flex preprocesador.l
-    gcc -o ..\compilados\preprocesador lex.yy.c 
+      ```bash
+         bison -o ../compilados/analizador_sintactico.tab.c --defines=../compilados/analizador_sintactico.tab.h -d analizador_sintactico.y &&
+         flex analizador_lexico.l &&
+         mv lex.yy.c ../compilados/analizadorLexico.yy.c &&
+         gcc -o ../compilados/compiler -I. -I../compilados \
+         ../compilados/analizadorLexico.yy.c \
+         ../compilados/analizador_sintactico.tab.c \
+         ast.c \
+         analizador_semantico.c \
+         intermediate_code.c \
+         -lfl
 
-    bison -d .\analizador_sintactico.y
-    flex .\analizador_lexico.l
-    gcc -c .\ast.c
-    gcc -c lex.yy.c analizador_sintactico.tab.c analizador_semantico.c intermediate_code.c
-    gcc -o ..\compilados\compiler ast.o lex.yy.o analizador_sintactico.tab.o analizador_semantico.o intermediate_code.o
-
-    ```
+   - ensamblador
+      ```bash
+         flex ensamblador.l &&
+         mv lex.yy.c ../compilados/ensamblador.yy.c &&
+         gcc -o ../compilados/ensamblador ../compilados/ensamblador.yy.c -lfl -lm
+   - enlazador
+      ```bash
+         flex linkerLoader.l &&
+         mv lex.yy.c ../compilados/linkerLoader.yy.c &&
+         gcc -o ../compilados/linkerLoader ../compilados/linkerLoader.yy.c -lfl -lm
+         
    Exclusivo para ususario JuanXo375
    
    ```bash
