@@ -665,13 +665,28 @@ class MainWindow(QMainWindow):
         self.setCp(dir_destino)
         return 0
 
-    def BEQ(self,instruccion):
-        reg_1 = int(instruccion[:2], 2)
-        reg_2 = int(instruccion[2:4], 2)
-        dir_destino = int(instruccion[4:], 2)
-        if(self.registro[reg_1] == self.registro[reg_2]):
-            self.setZero(1)
-            self.setCp(dir_destino)
+    def BEQ(self, instruccion):
+        """
+        Branch if Equal.
+        
+        In this design, BEQ assumes that a CMP instruction has already been executed
+        so that the Zero flag reflects the equality of the two compared operands.
+        
+        The instruction is assumed to encode the branch target address in all its bits.
+        If the Zero flag is 1 (i.e. the last CMP found the operands equal), the
+        program counter is set to the target address.
+        """
+        # Convert the entire instruction to a branch target address.
+        branch_target = int(instruccion, 2)
+        
+        print(f"BEQ: Zero flag = {self.zero}. Branch target = {branch_target}.")
+        if self.zero == 1:
+            self.setCp(branch_target)
+            print(f"BEQ: Branch taken. CP set to {branch_target}.")
+        else:
+            print("BEQ: Branch not taken.")
+        
+        return 0
 
     def BNE(self, instruccion):
         reg_1 = int(instruccion[:2], 2)
@@ -740,21 +755,34 @@ class MainWindow(QMainWindow):
         self.ui.Output.setPlainText(str(self.registro[reg_1]))
         return 0
 
-    def CMP(self,instruccion):
+    def CMP(self, instruccion):
+        """
+        Compare the values in two registers.
+        
+        Assumes that the instruction encodes:
+        - The first 2 bits: register index for operand 1
+        - The next 2 bits: register index for operand 2
+        It subtracts the second operand from the first, sets the zero flag
+        if the result is zero, and the negative flag if the result is negative.
+        """
+        # Extract register indices from the first 4 bits.
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
-        reg_destino = int(instruccion[4:6], 2)
+        
+        value1 = self.registro[reg_1]
+        value2 = self.registro[reg_2]
+        result = value1 - value2
 
-        # actualiza las banderas
-        if self.registro[reg_1] == self.registro[reg_2]:
-            self.setZero(1)
-        if self.registro[reg_1] < self.registro[reg_2]:
-            self.setNegative(1)
-        if self.registro[reg_1] > self.registro[reg_2]:
-            self.setCarry(1)
-        if self.registro[reg_1] > 2097151:
-            self.setDesb(1)
-        print("CMP", instruccion)
+        # Set the Zero flag: 1 if result is zero, else 0.
+        self.setZero(1 if result == 0 else 0)
+        
+        # Set the Negative flag: 1 if result is negative, else 0.
+        self.setNegative(1 if result < 0 else 0)
+        
+        # (Optional: you could also set a carry flag if desired.)
+        print(f"CMP: Comparing R{reg_1}({value1}) with R{reg_2}({value2}).")
+        print(f"CMP: Result = {result}. Zero flag set to {self.zero}, Negative flag set to {self.negative}.")
+        
         return 0
 
     def CLR(self,instruccion):
