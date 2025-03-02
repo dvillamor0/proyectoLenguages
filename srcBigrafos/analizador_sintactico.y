@@ -32,12 +32,15 @@
 %token TOKEN_RELOP_LT TOKEN_RELOP_LE TOKEN_RELOP_EQ TOKEN_RELOP_NE TOKEN_RELOP_GT TOKEN_RELOP_GE
 %token TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_ASSIGN
 %token TOKEN_SEMICOLON TOKEN_COMMA TOKEN_LPAREN TOKEN_RPAREN TOKEN_LBRACE TOKEN_RBRACE
+%token TOKEN_EDGE TOKEN_TYPE TOKEN_CHILD TOKEN_LNK TOKEN_NODE
 %type <symbol_index> relop
 
 // Declaración de no terminales y su tipo asociado (puntero a nodo).
 %type <node> program function_list function param_list param
 %type <node> block statement_list statement declaration_stmt assignment_stmt
 %type <node> if_stmt while_stmt return_stmt condition expr arg_list
+%type <node> node_declaration link_declaration site_declaration root_declaration
+%type <node> place_declaration bigraph_structure
 
 // Declaración de la precedencia y asociatividad de los operadores.
 %left TOKEN_PLUS TOKEN_MINUS
@@ -75,6 +78,91 @@ function_list
                                      }
     ;
 
+/*
+ * Regla: bigraph_structure
+ * ------------------------
+ * Define la estructura de bigraphs, que puede incluir nodos, enlaces, sitios, raíces y lugares.
+ */
+bigraph_structure
+    : node_declaration
+    | link_declaration
+    | site_declaration
+    | root_declaration
+    | place_declaration
+    ;
+
+/*
+ * Regla: node_declaration
+ * -----------------------
+ * Define la declaración de un nodo.
+ */
+node_declaration
+    : TOKEN_NODE TOKEN_ID
+      {
+          Node *node = create_node(NODE_NODE, NULL, NULL);
+          node->symbol_index = $2;  // Asignar el índice del identificador del nodo
+          $$ = node;
+      }
+    ;
+
+/*
+ * Regla: link_declaration
+ * -----------------------
+ * Define la declaración de un enlace entre dos nodos.
+ */
+link_declaration
+    : TOKEN_LNK TOKEN_ID TOKEN_ID
+      {
+          Node *source = create_node(NODE_IDENTIFIER, NULL, NULL);
+          source->symbol_index = $2;
+          Node *target = create_node(NODE_IDENTIFIER, NULL, NULL);
+          target->symbol_index = $3;
+          $$ = create_node(NODE_LINK, source, target);
+      }
+    ;
+
+/*
+ * Regla: site_declaration
+ * -----------------------
+ * Define la declaración de un sitio que contiene un nodo.
+ */
+site_declaration
+    : TOKEN_SITE TOKEN_ID TOKEN_LBRACE node_declaration TOKEN_RBRACE
+      {
+          Node *site = create_node(NODE_SITE, $4, NULL);
+          site->symbol_index = $2;  // Asignar el índice del identificador del sitio
+          $$ = site;
+      }
+    ;
+
+/*
+ * Regla: root_declaration
+ * -----------------------
+ * Define la declaración de una raíz que contiene un nodo.
+ */
+root_declaration
+    : TOKEN_ROOT TOKEN_ID TOKEN_LBRACE node_declaration TOKEN_RBRACE
+      {
+          Node *root = create_node(NODE_ROOT, $4, NULL);
+          root->symbol_index = $2;  // Asignar el índice del identificador de la raíz
+          $$ = root;
+      }
+    ;
+
+/*
+ * Regla: place_declaration
+ * ------------------------
+ * Define la declaración de un lugar que contiene una estructura de bigraph.
+ */
+place_declaration
+    : TOKEN_PLACE TOKEN_ID TOKEN_LBRACE bigraph_structure TOKEN_RBRACE
+      {
+          Node *place = create_node(NODE_PLACE, $4, NULL);
+          place->symbol_index = $2;  // Asignar el índice del identificador del lugar
+          $$ = place;
+      }
+    ;
+    
 /*
  * Regla: function
  * ----------------
