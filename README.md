@@ -111,6 +111,12 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
          flex linkerLoader.l &&
          mv lex.yy.c ../compilados/linkerLoader.yy.c &&
          gcc -o ../compilados/linkerLoader ../compilados/linkerLoader.yy.c -lfl -lm
+         
+   Exclusivo para ususario JuanXo375
+   
+   ```bash
+   $env:Path = "C:\msys64\usr\bin;" + $env:Path
+   ```
 
 ### 2. **Pruebas**
 

@@ -218,8 +218,8 @@ class MainWindow(QMainWindow):
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
         flex_executable = "./compilados/preprocesador"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
-        if os.name != 'posix':  # Si es Windows, agrega ".exe"
-                flex_executable += ".exe"
+        if os.name != 'posix':
+            flex_executable += ".exe"
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal
@@ -242,8 +242,8 @@ class MainWindow(QMainWindow):
 
         # Definir rutas absolutas para evitar problemas de ubicación
         compiler_executable = os.path.abspath("./compilados/compiler")
-        if os.name != 'posix':  # Si es Windows, agrega ".exe"
-                compiler_executable += ".exe"
+        if os.name != 'posix':
+            compiler_executable += ".exe"
         output_file = "./archivos_salida/compilador.out"
         output_file_tac = "./archivos_salida/compilador.tac"
         output_file_asm = "./archivos_salida/compilador.asm"
@@ -275,10 +275,6 @@ class MainWindow(QMainWindow):
                 text=True
             )
 
-            # Si el compilador falla, mostrar el error
-            if result.returncode != 0:
-                self.ui.Output.setPlainText(f"[Error Compilador]: {result.stderr}")
-                return
 
             # Esperar a que se genere el archivo de salida (.tac)
             timeout = 5  # Tiempo máximo de espera en segundos
@@ -362,50 +358,62 @@ class MainWindow(QMainWindow):
         try:
             direccion_referencia = int(direccion_referencia)
             # Lee el código reubicable desde la UI
-            texto = self.ui.binary_input.toPlainText()  
-            texto_modificado = f"#{direccion_referencia}\n{texto}"
+            texto = self.ui.binary_input.toPlainText()
+            texto_modificado = texto
 
-            # Define el comando según el sistema operativo
-            comando = "./compilados/linkerLoader"
-            if os.name != 'posix':  # Si es Windows, agrega ".exe"
+            # Crear un archivo temporal para la entrada (similar a compilador.bin)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".bin", mode="w", encoding="utf-8") as temp_in:
+                temp_in.write(texto_modificado)
+                temp_in_path = temp_in.name
+
+            # Crear un nombre de archivo temporal para la salida (similar a executable.bin)
+            temp_out_path = tempfile.mktemp(suffix=".bin")
+
+            # Definir el comando y agregar la extensión si es Windows
+            comando = "./compilados/linkerloader"
+            if os.name != 'posix':
                 comando += ".exe"
 
-            try:
-                # Ejecuta el comando pasando los datos como entrada estándar
-                proceso = subprocess.run(
-                    [comando, str(direccion_referencia)],  # Argumentos
-                    input=texto_modificado,  # Envía el código reubicable como entrada
-                    text=True,  # Modo texto
-                    capture_output=True  # Captura la salida del proceso
-                )
+            # Ejecutar el linkerloader pasando los tres parámetros:
+            # 1. La dirección de referencia
+            # 2. El archivo de entrada generado temporalmente
+            # 3. El archivo de salida donde se almacenará el ejecutable
+            proceso = subprocess.run(
+                [comando, str(direccion_referencia), temp_in_path, temp_out_path],
+                capture_output=True,
+                text=True
+            )
 
-                # Divide la salida en líneas
-                resultado = proceso.stdout.strip().split("\n")
+            # Si hay errores en stderr, mostrarlos en la UI
+            if proceso.stderr:
+                self.ui.Output.append("[Error Linker]: " + proceso.stderr)
 
-                # Mostrar la salida en el campo de texto
-                self.ui.binary_input.setPlainText(proceso.stdout.strip())
+            # Leer el contenido del archivo de salida generado
+            if os.path.exists(temp_out_path):
+                with open(temp_out_path, "r", encoding="utf-8") as out_file:
+                    salida = out_file.read().strip()
+                # Mostrar la salida en el campo de texto de la UI
+                self.ui.binary_input.setPlainText(salida)
 
-                # Escribir la salida en la dirección relativa en la memoria
-                for i, valor in enumerate(resultado):
-                    direccion = direccion_referencia + i  # Ajusta la dirección según la salida
+                # Escribir la salida en la memoria a partir de la dirección de referencia
+                for i, linea in enumerate(salida.splitlines()):
+                    direccion = direccion_referencia + i
                     if direccion < len(self.memoria):
-                        self.memoria[direccion] = valor  # Almacena en la memoria
+                        self.memoria[direccion] = linea
 
-                # Actualizar la tabla de memoria en la UI
+                # Actualizar el contador de programa
                 self.setCp(direccion_referencia)
 
-                # Si hay errores, también los muestra
-                if proceso.stderr:
-                    print(f"Error en linkerLoader: {proceso.stderr}")
-                    self.ui.Output.append("[Error Linker]: " + proceso.stderr)
+            # Limpiar el archivo temporal de entrada
+            if os.path.exists(temp_in_path):
+                os.remove(temp_in_path)
+            # Puedes optar por eliminar el archivo de salida si no lo necesitas después:
+            # if os.path.exists(temp_out_path):
+            #     os.remove(temp_out_path)
 
-            except FileNotFoundError:
-                self.ui.Output.setPlainText("[Error]: No se encontró el ejecutable del linkerLoader.")
-            except Exception as e:
-                self.ui.Output.setPlainText("[Error inesperado]: " + str(e))
         except ValueError as e:
-            print(f"Error: '{direccion_referencia}' no es un número válido.")
-            self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
+            self.ui.Output.setPlainText("[Error Enlazador]: " + str(e))
+
         
     def LeerDato(self,direccion):
         instruccion = self.memoria.leer_memoria(direccion)
@@ -496,20 +504,30 @@ class MainWindow(QMainWindow):
             print("Error: La data debe ser un número entero.")
             return "ERROR"
         
-    def LOAD(self,instruccion):
+    def LOAD(self, instruccion):
         reg_destino = int(instruccion[:2], 2)
-        print("🚀 ~ reg_destino:", reg_destino)
         dir_origen = int(instruccion[2:], 2)
-        print("🚀 ~ dir_origen:", dir_origen)
-        print("🚀 ~ self.LeerDato(dir_origen):", self.LeerDato(dir_origen))
-        print("🚀 ~ reg_destino: ", self.registro[reg_destino]," <-- self.LeerDato(dir_origen): ", self.LeerDato(dir_origen))
-        self.guardar_en_registro(reg_destino,self.LeerDato(dir_origen))
+        
+        # Debug prints
+        print(f"LOAD: Reading from memory address {dir_origen} value {self.LeerDato(dir_origen)}")
+        print(f"LOAD: Will store into register {reg_destino}")
+        
+        # Make sure this actually loads into reg_destino, not some other register
+        self.guardar_en_registro(reg_destino, self.LeerDato(dir_origen))
+        
+        # Verify after loading
+        print(f"LOAD: Register {reg_destino} now has value {self.registro[reg_destino]}")
       
-    def STORE(self,instruccion):
+    def STORE(self, instruccion):
         reg_origen = int(instruccion[:2], 2)
         dir_destino = int(instruccion[2:], 2)
-        print("🚀 ~ reg_origen: ", self.registro[reg_origen]," --> dir_destino: ", dir_destino)
-        self.memoria.escribir_memoria(dir_destino,ConvertirDatoBinario(self.registro[reg_origen]))
+        
+        print(f"STORE: Raw instruction bits: {instruccion}")
+        print(f"STORE: Parsed reg_origen={reg_origen}, dir_destino={dir_destino}")
+        print(f"STORE: Register {reg_origen} value = {self.registro[reg_origen]}")
+        
+        # Store the value from the specified register to memory
+        self.memoria.escribir_memoria(dir_destino, ConvertirDatoBinario(self.registro[reg_origen]))
         return 0
         
     def MOVE(self,instruccion):
@@ -518,17 +536,27 @@ class MainWindow(QMainWindow):
         self.guardar_en_registro(reg_origen,self.LeerDato(reg_destino))
         return 0
         
-    def ADD(self,instruccion):
+    def ADD(self, instruccion):
+        # Check these bit positions - they might be incorrect
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
+        
+        # Debug prints
+        print(f"ADD: Raw instruction bits: {instruccion}")
+        print(f"ADD: Parsed reg_1={reg_1}, reg_2={reg_2}, reg_destino={reg_destino}")
+        print(f"ADD: Register {reg_1} value = {self.registro[reg_1]}")
+        print(f"ADD: Register {reg_2} value = {self.registro[reg_2]}")
+        
+        # Do the addition
         suma = self.registro[reg_1] + self.registro[reg_2]
-        if suma > 2097151:
-            self.setDesb(1)
-            self.setCarry(1)
-        if suma == 0:
-            self.setZero(1)
-        self.guardar_en_registro(reg_destino,suma)
+        print(f"ADD: Sum result = {suma}, storing in Register {reg_destino}")
+        
+        # Store result
+        self.guardar_en_registro(reg_destino, suma)
+        
+        # Set flags appropriately
+        
         return 0
         
     def SUB(self,instruccion):

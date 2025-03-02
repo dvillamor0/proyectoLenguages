@@ -40,7 +40,7 @@
 
 /* Definiciones de expresiones regulares */
 DIGIT       [0-9]
-LETTER      [a-zA-Z]
+LETTER      [a-zA-Z_]
 ID          {LETTER}({LETTER}|{DIGIT})*
 NUMBER      {DIGIT}+(\.{DIGIT}+)?([Ee][+-]?{DIGIT}+)?  
 WHITESPACE  [ \t\n\r]+
