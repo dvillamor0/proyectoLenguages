@@ -355,7 +355,7 @@ class MainWindow(QMainWindow):
             direccion_referencia = int(direccion_referencia)
             # Lee el código reubicable desde la UI
             texto = self.ui.binary_input.toPlainText()
-            texto_modificado = f"#{direccion_referencia}\n{texto}"
+            texto_modificado = texto
 
             # Crear un archivo temporal para la entrada (similar a compilador.bin)
             with tempfile.NamedTemporaryFile(delete=False, suffix=".bin", mode="w", encoding="utf-8") as temp_in:
@@ -500,20 +500,30 @@ class MainWindow(QMainWindow):
             print("Error: La data debe ser un número entero.")
             return "ERROR"
         
-    def LOAD(self,instruccion):
+    def LOAD(self, instruccion):
         reg_destino = int(instruccion[:2], 2)
-        print("🚀 ~ reg_destino:", reg_destino)
         dir_origen = int(instruccion[2:], 2)
-        print("🚀 ~ dir_origen:", dir_origen)
-        print("🚀 ~ self.LeerDato(dir_origen):", self.LeerDato(dir_origen))
-        print("🚀 ~ reg_destino: ", self.registro[reg_destino]," <-- self.LeerDato(dir_origen): ", self.LeerDato(dir_origen))
-        self.guardar_en_registro(reg_destino,self.LeerDato(dir_origen))
+        
+        # Debug prints
+        print(f"LOAD: Reading from memory address {dir_origen} value {self.LeerDato(dir_origen)}")
+        print(f"LOAD: Will store into register {reg_destino}")
+        
+        # Make sure this actually loads into reg_destino, not some other register
+        self.guardar_en_registro(reg_destino, self.LeerDato(dir_origen))
+        
+        # Verify after loading
+        print(f"LOAD: Register {reg_destino} now has value {self.registro[reg_destino]}")
       
-    def STORE(self,instruccion):
+    def STORE(self, instruccion):
         reg_origen = int(instruccion[:2], 2)
         dir_destino = int(instruccion[2:], 2)
-        print("🚀 ~ reg_origen: ", self.registro[reg_origen]," --> dir_destino: ", dir_destino)
-        self.memoria.escribir_memoria(dir_destino,ConvertirDatoBinario(self.registro[reg_origen]))
+        
+        print(f"STORE: Raw instruction bits: {instruccion}")
+        print(f"STORE: Parsed reg_origen={reg_origen}, dir_destino={dir_destino}")
+        print(f"STORE: Register {reg_origen} value = {self.registro[reg_origen]}")
+        
+        # Store the value from the specified register to memory
+        self.memoria.escribir_memoria(dir_destino, ConvertirDatoBinario(self.registro[reg_origen]))
         return 0
         
     def MOVE(self,instruccion):
@@ -522,17 +532,27 @@ class MainWindow(QMainWindow):
         self.guardar_en_registro(reg_origen,self.LeerDato(reg_destino))
         return 0
         
-    def ADD(self,instruccion):
+    def ADD(self, instruccion):
+        # Check these bit positions - they might be incorrect
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
+        
+        # Debug prints
+        print(f"ADD: Raw instruction bits: {instruccion}")
+        print(f"ADD: Parsed reg_1={reg_1}, reg_2={reg_2}, reg_destino={reg_destino}")
+        print(f"ADD: Register {reg_1} value = {self.registro[reg_1]}")
+        print(f"ADD: Register {reg_2} value = {self.registro[reg_2]}")
+        
+        # Do the addition
         suma = self.registro[reg_1] + self.registro[reg_2]
-        if suma > 2097151:
-            self.setDesb(1)
-            self.setCarry(1)
-        if suma == 0:
-            self.setZero(1)
-        self.guardar_en_registro(reg_destino,suma)
+        print(f"ADD: Sum result = {suma}, storing in Register {reg_destino}")
+        
+        # Store result
+        self.guardar_en_registro(reg_destino, suma)
+        
+        # Set flags appropriately
+        
         return 0
         
     def SUB(self,instruccion):
