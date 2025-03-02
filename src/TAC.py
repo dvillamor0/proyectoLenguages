@@ -3,7 +3,7 @@ import sys
 
 def tac_to_assembly(tac_file):
     # Leer y limpiar el archivo TAC
-    with open(tac_file, 'r') as f:
+    with open(tac_file, 'r', encoding='utf-8') as f:
         tac_lines = [line.strip() for line in f if line.strip()]
 
     # --- Construir la tabla de constantes ---
@@ -282,7 +282,7 @@ def main():
     tac_file = sys.argv[1]
     data_section, code_section = tac_to_assembly(tac_file)
     output_file = tac_file.replace('.tac', '.asm')
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         for data in data_section:
             f.write(f"{data}\n")
         for instr in code_section:

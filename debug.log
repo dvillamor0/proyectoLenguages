@@ -1,60 +1,50 @@
-🔹 Código fuente escrito en C:\Users\JUANAN~1\AppData\Local\Temp\tmpqfqgxdit.out:
+🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpl03qjc7o.out:
 Fun main() {
-    Flo number = 16.0;
-    Flo root = add(number);
+    Ent a = 5;
+    Ent b = 5;
+    If (a == b) {
+        Ent result = 1;
+    }
 }
-Fun add(Flo num) {
-    Flo result = num;
-    Flo temp = 10;
-    result = num + temp;
-    Ret result;
-}
-
 🔹 Archivos temporales creados:
-OUT: C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.out
-ASM: C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.asm
-🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.tac:
+OUT: C:\Users\dmriv\AppData\Local\Temp\tmp1tb5n52s.out
+ASM: C:\Users\dmriv\AppData\Local\Temp\tmp1tb5n52s.asm
+🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1tb5n52s.tac:
 begin_func main
-number = 16.0
-param number
-t1 = call add, 1
-root = t1
+t1 = 5
+a = t1
+t2 = 5
+b = t2
+t3 = a == b
+ifz t3 goto L1
+t4 = 1
+result = t4
+goto L2
+L1:
+L2:
 end_func
 
-begin_func add
-param num
-result = num
-temp = 10
-t2 = num + temp
-result = t2
-return result
-end_func
 
-
-🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.tac:
+🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1tb5n52s.tac:
 begin_func main
-number = 16.0
-param number
-t1 = call add, 1
-root = t1
+t1 = 5
+a = t1
+t2 = 5
+b = t2
+t3 = a == b
+ifz t3 goto L1
+t4 = 1
+result = t4
+goto L2
+L1:
+L2:
 end_func
 
-begin_func add
-param num
-result = num
-temp = 10
-t2 = num + temp
-result = t2
-return result
-end_func
 
-
-🔹 Contenido de C:\Users\JUANAN~1\AppData\Local\Temp\tmpwrn9tna_.asm:
-; SECCION DE DATOS
+🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1tb5n52s.asm:
 0
-16.0
-10
-2
+5
+1
 0
 0
 0
@@ -62,568 +52,22 @@ end_func
 0
 0
 0
-0
-
-; SECCION DE CODIGO
-LOAD R0, [0x2]
-STORE R0, [0x1]
-LOAD R0, [0xA]
+LOAD R0, [0x1]
 STORE R0, [0x3]
 LOAD R0, [0x3]
 STORE R0, [0x4]
-LOAD R0, [0xB]
+LOAD R0, [0x1]
 STORE R0, [0x5]
-LOAD R0, [0x7]
+LOAD R0, [0x5]
 STORE R0, [0x6]
-LOAD R0, [0xB]
-LOAD R1, [0x6]
-ADD R3, R0, R1
-STORE R3, [0x8]
+# Expresión no reconocida: a == b
+LOAD R0, [0x7]
+LOAD R1, [0x0]
+CMP R0, R1
+BEQ R0, R1, [0x13]
+LOAD R0, [0x2]
+STORE R0, [0x8]
 LOAD R0, [0x8]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-RET
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmp4mmin2ss.out:
-Fun sqrt(Flo num) {
-    Flo result = num;
-    Flo temp = 0;
-    
-    While(temp != result) {
-        temp = result;
-        result = (num/result + result) / 2;
-    }
-    Ret result;
-}
-
-Fun power(Flo base, Ent exp) {
-    If(exp == 0) {
-        Ret 1;
-    }
-    
-    Flo result = 1;
-    Ent i = 0;
-    
-    While(i < exp) {
-        result = result * base;
-        i = i + 1;
-    }
-    Ret result;
-}
-
-
-Fun main() {
-    Flo number = 16.0;
-    Flo root = sqrt(number);   
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpalkxvvpg.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpalkxvvpg.asm
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpwz_s1c2x.out:
-Fun main() {
-	Ent num1 = 2;
-	Ent num2 = 3;
-	Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmp1c_8p4h0.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmp1c_8p4h0.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1c_8p4h0.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1c_8p4h0.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp1c_8p4h0.asm:
-0
-2
-3
-1
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x2]
-STORE R0, [0x1]
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x5]
-STORE R0, [0x4]
-LOAD R0, [0x4]
-STORE R0, [0x6]
-LOAD R0, [0x3]
-LOAD R1, [0x6]
-ADD R2, R0, R1
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmptskysllx.out:
-Fun main() {
-	Ent num1 = 2;
-	Ent num2 = 3;
-	Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmp48zpsf3n.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmp48zpsf3n.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp48zpsf3n.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp48zpsf3n.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp48zpsf3n.asm:
-0
-2
-3
-1
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x2]
-STORE R0, [0x1]
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x5]
-STORE R0, [0x4]
-LOAD R0, [0x4]
-STORE R0, [0x6]
-LOAD R0, [0x3]
-LOAD R1, [0x6]
-ADD R2, R0, R1
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmp4h61y898.out:
-Fun main() {
-	Ent num1 = 2;
-	Ent num2 = 3;
-	Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpm6s3pd64.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpm6s3pd64.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpm6s3pd64.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpm6s3pd64.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpm6s3pd64.asm:
-0
-2
-3
-1
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x2]
-STORE R0, [0x1]
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x5]
-STORE R0, [0x4]
-LOAD R0, [0x4]
-STORE R0, [0x6]
-LOAD R0, [0x3]
-LOAD R1, [0x6]
-ADD R2, R0, R1
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpns2ihya2.out:
-Fun main() {
-	Ent num1 = 2;
-	Ent num2 = 3;
-	Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpxtx56f6v.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpxtx56f6v.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpxtx56f6v.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpxtx56f6v.tac:
-begin_func main
-t1 = 2
-num1 = t1
-t2 = 3
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpxtx56f6v.asm:
-0
-2
-3
-1
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x2]
-STORE R0, [0x1]
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x5]
-STORE R0, [0x4]
-LOAD R0, [0x4]
-STORE R0, [0x6]
-LOAD R0, [0x3]
-LOAD R1, [0x6]
-ADD R2, R0, R1
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpqsa2svlq.out:
-Fun main() {
-    Ent num1 = 5;
-    Ent num2 = 7;
-    Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmp0b37r87j.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmp0b37r87j.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp0b37r87j.tac:
-begin_func main
-t1 = 5
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp0b37r87j.tac:
-begin_func main
-t1 = 5
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp0b37r87j.asm:
-0
-5
-7
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x3]
-STORE R0, [0x4]
-LOAD R0, [0x2]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-STORE R0, [0x6]
-LOAD R0, [0x4]
-LOAD R1, [0x6]
-ADD R0, R1, R2
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmp2vo20x2z.out:
-Fun main() {
-    Ent num1 = 5;
-    Ent num2 = 7;
-    Ent result = num1 + num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpzlvlfbs0.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpzlvlfbs0.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpzlvlfbs0.tac:
-begin_func main
-t1 = 5
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpzlvlfbs0.tac:
-begin_func main
-t1 = 5
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 + num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpzlvlfbs0.asm:
-0
-5
-7
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x3]
-STORE R0, [0x4]
-LOAD R0, [0x2]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-STORE R0, [0x6]
-LOAD R0, [0x4]
-LOAD R1, [0x6]
-ADD R0, R1, R2
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpq55_qst1.out:
-Fun main() {
-    Ent num1 = 15;
-    Ent num2 = 7;
-    Ent result = num1 - num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpl7287n9s.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpl7287n9s.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpl7287n9s.tac:
-begin_func main
-t1 = 15
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 - num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpl7287n9s.tac:
-begin_func main
-t1 = 15
-num1 = t1
-t2 = 7
-num2 = t2
-t3 = num1 - num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpl7287n9s.asm:
-0
-15
-7
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x3]
-STORE R0, [0x4]
-LOAD R0, [0x2]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-STORE R0, [0x6]
-LOAD R0, [0x4]
-LOAD R1, [0x6]
-SUB R0, R1, R2
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpzezzmrrn.out:
-Fun main() {
-    Ent num1 = 6;
-    Ent num2 = 8;
-    Ent result = num1 * num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmpp5x86i91.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmpp5x86i91.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpp5x86i91.tac:
-begin_func main
-t1 = 6
-num1 = t1
-t2 = 8
-num2 = t2
-t3 = num1 * num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpp5x86i91.tac:
-begin_func main
-t1 = 6
-num1 = t1
-t2 = 8
-num2 = t2
-t3 = num1 * num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmpp5x86i91.asm:
-0
-6
-8
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x3]
-STORE R0, [0x4]
-LOAD R0, [0x2]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-STORE R0, [0x6]
-LOAD R0, [0x4]
-LOAD R1, [0x6]
-MUL R0, R1, R2
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
-
-🔹 Código fuente escrito en C:\Users\dmriv\AppData\Local\Temp\tmpric9i21s.out:
-Fun main() {
-    Ent num1 = 20;
-    Ent num2 = 4;
-    Ent result = num1 / num2;
-}
-🔹 Archivos temporales creados:
-OUT: C:\Users\dmriv\AppData\Local\Temp\tmp30rxx354.out
-ASM: C:\Users\dmriv\AppData\Local\Temp\tmp30rxx354.asm
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp30rxx354.tac:
-begin_func main
-t1 = 20
-num1 = t1
-t2 = 4
-num2 = t2
-t3 = num1 / num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp30rxx354.tac:
-begin_func main
-t1 = 20
-num1 = t1
-t2 = 4
-num2 = t2
-t3 = num1 / num2
-result = t3
-end_func
-
-
-🔹 Contenido de C:\Users\dmriv\AppData\Local\Temp\tmp30rxx354.asm:
-0
-20
-4
-0
-0
-0
-0
-0
-0
-LOAD R0, [0x1]
-STORE R0, [0x3]
-LOAD R0, [0x3]
-STORE R0, [0x4]
-LOAD R0, [0x2]
-STORE R0, [0x5]
-LOAD R0, [0x5]
-STORE R0, [0x6]
-LOAD R0, [0x4]
-LOAD R1, [0x6]
-DIV R0, R1, R2
-STORE R2, [0x7]
-LOAD R0, [0x7]
-STORE R0, [0x8]
+STORE R0, [0x9]
+JUMP [0x13]
 
