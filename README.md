@@ -90,6 +90,7 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    - compilador
 
       ```bash
+         bison -o ../compilados/analizador_sintactico.tab.c --defines=../compilados/analizador_sintactico.tab.h -d analizador_sintactico.y &&
          flex analizador_lexico.l &&
          mv lex.yy.c ../compilados/analizadorLexico.yy.c &&
          gcc -o ../compilados/compiler -I. -I../compilados \
