@@ -741,7 +741,20 @@ class MainWindow(QMainWindow):
         return 0
 
     def CMP(self,instruccion):
-        print("CMP",instruccion)
+        reg_1 = int(instruccion[:2], 2)
+        reg_2 = int(instruccion[2:4], 2)
+        reg_destino = int(instruccion[4:6], 2)
+
+        # actualiza las banderas
+        if self.registro[reg_1] == self.registro[reg_2]:
+            self.setZero(1)
+        if self.registro[reg_1] < self.registro[reg_2]:
+            self.setNegative(1)
+        if self.registro[reg_1] > self.registro[reg_2]:
+            self.setCarry(1)
+        if self.registro[reg_1] > 2097151:
+            self.setDesb(1)
+        print("CMP", instruccion)
         return 0
 
     def CLR(self,instruccion):
