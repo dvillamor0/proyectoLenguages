@@ -1,1 +1,17 @@
 t2 = num + temp
+t1 = 0
+t2 = temp != result
+t3 = num / result
+t4 = t3 + result
+t5 = 2
+t6 = t4 / t5
+t7 = 0
+t8 = exp == t7
+t9 = 1
+t10 = 1
+t11 = 0
+t12 = i < exp
+t13 = result * base
+t14 = 1
+t15 = i + t14
+t16 = 16.0

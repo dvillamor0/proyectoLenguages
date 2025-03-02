@@ -1,4 +1,19 @@
-begin_func main
+t1 = 0
+t2 = temp != result
+t3 = num / result
+t4 = t3 + result
+t5 = 2
+t6 = t4 / t5
+t7 = 0
+t8 = exp == t7
+t9 = 1
+t10 = 1
+t11 = 0
+t12 = i < exp
+t13 = result * base
+t14 = 1
+t15 = i + t14
+t16 = 16.0
 t1 = 5
 nums = new_array t1
 t2 = 0
@@ -31,23 +46,13 @@ t18 = nums[t17]
 t19 = 4
 t20 = nums[t19]
 t21 = t18 + t20
-total = t21
 t22 = 0
-i = t22
-L1:
 t23 = 5
 t24 = i < t23
-ifz t24 goto L2
 t25 = nums[i]
 t26 = 2
 t27 = t25 * t26
 nums[i] = t27
 t28 = 1
 t29 = i + t28
-i = t29
-goto L1
-L2:
 t30 = 0
-return t30
-end_func
-

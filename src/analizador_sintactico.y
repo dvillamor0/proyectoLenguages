@@ -28,16 +28,19 @@
 
 // Declaración de tokens con sus tipos de datos asociados.
 %token <symbol_index> TOKEN_ID TOKEN_NUMBER
-%token TOKEN_FUN TOKEN_RET TOKEN_IF TOKEN_WHILE TOKEN_ENT TOKEN_FLO
+%token TOKEN_FUN TOKEN_RET TOKEN_IF TOKEN_WHILE TOKEN_ENT TOKEN_FLO TOKEN_NAT TOKEN_ARREGLO
 %token TOKEN_RELOP_LT TOKEN_RELOP_LE TOKEN_RELOP_EQ TOKEN_RELOP_NE TOKEN_RELOP_GT TOKEN_RELOP_GE
 %token TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_ASSIGN
 %token TOKEN_SEMICOLON TOKEN_COMMA TOKEN_LPAREN TOKEN_RPAREN TOKEN_LBRACE TOKEN_RBRACE
-%type <symbol_index> relop
+%token TOKEN_LBRACK TOKEN_RBRACK 
+%type <symbol_index> relop type
 
 // Declaración de no terminales y su tipo asociado (puntero a nodo).
 %type <node> program function_list function param_list param
 %type <node> block statement_list statement declaration_stmt assignment_stmt
 %type <node> if_stmt while_stmt return_stmt condition expr arg_list
+%type <node> array_decl array_literal array_access array_elements
+
 
 // Declaración de la precedencia y asociatividad de los operadores.
 %left TOKEN_PLUS TOKEN_MINUS
@@ -126,8 +129,9 @@ param
  * Define los tipos de datos válidos para los parámetros y declaraciones (entero o flotante).
  */
 type
-    : TOKEN_ENT
-    | TOKEN_FLO
+    : TOKEN_ENT                      { $$ = TOKEN_ENT; }
+    | TOKEN_FLO                      { $$ = TOKEN_FLO; }
+    | TOKEN_NAT                      { $$ = TOKEN_NAT; }
     ;
 
 /*
@@ -171,6 +175,7 @@ statement
     | if_stmt
     | while_stmt
     | return_stmt
+    | array_decl
     ;
 
 /*
@@ -194,13 +199,14 @@ declaration_stmt
  * Define una sentencia de asignación a una variable existente.
  */
 assignment_stmt
-    : TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON
-                                     {
-                                        // Se crea un nodo identificador para la variable a la que se asigna el valor.
-                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        id->symbol_index = $1;
-                                        $$ = create_node(NODE_ASSIGNMENT, id, $3);
-                                     }
+    : TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = $1;
+        $$ = create_node(NODE_ASSIGNMENT, id, $3);
+    }
+    | array_access TOKEN_ASSIGN expr TOKEN_SEMICOLON {
+        $$ = create_node(NODE_ARRAY_ASSIGNMENT, $1, $3);
+    }
     ;
 
 /*
@@ -264,37 +270,44 @@ relop
  * Define las expresiones aritméticas y de llamada a función.
  */
 expr
-    : TOKEN_ID                        {
-                                        $$ = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        $$->symbol_index = $1;
-                                     }
-    | TOKEN_NUMBER                    {
-                                        $$ = create_node(NODE_NUMBER, NULL, NULL);
-                                        $$->symbol_index = $1;
-                                     }
-    | TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN
-                                     {
-                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        id->symbol_index = $1;
-                                        $$ = create_node(NODE_FUNCTION_CALL, id, $3);
-                                     }
-    | expr TOKEN_PLUS expr           { 
-                                        $$ = create_node(NODE_BINARY_OP, $1, $3); 
-                                        $$->symbol_index = TOKEN_PLUS;
-                                     }
-    | expr TOKEN_MINUS expr          { 
-                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
-                                        $$->symbol_index = TOKEN_MINUS;
-                                     }
-    | expr TOKEN_MULT expr           { 
-                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
-                                        $$->symbol_index = TOKEN_MULT;
-                                     }
-    | expr TOKEN_DIV expr            { 
-                                        $$ = create_node(NODE_BINARY_OP, $1, $3);
-                                        $$->symbol_index = TOKEN_DIV;
-                                     }
-    | TOKEN_LPAREN expr TOKEN_RPAREN { $$ = $2; }
+    : TOKEN_ID {
+        $$ = create_node(NODE_IDENTIFIER, NULL, NULL);
+        $$->symbol_index = $1;
+    }
+    | TOKEN_NUMBER {
+        $$ = create_node(NODE_NUMBER, NULL, NULL);
+        $$->symbol_index = $1;
+    }
+    | array_access {
+        $$ = $1;
+    }
+    | array_literal {
+        $$ = $1;
+    }
+    | TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = $1;
+        $$ = create_node(NODE_FUNCTION_CALL, id, $3);
+    }
+    | expr TOKEN_PLUS expr {
+        $$ = create_node(NODE_BINARY_OP, $1, $3);
+        $$->symbol_index = TOKEN_PLUS;
+    }
+    | expr TOKEN_MINUS expr {
+        $$ = create_node(NODE_BINARY_OP, $1, $3);
+        $$->symbol_index = TOKEN_MINUS;
+    }
+    | expr TOKEN_MULT expr {
+        $$ = create_node(NODE_BINARY_OP, $1, $3);
+        $$->symbol_index = TOKEN_MULT;
+    }
+    | expr TOKEN_DIV expr {
+        $$ = create_node(NODE_BINARY_OP, $1, $3);
+        $$->symbol_index = TOKEN_DIV;
+    }
+    | TOKEN_LPAREN expr TOKEN_RPAREN {
+        $$ = $2;
+    }
     ;
 
 /*
@@ -313,6 +326,61 @@ arg_list
                                         while(last->next) last = last->next;
                                         last->next = $3;
                                      }
+    ;
+
+array_decl
+    : TOKEN_ARREGLO type TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK TOKEN_SEMICOLON {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = $3;
+        
+        // Create array type node with size expression
+        Node *array_type = create_node(NODE_ARRAY_TYPE, NULL, NULL);
+        array_type->symbol_index = $2;  // Store the base type token
+        
+        // Create array declaration node
+        $$ = create_node(NODE_ARRAY_DECL, id, $5);  // Left: ID, Right: Size expression
+    }
+    | TOKEN_ARREGLO type TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK TOKEN_ASSIGN array_literal TOKEN_SEMICOLON {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = $3;
+        
+        // Create array type node with size expression
+        Node *array_type = create_node(NODE_ARRAY_TYPE, NULL, NULL);
+        array_type->symbol_index = $2;  // Store the base type token
+        
+        // Create array declaration node with initialization
+        Node *size_and_type = create_node(NODE_ARRAY_SIZE, $5, array_type);
+        $$ = create_node(NODE_ARRAY_DECL, id, create_node(NODE_ARRAY_INIT, size_and_type, $8));
+    }
+    ;
+
+array_literal
+    : TOKEN_LBRACK array_elements TOKEN_RBRACK {
+        $$ = create_node(NODE_ARRAY_LITERAL, $2, NULL);
+    }
+    | TOKEN_LBRACK TOKEN_RBRACK {
+        $$ = create_node(NODE_ARRAY_LITERAL, NULL, NULL);  // Empty array
+    }
+    ;
+
+array_elements
+    : expr {
+        $$ = $1;
+    }
+    | array_elements TOKEN_COMMA expr {
+        $$ = $1;
+        Node *last = $1;
+        while (last->next) last = last->next;
+        last->next = $3;
+    }
+    ;
+
+array_access
+    : TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = $1;
+        $$ = create_node(NODE_ARRAY_ACCESS, id, $3);
+    }
     ;
 
 %%
@@ -392,4 +460,3 @@ int main(int argc, char **argv) {
     printf("Debug: Compilacion completada exitosamente\n");
     return 0;
 }
-

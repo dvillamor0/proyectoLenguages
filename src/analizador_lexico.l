@@ -12,6 +12,7 @@
     // Constantes para identificar el tipo de simbolo.
     #define SYMTAB_IDENTIFIER 1
     #define SYMTAB_NUMBER 2
+    #define SYMTAB_NATURAL 3
 
     // Estructura que representa una entrada en la tabla de simbolos.
     typedef struct {
@@ -20,6 +21,8 @@
         union {
             double number_value;  // Valor numerico (para numeros).
             char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
+            unsigned int natural_value; // Valor para numeros naturales.
+
         } value;
     } SymbolEntry;
 
@@ -53,6 +56,9 @@ COMMENT     #[^\n]*\n
 "While"     { return TOKEN_WHILE; }
 "Ent"       { return TOKEN_ENT; }
 "Flo"       { return TOKEN_FLO; }
+"Nat"       { return TOKEN_NAT; }
+"Arreglo"   { return TOKEN_ARREGLO; }
+
 
 "<"         { return TOKEN_RELOP_LT; }
 "<="        { return TOKEN_RELOP_LE; }
@@ -72,6 +78,8 @@ COMMENT     #[^\n]*\n
 ")"         { return TOKEN_RPAREN; }
 "{"         { return TOKEN_LBRACE; }
 "}"         { return TOKEN_RBRACE; }
+"["         { return TOKEN_LBRACK; }
+"]"         { return TOKEN_RBRACK; }
 
 {ID}        { yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
 {NUMBER}    { yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }

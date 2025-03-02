@@ -127,42 +127,50 @@ enum yysymbol_kind_t
   YYSYMBOL_TOKEN_WHILE = 8,                /* TOKEN_WHILE  */
   YYSYMBOL_TOKEN_ENT = 9,                  /* TOKEN_ENT  */
   YYSYMBOL_TOKEN_FLO = 10,                 /* TOKEN_FLO  */
-  YYSYMBOL_TOKEN_RELOP_LT = 11,            /* TOKEN_RELOP_LT  */
-  YYSYMBOL_TOKEN_RELOP_LE = 12,            /* TOKEN_RELOP_LE  */
-  YYSYMBOL_TOKEN_RELOP_EQ = 13,            /* TOKEN_RELOP_EQ  */
-  YYSYMBOL_TOKEN_RELOP_NE = 14,            /* TOKEN_RELOP_NE  */
-  YYSYMBOL_TOKEN_RELOP_GT = 15,            /* TOKEN_RELOP_GT  */
-  YYSYMBOL_TOKEN_RELOP_GE = 16,            /* TOKEN_RELOP_GE  */
-  YYSYMBOL_TOKEN_PLUS = 17,                /* TOKEN_PLUS  */
-  YYSYMBOL_TOKEN_MINUS = 18,               /* TOKEN_MINUS  */
-  YYSYMBOL_TOKEN_MULT = 19,                /* TOKEN_MULT  */
-  YYSYMBOL_TOKEN_DIV = 20,                 /* TOKEN_DIV  */
-  YYSYMBOL_TOKEN_ASSIGN = 21,              /* TOKEN_ASSIGN  */
-  YYSYMBOL_TOKEN_SEMICOLON = 22,           /* TOKEN_SEMICOLON  */
-  YYSYMBOL_TOKEN_COMMA = 23,               /* TOKEN_COMMA  */
-  YYSYMBOL_TOKEN_LPAREN = 24,              /* TOKEN_LPAREN  */
-  YYSYMBOL_TOKEN_RPAREN = 25,              /* TOKEN_RPAREN  */
-  YYSYMBOL_TOKEN_LBRACE = 26,              /* TOKEN_LBRACE  */
-  YYSYMBOL_TOKEN_RBRACE = 27,              /* TOKEN_RBRACE  */
-  YYSYMBOL_YYACCEPT = 28,                  /* $accept  */
-  YYSYMBOL_program = 29,                   /* program  */
-  YYSYMBOL_function_list = 30,             /* function_list  */
-  YYSYMBOL_function = 31,                  /* function  */
-  YYSYMBOL_param_list = 32,                /* param_list  */
-  YYSYMBOL_param = 33,                     /* param  */
-  YYSYMBOL_type = 34,                      /* type  */
-  YYSYMBOL_block = 35,                     /* block  */
-  YYSYMBOL_statement_list = 36,            /* statement_list  */
-  YYSYMBOL_statement = 37,                 /* statement  */
-  YYSYMBOL_declaration_stmt = 38,          /* declaration_stmt  */
-  YYSYMBOL_assignment_stmt = 39,           /* assignment_stmt  */
-  YYSYMBOL_if_stmt = 40,                   /* if_stmt  */
-  YYSYMBOL_while_stmt = 41,                /* while_stmt  */
-  YYSYMBOL_return_stmt = 42,               /* return_stmt  */
-  YYSYMBOL_condition = 43,                 /* condition  */
-  YYSYMBOL_relop = 44,                     /* relop  */
-  YYSYMBOL_expr = 45,                      /* expr  */
-  YYSYMBOL_arg_list = 46                   /* arg_list  */
+  YYSYMBOL_TOKEN_NAT = 11,                 /* TOKEN_NAT  */
+  YYSYMBOL_TOKEN_ARREGLO = 12,             /* TOKEN_ARREGLO  */
+  YYSYMBOL_TOKEN_RELOP_LT = 13,            /* TOKEN_RELOP_LT  */
+  YYSYMBOL_TOKEN_RELOP_LE = 14,            /* TOKEN_RELOP_LE  */
+  YYSYMBOL_TOKEN_RELOP_EQ = 15,            /* TOKEN_RELOP_EQ  */
+  YYSYMBOL_TOKEN_RELOP_NE = 16,            /* TOKEN_RELOP_NE  */
+  YYSYMBOL_TOKEN_RELOP_GT = 17,            /* TOKEN_RELOP_GT  */
+  YYSYMBOL_TOKEN_RELOP_GE = 18,            /* TOKEN_RELOP_GE  */
+  YYSYMBOL_TOKEN_PLUS = 19,                /* TOKEN_PLUS  */
+  YYSYMBOL_TOKEN_MINUS = 20,               /* TOKEN_MINUS  */
+  YYSYMBOL_TOKEN_MULT = 21,                /* TOKEN_MULT  */
+  YYSYMBOL_TOKEN_DIV = 22,                 /* TOKEN_DIV  */
+  YYSYMBOL_TOKEN_ASSIGN = 23,              /* TOKEN_ASSIGN  */
+  YYSYMBOL_TOKEN_SEMICOLON = 24,           /* TOKEN_SEMICOLON  */
+  YYSYMBOL_TOKEN_COMMA = 25,               /* TOKEN_COMMA  */
+  YYSYMBOL_TOKEN_LPAREN = 26,              /* TOKEN_LPAREN  */
+  YYSYMBOL_TOKEN_RPAREN = 27,              /* TOKEN_RPAREN  */
+  YYSYMBOL_TOKEN_LBRACE = 28,              /* TOKEN_LBRACE  */
+  YYSYMBOL_TOKEN_RBRACE = 29,              /* TOKEN_RBRACE  */
+  YYSYMBOL_TOKEN_LBRACK = 30,              /* TOKEN_LBRACK  */
+  YYSYMBOL_TOKEN_RBRACK = 31,              /* TOKEN_RBRACK  */
+  YYSYMBOL_YYACCEPT = 32,                  /* $accept  */
+  YYSYMBOL_program = 33,                   /* program  */
+  YYSYMBOL_function_list = 34,             /* function_list  */
+  YYSYMBOL_function = 35,                  /* function  */
+  YYSYMBOL_param_list = 36,                /* param_list  */
+  YYSYMBOL_param = 37,                     /* param  */
+  YYSYMBOL_type = 38,                      /* type  */
+  YYSYMBOL_block = 39,                     /* block  */
+  YYSYMBOL_statement_list = 40,            /* statement_list  */
+  YYSYMBOL_statement = 41,                 /* statement  */
+  YYSYMBOL_declaration_stmt = 42,          /* declaration_stmt  */
+  YYSYMBOL_assignment_stmt = 43,           /* assignment_stmt  */
+  YYSYMBOL_if_stmt = 44,                   /* if_stmt  */
+  YYSYMBOL_while_stmt = 45,                /* while_stmt  */
+  YYSYMBOL_return_stmt = 46,               /* return_stmt  */
+  YYSYMBOL_condition = 47,                 /* condition  */
+  YYSYMBOL_relop = 48,                     /* relop  */
+  YYSYMBOL_expr = 49,                      /* expr  */
+  YYSYMBOL_arg_list = 50,                  /* arg_list  */
+  YYSYMBOL_array_decl = 51,                /* array_decl  */
+  YYSYMBOL_array_literal = 52,             /* array_literal  */
+  YYSYMBOL_array_elements = 53,            /* array_elements  */
+  YYSYMBOL_array_access = 54               /* array_access  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -490,19 +498,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   84
+#define YYLAST   125
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  28
+#define YYNTOKENS  32
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  19
+#define YYNNTS  23
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  42
+#define YYNRULES  54
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  78
+#define YYNSTATES  106
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   282
+#define YYMAXUTOK   286
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -544,18 +552,19 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27
+      25,    26,    27,    28,    29,    30,    31
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    56,    56,    68,    69,    84,    99,   100,   101,   116,
-     129,   130,   139,   149,   150,   169,   170,   171,   172,   173,
-     182,   197,   212,   222,   232,   241,   253,   254,   255,   256,
-     257,   258,   267,   271,   275,   281,   285,   289,   293,   297,
-     307,   308,   309
+       0,    59,    59,    71,    72,    87,   102,   103,   104,   119,
+     132,   133,   134,   143,   153,   154,   173,   174,   175,   176,
+     177,   178,   187,   202,   207,   218,   228,   238,   247,   259,
+     260,   261,   262,   263,   264,   273,   277,   281,   284,   287,
+     292,   296,   300,   304,   308,   320,   321,   322,   332,   343,
+     358,   361,   367,   370,   379
 };
 #endif
 
@@ -573,14 +582,16 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "TOKEN_ID",
   "TOKEN_NUMBER", "TOKEN_FUN", "TOKEN_RET", "TOKEN_IF", "TOKEN_WHILE",
-  "TOKEN_ENT", "TOKEN_FLO", "TOKEN_RELOP_LT", "TOKEN_RELOP_LE",
-  "TOKEN_RELOP_EQ", "TOKEN_RELOP_NE", "TOKEN_RELOP_GT", "TOKEN_RELOP_GE",
-  "TOKEN_PLUS", "TOKEN_MINUS", "TOKEN_MULT", "TOKEN_DIV", "TOKEN_ASSIGN",
-  "TOKEN_SEMICOLON", "TOKEN_COMMA", "TOKEN_LPAREN", "TOKEN_RPAREN",
-  "TOKEN_LBRACE", "TOKEN_RBRACE", "$accept", "program", "function_list",
-  "function", "param_list", "param", "type", "block", "statement_list",
-  "statement", "declaration_stmt", "assignment_stmt", "if_stmt",
-  "while_stmt", "return_stmt", "condition", "relop", "expr", "arg_list", YY_NULLPTR
+  "TOKEN_ENT", "TOKEN_FLO", "TOKEN_NAT", "TOKEN_ARREGLO", "TOKEN_RELOP_LT",
+  "TOKEN_RELOP_LE", "TOKEN_RELOP_EQ", "TOKEN_RELOP_NE", "TOKEN_RELOP_GT",
+  "TOKEN_RELOP_GE", "TOKEN_PLUS", "TOKEN_MINUS", "TOKEN_MULT", "TOKEN_DIV",
+  "TOKEN_ASSIGN", "TOKEN_SEMICOLON", "TOKEN_COMMA", "TOKEN_LPAREN",
+  "TOKEN_RPAREN", "TOKEN_LBRACE", "TOKEN_RBRACE", "TOKEN_LBRACK",
+  "TOKEN_RBRACK", "$accept", "program", "function_list", "function",
+  "param_list", "param", "type", "block", "statement_list", "statement",
+  "declaration_stmt", "assignment_stmt", "if_stmt", "while_stmt",
+  "return_stmt", "condition", "relop", "expr", "arg_list", "array_decl",
+  "array_literal", "array_elements", "array_access", YY_NULLPTR
 };
 
 static const char *
@@ -590,7 +601,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-52)
+#define YYPACT_NINF (-68)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -604,14 +615,17 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      11,    -2,    29,    11,   -52,     7,   -52,   -52,    -6,   -52,
-     -52,    -8,   -52,    41,    -6,     6,   -52,   -52,   -52,   -52,
-      -1,    24,     9,    40,    46,   -52,    44,   -52,   -52,   -52,
-     -52,   -52,   -52,     9,    52,   -52,     9,    37,     9,     9,
-      27,    43,     9,    33,     9,     9,     9,     9,   -52,    53,
-      23,    54,     9,   -52,    55,    -4,   -52,     8,     8,   -52,
-     -52,     6,   -52,   -52,   -52,   -52,   -52,   -52,     9,     6,
-      49,     9,   -52,   -52,    55,   -52,   -52,    55
+      28,     0,    65,    28,   -68,    64,   -68,   -68,    99,   -68,
+     -68,   -68,    43,   -68,    70,    99,    68,   -68,   -68,   -68,
+     -68,    46,     2,    13,    76,    86,    99,   -68,   108,   -68,
+     -68,   -68,   -68,   -68,   -68,   -68,    90,    13,    13,    37,
+     -68,    13,    -2,    26,   -68,   -68,    13,    13,   111,    92,
+      13,    67,   -11,    13,   -15,   -68,    85,     9,    13,    13,
+      13,    13,   -68,    89,    63,    91,    87,    13,    73,   -68,
+     -68,    85,    47,   -68,    13,   -68,     1,     1,   -68,   -68,
+      68,   -68,   -68,   -68,   -68,   -68,   -68,    13,    68,    13,
+      79,   -68,    13,   -68,    85,   -68,    85,   -68,    40,   -68,
+      85,    18,    93,   -68,    95,   -68
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -620,27 +634,32 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     2,     3,     0,     1,     4,     6,    10,
-      11,     0,     7,     0,     0,     0,     9,     8,    13,     5,
-       0,     0,     0,     0,     0,    12,     0,    14,    15,    16,
-      17,    18,    19,     0,    32,    33,     0,     0,     0,     0,
-       0,     0,    40,     0,     0,     0,     0,     0,    24,     0,
-       0,     0,     0,    21,    41,     0,    39,    35,    36,    37,
-      38,     0,    26,    27,    28,    29,    30,    31,     0,     0,
-       0,     0,    34,    22,    25,    23,    20,    42
+      11,    12,     0,     7,     0,     0,     0,     9,     8,    14,
+       5,     0,     0,     0,     0,     0,     0,    13,     0,    15,
+      16,    17,    18,    19,    20,    21,     0,     0,     0,    35,
+      36,     0,     0,     0,    38,    37,     0,     0,     0,     0,
+       0,     0,     0,    45,     0,    51,    52,     0,     0,     0,
+       0,     0,    27,     0,     0,     0,     0,     0,     0,    23,
+      54,    46,     0,    44,     0,    50,    40,    41,    42,    43,
+       0,    29,    30,    31,    32,    33,    34,     0,     0,     0,
+       0,    24,     0,    39,    53,    25,    28,    26,     0,    22,
+      47,     0,     0,    48,     0,    49
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -52,   -52,   -52,    74,   -52,    66,    61,   -51,   -52,   -52,
-     -52,   -52,   -52,   -52,   -52,    45,   -52,   -22,   -52
+     -68,   -68,   -68,   117,   -68,   106,     5,   -67,   -68,   -68,
+     -68,   -68,   -68,   -68,   -68,    75,   -68,   -23,   -68,   -68,
+      22,   -68,   104
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,    11,    12,    13,    19,    20,    27,
-      28,    29,    30,    31,    32,    49,    68,    50,    55
+       0,     2,     3,     4,    12,    13,    14,    20,    21,    29,
+      30,    31,    32,    33,    34,    63,    87,    64,    72,    35,
+      44,    57,    45
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -648,62 +667,75 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      37,     5,    21,     9,    10,    22,    23,    24,     9,    10,
-      73,    41,    34,    35,    43,    14,     1,    15,    75,    71,
-      54,    72,    57,    58,    59,    60,    25,    46,    47,     6,
-      70,     8,    18,    36,    62,    63,    64,    65,    66,    67,
-      44,    45,    46,    47,    16,    33,    74,    40,    52,    77,
-      44,    45,    46,    47,    44,    45,    46,    47,    56,    48,
-      44,    45,    46,    47,    38,    53,    44,    45,    46,    47,
-      39,    76,    44,    45,    46,    47,    42,     7,    61,    69,
-      17,    26,     0,     0,    51
+      43,    39,    40,     5,    58,    59,    60,    61,    58,    59,
+      60,    61,    73,    95,    51,    52,    39,    40,    54,    56,
+      70,    97,    60,    61,    41,    37,    28,    68,    42,    55,
+      71,    48,    38,     1,    74,    76,    77,    78,    79,    41,
+      75,   102,   103,    42,    90,    58,    59,    60,    61,    22,
+      62,    94,    23,    24,    25,     9,    10,    11,    26,    58,
+      59,    60,    61,    53,    96,     6,    98,    38,    15,   100,
+      16,   101,    92,    17,    93,    27,    81,    82,    83,    84,
+      85,    86,    58,    59,    60,    61,    58,    59,    60,    61,
+       8,    69,    58,    59,    60,    61,    19,    91,    58,    59,
+      60,    61,    46,    99,    58,    59,    60,    61,     9,    10,
+      11,    49,    47,    50,    66,    67,    80,    89,    88,   105,
+       7,    18,    65,    42,   104,    36
 };
 
 static const yytype_int8 yycheck[] =
 {
-      22,     3,     3,     9,    10,     6,     7,     8,     9,    10,
-      61,    33,     3,     4,    36,    23,     5,    25,    69,    23,
-      42,    25,    44,    45,    46,    47,    27,    19,    20,     0,
-      52,    24,    26,    24,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,     3,    21,    68,     3,    21,    71,
-      17,    18,    19,    20,    17,    18,    19,    20,    25,    22,
-      17,    18,    19,    20,    24,    22,    17,    18,    19,    20,
-      24,    22,    17,    18,    19,    20,    24,     3,    25,    25,
-      14,    20,    -1,    -1,    39
+      23,     3,     4,     3,    19,    20,    21,    22,    19,    20,
+      21,    22,    27,    80,    37,    38,     3,     4,    41,    42,
+      31,    88,    21,    22,    26,    23,    21,    50,    30,    31,
+      53,    26,    30,     5,    25,    58,    59,    60,    61,    26,
+      31,    23,    24,    30,    67,    19,    20,    21,    22,     3,
+      24,    74,     6,     7,     8,     9,    10,    11,    12,    19,
+      20,    21,    22,    26,    87,     0,    89,    30,    25,    92,
+      27,    31,    25,     3,    27,    29,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    22,    19,    20,    21,    22,
+      26,    24,    19,    20,    21,    22,    28,    24,    19,    20,
+      21,    22,    26,    24,    19,    20,    21,    22,     9,    10,
+      11,     3,    26,    23,     3,    23,    27,    30,    27,    24,
+       3,    15,    47,    30,   102,    21
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,    29,    30,    31,     3,     0,    31,    24,     9,
-      10,    32,    33,    34,    23,    25,     3,    33,    26,    35,
-      36,     3,     6,     7,     8,    27,    34,    37,    38,    39,
-      40,    41,    42,    21,     3,     4,    24,    45,    24,    24,
-       3,    45,    24,    45,    17,    18,    19,    20,    22,    43,
-      45,    43,    21,    22,    45,    46,    25,    45,    45,    45,
-      45,    25,    11,    12,    13,    14,    15,    16,    44,    25,
-      45,    23,    25,    35,    45,    35,    22,    45
+       0,     5,    33,    34,    35,     3,     0,    35,    26,     9,
+      10,    11,    36,    37,    38,    25,    27,     3,    37,    28,
+      39,    40,     3,     6,     7,     8,    12,    29,    38,    41,
+      42,    43,    44,    45,    46,    51,    54,    23,    30,     3,
+       4,    26,    30,    49,    52,    54,    26,    26,    38,     3,
+      23,    49,    49,    26,    49,    31,    49,    53,    19,    20,
+      21,    22,    24,    47,    49,    47,     3,    23,    49,    24,
+      31,    49,    50,    27,    25,    31,    49,    49,    49,    49,
+      27,    13,    14,    15,    16,    17,    18,    48,    27,    30,
+      49,    24,    25,    27,    49,    39,    49,    39,    49,    24,
+      49,    31,    23,    24,    52,    24
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    28,    29,    30,    30,    31,    32,    32,    32,    33,
-      34,    34,    35,    36,    36,    37,    37,    37,    37,    37,
-      38,    39,    40,    41,    42,    43,    44,    44,    44,    44,
-      44,    44,    45,    45,    45,    45,    45,    45,    45,    45,
-      46,    46,    46
+       0,    32,    33,    34,    34,    35,    36,    36,    36,    37,
+      38,    38,    38,    39,    40,    40,    41,    41,    41,    41,
+      41,    41,    42,    43,    43,    44,    45,    46,    47,    48,
+      48,    48,    48,    48,    48,    49,    49,    49,    49,    49,
+      49,    49,    49,    49,    49,    50,    50,    50,    51,    51,
+      52,    52,    53,    53,    54
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     1,     2,     6,     0,     1,     3,     2,
-       1,     1,     3,     0,     2,     1,     1,     1,     1,     1,
-       5,     4,     5,     5,     3,     3,     1,     1,     1,     1,
-       1,     1,     1,     1,     4,     3,     3,     3,     3,     3,
-       0,     1,     3
+       1,     1,     1,     3,     0,     2,     1,     1,     1,     1,
+       1,     1,     5,     4,     4,     5,     5,     3,     3,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     4,
+       3,     3,     3,     3,     3,     0,     1,     3,     7,     9,
+       3,     2,     1,     3,     4
 };
 
 
@@ -1437,22 +1469,22 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: function_list  */
-#line 56 ".\\analizador_sintactico.y"
+#line 59 ".\\analizador_sintactico.y"
                        { 
         (yyval.node) = create_node(NODE_PROGRAM, (yyvsp[0].node), NULL);
         ast_root = (yyval.node);  // Asigna la raíz del AST para su posterior procesamiento.
     }
-#line 1446 "analizador_sintactico.tab.c"
+#line 1478 "analizador_sintactico.tab.c"
     break;
 
   case 3: /* function_list: function  */
-#line 68 ".\\analizador_sintactico.y"
+#line 71 ".\\analizador_sintactico.y"
                                       { (yyval.node) = (yyvsp[0].node); }
-#line 1452 "analizador_sintactico.tab.c"
+#line 1484 "analizador_sintactico.tab.c"
     break;
 
   case 4: /* function_list: function_list function  */
-#line 69 ".\\analizador_sintactico.y"
+#line 72 ".\\analizador_sintactico.y"
                                       { 
                                         (yyval.node) = (yyvsp[-1].node);
                                         // Se recorre la lista hasta el último nodo y se enlaza la nueva función.
@@ -1460,33 +1492,33 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1464 "analizador_sintactico.tab.c"
+#line 1496 "analizador_sintactico.tab.c"
     break;
 
   case 5: /* function: TOKEN_FUN TOKEN_ID TOKEN_LPAREN param_list TOKEN_RPAREN block  */
-#line 85 ".\\analizador_sintactico.y"
+#line 88 ".\\analizador_sintactico.y"
                                      { 
                                         Node *func = create_node(NODE_FUNCTION, (yyvsp[-2].node), (yyvsp[0].node));
                                         func->symbol_index = (yyvsp[-4].symbol_index);  // Asigna el índice del identificador de la función.
                                         (yyval.node) = func;
                                      }
-#line 1474 "analizador_sintactico.tab.c"
+#line 1506 "analizador_sintactico.tab.c"
     break;
 
   case 6: /* param_list: %empty  */
-#line 99 ".\\analizador_sintactico.y"
+#line 102 ".\\analizador_sintactico.y"
                                       { (yyval.node) = NULL; }
-#line 1480 "analizador_sintactico.tab.c"
+#line 1512 "analizador_sintactico.tab.c"
     break;
 
   case 7: /* param_list: param  */
-#line 100 ".\\analizador_sintactico.y"
+#line 103 ".\\analizador_sintactico.y"
                                       { (yyval.node) = (yyvsp[0].node); }
-#line 1486 "analizador_sintactico.tab.c"
+#line 1518 "analizador_sintactico.tab.c"
     break;
 
   case 8: /* param_list: param_list TOKEN_COMMA param  */
-#line 101 ".\\analizador_sintactico.y"
+#line 104 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = (yyvsp[-2].node);
                                         // Se recorre la lista de parámetros y se enlaza el nuevo parámetro.
@@ -1494,33 +1526,51 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1498 "analizador_sintactico.tab.c"
+#line 1530 "analizador_sintactico.tab.c"
     break;
 
   case 9: /* param: type TOKEN_ID  */
-#line 116 ".\\analizador_sintactico.y"
+#line 119 ".\\analizador_sintactico.y"
                                       {
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[0].symbol_index);  // Asigna el índice del identificador del parámetro.
                                         (yyval.node) = id;
                                      }
-#line 1508 "analizador_sintactico.tab.c"
+#line 1540 "analizador_sintactico.tab.c"
     break;
 
-  case 12: /* block: TOKEN_LBRACE statement_list TOKEN_RBRACE  */
-#line 140 ".\\analizador_sintactico.y"
+  case 10: /* type: TOKEN_ENT  */
+#line 132 ".\\analizador_sintactico.y"
+                                     { (yyval.symbol_index) = TOKEN_ENT; }
+#line 1546 "analizador_sintactico.tab.c"
+    break;
+
+  case 11: /* type: TOKEN_FLO  */
+#line 133 ".\\analizador_sintactico.y"
+                                     { (yyval.symbol_index) = TOKEN_FLO; }
+#line 1552 "analizador_sintactico.tab.c"
+    break;
+
+  case 12: /* type: TOKEN_NAT  */
+#line 134 ".\\analizador_sintactico.y"
+                                     { (yyval.symbol_index) = TOKEN_NAT; }
+#line 1558 "analizador_sintactico.tab.c"
+    break;
+
+  case 13: /* block: TOKEN_LBRACE statement_list TOKEN_RBRACE  */
+#line 144 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_BLOCK, (yyvsp[-1].node), NULL); }
-#line 1514 "analizador_sintactico.tab.c"
+#line 1564 "analizador_sintactico.tab.c"
     break;
 
-  case 13: /* statement_list: %empty  */
-#line 149 ".\\analizador_sintactico.y"
+  case 14: /* statement_list: %empty  */
+#line 153 ".\\analizador_sintactico.y"
                                       { (yyval.node) = NULL; }
-#line 1520 "analizador_sintactico.tab.c"
+#line 1570 "analizador_sintactico.tab.c"
     break;
 
-  case 14: /* statement_list: statement_list statement  */
-#line 150 ".\\analizador_sintactico.y"
+  case 15: /* statement_list: statement_list statement  */
+#line 154 ".\\analizador_sintactico.y"
                                       {
                                         if ((yyvsp[-1].node) == NULL) {
                                             (yyval.node) = (yyvsp[0].node);
@@ -1532,178 +1582,203 @@ yyreduce:
                                             last->next = (yyvsp[0].node);
                                         }
                                      }
-#line 1536 "analizador_sintactico.tab.c"
+#line 1586 "analizador_sintactico.tab.c"
     break;
 
-  case 20: /* declaration_stmt: type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 183 ".\\analizador_sintactico.y"
+  case 22: /* declaration_stmt: type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
+#line 188 ".\\analizador_sintactico.y"
                                      {
                                         // Se crea un nodo identificador y se asocia a la declaración.
                                         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
                                         id->symbol_index = (yyvsp[-3].symbol_index);
                                         (yyval.node) = create_node(NODE_DECLARATION, id, (yyvsp[-1].node));
                                      }
-#line 1547 "analizador_sintactico.tab.c"
+#line 1597 "analizador_sintactico.tab.c"
     break;
 
-  case 21: /* assignment_stmt: TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 198 ".\\analizador_sintactico.y"
-                                     {
-                                        // Se crea un nodo identificador para la variable a la que se asigna el valor.
-                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        id->symbol_index = (yyvsp[-3].symbol_index);
-                                        (yyval.node) = create_node(NODE_ASSIGNMENT, id, (yyvsp[-1].node));
-                                     }
-#line 1558 "analizador_sintactico.tab.c"
+  case 23: /* assignment_stmt: TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
+#line 202 ".\\analizador_sintactico.y"
+                                                 {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = (yyvsp[-3].symbol_index);
+        (yyval.node) = create_node(NODE_ASSIGNMENT, id, (yyvsp[-1].node));
+    }
+#line 1607 "analizador_sintactico.tab.c"
     break;
 
-  case 22: /* if_stmt: TOKEN_IF TOKEN_LPAREN condition TOKEN_RPAREN block  */
-#line 213 ".\\analizador_sintactico.y"
+  case 24: /* assignment_stmt: array_access TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
+#line 207 ".\\analizador_sintactico.y"
+                                                     {
+        (yyval.node) = create_node(NODE_ARRAY_ASSIGNMENT, (yyvsp[-3].node), (yyvsp[-1].node));
+    }
+#line 1615 "analizador_sintactico.tab.c"
+    break;
+
+  case 25: /* if_stmt: TOKEN_IF TOKEN_LPAREN condition TOKEN_RPAREN block  */
+#line 219 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_IF, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1564 "analizador_sintactico.tab.c"
+#line 1621 "analizador_sintactico.tab.c"
     break;
 
-  case 23: /* while_stmt: TOKEN_WHILE TOKEN_LPAREN condition TOKEN_RPAREN block  */
-#line 223 ".\\analizador_sintactico.y"
+  case 26: /* while_stmt: TOKEN_WHILE TOKEN_LPAREN condition TOKEN_RPAREN block  */
+#line 229 ".\\analizador_sintactico.y"
                                      { (yyval.node) = create_node(NODE_WHILE, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1570 "analizador_sintactico.tab.c"
+#line 1627 "analizador_sintactico.tab.c"
     break;
 
-  case 24: /* return_stmt: TOKEN_RET expr TOKEN_SEMICOLON  */
-#line 232 ".\\analizador_sintactico.y"
+  case 27: /* return_stmt: TOKEN_RET expr TOKEN_SEMICOLON  */
+#line 238 ".\\analizador_sintactico.y"
                                       { (yyval.node) = create_node(NODE_RETURN, (yyvsp[-1].node), NULL); }
-#line 1576 "analizador_sintactico.tab.c"
+#line 1633 "analizador_sintactico.tab.c"
     break;
 
-  case 25: /* condition: expr relop expr  */
-#line 241 ".\\analizador_sintactico.y"
+  case 28: /* condition: expr relop expr  */
+#line 247 ".\\analizador_sintactico.y"
                                      { 
                                         (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
                                         (yyval.node)->symbol_index = (yyvsp[-1].symbol_index);  // El índice del operador relacional.
                                      }
-#line 1585 "analizador_sintactico.tab.c"
+#line 1642 "analizador_sintactico.tab.c"
     break;
 
-  case 26: /* relop: TOKEN_RELOP_LT  */
-#line 253 ".\\analizador_sintactico.y"
+  case 29: /* relop: TOKEN_RELOP_LT  */
+#line 259 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_LT; }
-#line 1591 "analizador_sintactico.tab.c"
+#line 1648 "analizador_sintactico.tab.c"
     break;
 
-  case 27: /* relop: TOKEN_RELOP_LE  */
-#line 254 ".\\analizador_sintactico.y"
+  case 30: /* relop: TOKEN_RELOP_LE  */
+#line 260 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_LE; }
-#line 1597 "analizador_sintactico.tab.c"
+#line 1654 "analizador_sintactico.tab.c"
     break;
 
-  case 28: /* relop: TOKEN_RELOP_EQ  */
-#line 255 ".\\analizador_sintactico.y"
+  case 31: /* relop: TOKEN_RELOP_EQ  */
+#line 261 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_EQ; }
-#line 1603 "analizador_sintactico.tab.c"
+#line 1660 "analizador_sintactico.tab.c"
     break;
 
-  case 29: /* relop: TOKEN_RELOP_NE  */
-#line 256 ".\\analizador_sintactico.y"
+  case 32: /* relop: TOKEN_RELOP_NE  */
+#line 262 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_NE; }
-#line 1609 "analizador_sintactico.tab.c"
+#line 1666 "analizador_sintactico.tab.c"
     break;
 
-  case 30: /* relop: TOKEN_RELOP_GT  */
-#line 257 ".\\analizador_sintactico.y"
+  case 33: /* relop: TOKEN_RELOP_GT  */
+#line 263 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_GT; }
-#line 1615 "analizador_sintactico.tab.c"
+#line 1672 "analizador_sintactico.tab.c"
     break;
 
-  case 31: /* relop: TOKEN_RELOP_GE  */
-#line 258 ".\\analizador_sintactico.y"
+  case 34: /* relop: TOKEN_RELOP_GE  */
+#line 264 ".\\analizador_sintactico.y"
                                      { (yyval.symbol_index) = TOKEN_RELOP_GE; }
-#line 1621 "analizador_sintactico.tab.c"
+#line 1678 "analizador_sintactico.tab.c"
     break;
 
-  case 32: /* expr: TOKEN_ID  */
-#line 267 ".\\analizador_sintactico.y"
-                                      {
-                                        (yyval.node) = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
-                                     }
-#line 1630 "analizador_sintactico.tab.c"
+  case 35: /* expr: TOKEN_ID  */
+#line 273 ".\\analizador_sintactico.y"
+               {
+        (yyval.node) = create_node(NODE_IDENTIFIER, NULL, NULL);
+        (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
+    }
+#line 1687 "analizador_sintactico.tab.c"
     break;
 
-  case 33: /* expr: TOKEN_NUMBER  */
-#line 271 ".\\analizador_sintactico.y"
-                                      {
-                                        (yyval.node) = create_node(NODE_NUMBER, NULL, NULL);
-                                        (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
-                                     }
-#line 1639 "analizador_sintactico.tab.c"
+  case 36: /* expr: TOKEN_NUMBER  */
+#line 277 ".\\analizador_sintactico.y"
+                   {
+        (yyval.node) = create_node(NODE_NUMBER, NULL, NULL);
+        (yyval.node)->symbol_index = (yyvsp[0].symbol_index);
+    }
+#line 1696 "analizador_sintactico.tab.c"
     break;
 
-  case 34: /* expr: TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN  */
-#line 276 ".\\analizador_sintactico.y"
-                                     {
-                                        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
-                                        id->symbol_index = (yyvsp[-3].symbol_index);
-                                        (yyval.node) = create_node(NODE_FUNCTION_CALL, id, (yyvsp[-1].node));
-                                     }
-#line 1649 "analizador_sintactico.tab.c"
-    break;
-
-  case 35: /* expr: expr TOKEN_PLUS expr  */
+  case 37: /* expr: array_access  */
 #line 281 ".\\analizador_sintactico.y"
-                                     { 
-                                        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node)); 
-                                        (yyval.node)->symbol_index = TOKEN_PLUS;
-                                     }
-#line 1658 "analizador_sintactico.tab.c"
+                   {
+        (yyval.node) = (yyvsp[0].node);
+    }
+#line 1704 "analizador_sintactico.tab.c"
     break;
 
-  case 36: /* expr: expr TOKEN_MINUS expr  */
-#line 285 ".\\analizador_sintactico.y"
-                                     { 
-                                        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
-                                        (yyval.node)->symbol_index = TOKEN_MINUS;
-                                     }
-#line 1667 "analizador_sintactico.tab.c"
+  case 38: /* expr: array_literal  */
+#line 284 ".\\analizador_sintactico.y"
+                    {
+        (yyval.node) = (yyvsp[0].node);
+    }
+#line 1712 "analizador_sintactico.tab.c"
     break;
 
-  case 37: /* expr: expr TOKEN_MULT expr  */
-#line 289 ".\\analizador_sintactico.y"
-                                     { 
-                                        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
-                                        (yyval.node)->symbol_index = TOKEN_MULT;
-                                     }
-#line 1676 "analizador_sintactico.tab.c"
+  case 39: /* expr: TOKEN_ID TOKEN_LPAREN arg_list TOKEN_RPAREN  */
+#line 287 ".\\analizador_sintactico.y"
+                                                  {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = (yyvsp[-3].symbol_index);
+        (yyval.node) = create_node(NODE_FUNCTION_CALL, id, (yyvsp[-1].node));
+    }
+#line 1722 "analizador_sintactico.tab.c"
     break;
 
-  case 38: /* expr: expr TOKEN_DIV expr  */
-#line 293 ".\\analizador_sintactico.y"
-                                     { 
-                                        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
-                                        (yyval.node)->symbol_index = TOKEN_DIV;
-                                     }
-#line 1685 "analizador_sintactico.tab.c"
+  case 40: /* expr: expr TOKEN_PLUS expr  */
+#line 292 ".\\analizador_sintactico.y"
+                           {
+        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.node)->symbol_index = TOKEN_PLUS;
+    }
+#line 1731 "analizador_sintactico.tab.c"
     break;
 
-  case 39: /* expr: TOKEN_LPAREN expr TOKEN_RPAREN  */
-#line 297 ".\\analizador_sintactico.y"
-                                     { (yyval.node) = (yyvsp[-1].node); }
-#line 1691 "analizador_sintactico.tab.c"
+  case 41: /* expr: expr TOKEN_MINUS expr  */
+#line 296 ".\\analizador_sintactico.y"
+                            {
+        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.node)->symbol_index = TOKEN_MINUS;
+    }
+#line 1740 "analizador_sintactico.tab.c"
     break;
 
-  case 40: /* arg_list: %empty  */
-#line 307 ".\\analizador_sintactico.y"
-                                      { (yyval.node) = NULL; }
-#line 1697 "analizador_sintactico.tab.c"
+  case 42: /* expr: expr TOKEN_MULT expr  */
+#line 300 ".\\analizador_sintactico.y"
+                           {
+        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.node)->symbol_index = TOKEN_MULT;
+    }
+#line 1749 "analizador_sintactico.tab.c"
     break;
 
-  case 41: /* arg_list: expr  */
+  case 43: /* expr: expr TOKEN_DIV expr  */
+#line 304 ".\\analizador_sintactico.y"
+                          {
+        (yyval.node) = create_node(NODE_BINARY_OP, (yyvsp[-2].node), (yyvsp[0].node));
+        (yyval.node)->symbol_index = TOKEN_DIV;
+    }
+#line 1758 "analizador_sintactico.tab.c"
+    break;
+
+  case 44: /* expr: TOKEN_LPAREN expr TOKEN_RPAREN  */
 #line 308 ".\\analizador_sintactico.y"
-                                      { (yyval.node) = (yyvsp[0].node); }
-#line 1703 "analizador_sintactico.tab.c"
+                                     {
+        (yyval.node) = (yyvsp[-1].node);
+    }
+#line 1766 "analizador_sintactico.tab.c"
     break;
 
-  case 42: /* arg_list: arg_list TOKEN_COMMA expr  */
-#line 309 ".\\analizador_sintactico.y"
+  case 45: /* arg_list: %empty  */
+#line 320 ".\\analizador_sintactico.y"
+                                      { (yyval.node) = NULL; }
+#line 1772 "analizador_sintactico.tab.c"
+    break;
+
+  case 46: /* arg_list: expr  */
+#line 321 ".\\analizador_sintactico.y"
+                                      { (yyval.node) = (yyvsp[0].node); }
+#line 1778 "analizador_sintactico.tab.c"
+    break;
+
+  case 47: /* arg_list: arg_list TOKEN_COMMA expr  */
+#line 322 ".\\analizador_sintactico.y"
                                       {
                                         (yyval.node) = (yyvsp[-2].node);
                                         // Se enlaza el nuevo argumento al final de la lista.
@@ -1711,11 +1786,89 @@ yyreduce:
                                         while(last->next) last = last->next;
                                         last->next = (yyvsp[0].node);
                                      }
-#line 1715 "analizador_sintactico.tab.c"
+#line 1790 "analizador_sintactico.tab.c"
+    break;
+
+  case 48: /* array_decl: TOKEN_ARREGLO type TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK TOKEN_SEMICOLON  */
+#line 332 ".\\analizador_sintactico.y"
+                                                                                 {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = (yyvsp[-4].symbol_index);
+        
+        // Create array type node with size expression
+        Node *array_type = create_node(NODE_ARRAY_TYPE, NULL, NULL);
+        array_type->symbol_index = (yyvsp[-5].symbol_index);  // Store the base type token
+        
+        // Create array declaration node
+        (yyval.node) = create_node(NODE_ARRAY_DECL, id, (yyvsp[-2].node));  // Left: ID, Right: Size expression
+    }
+#line 1806 "analizador_sintactico.tab.c"
+    break;
+
+  case 49: /* array_decl: TOKEN_ARREGLO type TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK TOKEN_ASSIGN array_literal TOKEN_SEMICOLON  */
+#line 343 ".\\analizador_sintactico.y"
+                                                                                                            {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = (yyvsp[-6].symbol_index);
+        
+        // Create array type node with size expression
+        Node *array_type = create_node(NODE_ARRAY_TYPE, NULL, NULL);
+        array_type->symbol_index = (yyvsp[-7].symbol_index);  // Store the base type token
+        
+        // Create array declaration node with initialization
+        Node *size_and_type = create_node(NODE_ARRAY_SIZE, (yyvsp[-4].node), array_type);
+        (yyval.node) = create_node(NODE_ARRAY_DECL, id, create_node(NODE_ARRAY_INIT, size_and_type, (yyvsp[-1].node)));
+    }
+#line 1823 "analizador_sintactico.tab.c"
+    break;
+
+  case 50: /* array_literal: TOKEN_LBRACK array_elements TOKEN_RBRACK  */
+#line 358 ".\\analizador_sintactico.y"
+                                               {
+        (yyval.node) = create_node(NODE_ARRAY_LITERAL, (yyvsp[-1].node), NULL);
+    }
+#line 1831 "analizador_sintactico.tab.c"
+    break;
+
+  case 51: /* array_literal: TOKEN_LBRACK TOKEN_RBRACK  */
+#line 361 ".\\analizador_sintactico.y"
+                                {
+        (yyval.node) = create_node(NODE_ARRAY_LITERAL, NULL, NULL);  // Empty array
+    }
+#line 1839 "analizador_sintactico.tab.c"
+    break;
+
+  case 52: /* array_elements: expr  */
+#line 367 ".\\analizador_sintactico.y"
+           {
+        (yyval.node) = (yyvsp[0].node);
+    }
+#line 1847 "analizador_sintactico.tab.c"
+    break;
+
+  case 53: /* array_elements: array_elements TOKEN_COMMA expr  */
+#line 370 ".\\analizador_sintactico.y"
+                                      {
+        (yyval.node) = (yyvsp[-2].node);
+        Node *last = (yyvsp[-2].node);
+        while (last->next) last = last->next;
+        last->next = (yyvsp[0].node);
+    }
+#line 1858 "analizador_sintactico.tab.c"
+    break;
+
+  case 54: /* array_access: TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK  */
+#line 379 ".\\analizador_sintactico.y"
+                                              {
+        Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
+        id->symbol_index = (yyvsp[-3].symbol_index);
+        (yyval.node) = create_node(NODE_ARRAY_ACCESS, id, (yyvsp[-1].node));
+    }
+#line 1868 "analizador_sintactico.tab.c"
     break;
 
 
-#line 1719 "analizador_sintactico.tab.c"
+#line 1872 "analizador_sintactico.tab.c"
 
       default: break;
     }
@@ -1939,7 +2092,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 318 ".\\analizador_sintactico.y"
+#line 386 ".\\analizador_sintactico.y"
 
 
 /*
@@ -2017,4 +2170,3 @@ int main(int argc, char **argv) {
     printf("Debug: Compilacion completada exitosamente\n");
     return 0;
 }
-

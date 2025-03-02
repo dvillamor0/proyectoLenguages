@@ -3,6 +3,14 @@
 #include <string.h>
 #include "ast.h"
 #include "analizador_sintactico.tab.h"
+#define DEBUG 1  // Cambiar a 0 para desactivar la depuración
+
+#define LOG(fmt, ...) \
+    if (DEBUG) { \
+        FILE *debug_file = fopen("debug_intermediate.log", "a"); \
+        fprintf(debug_file, fmt, ##__VA_ARGS__); \
+        fclose(debug_file); \
+    }
 
 // Declaracion externa de la tabla de simbolos
 extern struct {
@@ -11,6 +19,7 @@ extern struct {
     union {
         double number_value;
         char *string_value;
+        unsigned int natural_value;
     } value;
 } symbol_table[];
 
@@ -79,54 +88,70 @@ static char *process_binary_op(Node *node, FILE *output) {
     switch (node->type) {
         case NODE_ADD:
             fprintf(output, "%s = %s + %s\n", temp, left, right);
+            LOG("%s = %s + %s\n", temp, left, right);
             break;
         case NODE_SUB:
             fprintf(output, "%s = %s - %s\n", temp, left, right);
+            LOG("%s = %s - %s\n", temp, left, right);
             break;
         case NODE_MUL:
             fprintf(output, "%s = %s * %s\n", temp, left, right);
+            LOG("%s = %s * %s\n", temp, left, right);
             break;
         case NODE_DIV:
             fprintf(output, "%s = %s / %s\n", temp, left, right);
+            LOG("%s = %s / %s\n", temp, left, right);
             break;
         case NODE_BINARY_OP:
             switch (node->symbol_index) {
                 case TOKEN_RELOP_EQ:
                     fprintf(output, "%s = %s == %s\n", temp, left, right);
+                    LOG("%s = %s == %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_NE:
                     fprintf(output, "%s = %s != %s\n", temp, left, right);
+                    LOG("%s = %s != %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_LT:
                     fprintf(output, "%s = %s < %s\n", temp, left, right);
+                    LOG("%s = %s < %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_LE:
                     fprintf(output, "%s = %s <= %s\n", temp, left, right);
+                    LOG("%s = %s <= %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_GT:
                     fprintf(output, "%s = %s > %s\n", temp, left, right);
+                    LOG("%s = %s > %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_GE:
                     fprintf(output, "%s = %s >= %s\n", temp, left, right);
+                    LOG("%s = %s >= %s\n", temp, left, right);
                     break;
                 case TOKEN_PLUS:
                     fprintf(output, "%s = %s + %s\n", temp, left, right);
+                    LOG("%s = %s + %s\n", temp, left, right);
                     break;
                 case TOKEN_MINUS:
                     fprintf(output, "%s = %s - %s\n", temp, left, right);
+                    LOG("%s = %s - %s\n", temp, left, right);
                     break;
                 case TOKEN_MULT:
                     fprintf(output, "%s = %s * %s\n", temp, left, right);
+                    LOG("%s = %s * %s\n", temp, left, right);
                     break;
                 case TOKEN_DIV:
                     fprintf(output, "%s = %s / %s\n", temp, left, right);
+                    LOG("%s = %s / %s\n", temp, left, right);
                     break;
                 default:
                     fprintf(output, "%s = %s + %s\n", temp, left, right);
+                    LOG("%s = %s + %s\n", temp, left, right);
             }
             break;
         default:
             fprintf(output, "%s = %s + %s\n", temp, left, right);
+            LOG("%s = %s + %s\n", temp, left, right);
     }
     
     return temp;
@@ -264,7 +289,24 @@ static char *generate_code(Node *node, FILE *output) {
             result = process_binary_op(node, output);
             break;
             
-        case NODE_NUMBER:
+        case NODE_NUMBER: {
+            char *temp = new_temp();
+            
+            // Check if this is a natural number in the symbol table
+            if (symbol_table[node->symbol_index].type == 3) {  // 3 = SYMTAB_NATURAL from lexical analyzer
+                // For natural numbers, use the numeric value directly
+                unsigned int natural_value = symbol_table[node->symbol_index].value.natural_value;
+                fprintf(output, "%s = %u\n", temp, natural_value);
+                LOG("%s = %u (natural)\n", temp, natural_value);
+            } else {
+                // For regular numbers, just use the string representation as before
+                const char *num_str = get_symbol_name(node->symbol_index);
+                fprintf(output, "%s = %s\n", temp, num_str);
+                LOG("%s = %s\n", temp, num_str);
+            }
+            
+            return temp;
+        }
         case NODE_IDENTIFIER:
             result = get_symbol_name(node->symbol_index);
             break;
@@ -299,6 +341,7 @@ void generate_intermediate_code(Node *ast, const char *output_file) {
     FILE *output = fopen(output_file, "w");
     if (!output) {
         fprintf(stderr, "Could not open output file %s\n", output_file);
+        LOG("Could not open output file %s\n", output_file);
         return;
     }
     
