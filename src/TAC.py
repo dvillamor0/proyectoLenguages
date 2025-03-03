@@ -61,8 +61,13 @@ def tac_to_assembly(tac_file):
         # Ignorar etiquetas o líneas de control de flujo
         if line.startswith('L') and ':' in line:
             continue
-        if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
+        if line.startswith('begin_func') or line.startswith('end_func'):
             continue
+        if line.startswith('param'):
+            param = line.split()[1]
+            if param not in var_table:
+                var_table[param] = next_var_addr
+                next_var_addr += 1
 
         # Procesar asignaciones y retornos
         if '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
@@ -104,7 +109,11 @@ def tac_to_assembly(tac_file):
     # Primera pasada para identificar posiciones de etiquetas
     current_position = 0
     for line in tac_lines:
-        if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
+        if line.startswith('begin_func') and not 'main' in line:
+            label = line.split()[1]
+            label_to_asm[label] = current_position
+            continue
+        if line.startswith('end_func') or line.startswith('param'):
             continue
         if line.startswith('L') and ':' in line:
             label = line.split(':')[0]
@@ -306,6 +315,21 @@ def tac_to_assembly(tac_file):
                 asm_position += 1
                 code_section.append(f"STORE R0, [0x{target_addr:X}]")
                 asm_position += 1
+             # Asignacion de llamada a función: var = call func, num_args
+            elif 'call' in line:
+                target, call_expr = [x.strip() for x in line.split('=', 1)]
+                label, num_args = call_expr.split(', ')
+                label = label.split()[1]
+                target_addr = var_table[target]
+
+                label_addr = label_to_asm[label]
+                print("address:",label_to_asm,label_addr)
+                code_section.append(f"CALL [0x{label_addr:X}]")
+                asm_position += 1
+                print("solo funciona con un argumento, argumentos:",num_args)
+                code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                asm_position += 1
+
             # Caso no reconocido
             else:
                 code_section.append(f"# Expresión no reconocida: {expr}")
