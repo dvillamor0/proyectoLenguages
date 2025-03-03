@@ -1003,12 +1003,25 @@ class MainWindow(QMainWindow):
         return 0
 
     def BEQ(self, instruccion):
+        """
+        Implementa la instrucción BEQ (Branch if Equal) que realiza un salto condicional
+        si los valores de los dos registros especificados son iguales.
+
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros a comparar
+                            y la dirección destino del salto
+
+        Returns:
+            int: 0 para indicar éxito
+        """
+
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
         
         if self.registro[reg_1] == self.registro[reg_2]:
             self.setCp(dir_destino)
+        return 0
 
     def BNE(self, instruccion):
         """

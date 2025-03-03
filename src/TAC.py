@@ -343,26 +343,32 @@ def tac_to_assembly(tac_file):
 
             # Mapeo de operadores a instrucciones de ensamblador
             instrucciones_salto = {
-                "==": "BEQ",
-                "!=": "BNE",
-                "<": "BLT",
-                ">": "BLT",
-                "<=": "JLE",
-                ">=": "JLE"
+                "==": "BNE", # Si no son iguales, salta y no ejecuta la instruccion dentro
+                "!=": "BEQ", # Si no son diferentes, salta y no ejecuta la instruccion en la etiqueta
+                "<": "JLE", # se invierte el orden de los registros y si no es menor o igual se salta la instruccion
+                ">": "JLE", # si no es mayor se salta la instruccion
+                "<=": "BLT", # se invierte el orden de los registros y si no es menor se salta la instruccion
+                ">=": "BLT"  # si no es mayor o igual se salta la instruccion
             }
 
-            instr_salto = instrucciones_salto.get(comparacion, "BEQ") 
-            
-            if(comparacion == ">=" or comparacion == ">"):
-                if goto_label in label_to_asm:
-                    code_section.append(f"{instr_salto} R1, R0, [0x{label_to_asm[goto_label]:X}]")
-                else:
-                    code_section.append(f"{instr_salto} R1, R0, [{goto_label}]")
-            else:
+            instr_salto = instrucciones_salto.get(comparacion, "NOP")
+            # Generación del código de salto con base en las instrucciones de comparación
+            if comparacion in ["==", "!="]:
                 if goto_label in label_to_asm:
                     code_section.append(f"{instr_salto} R0, R1, [0x{label_to_asm[goto_label]:X}]")
                 else:
                     code_section.append(f"{instr_salto} R0, R1, [{goto_label}]")
+            elif comparacion in ["<", "<=", ">", ">="]:
+                if comparacion in [">", ">="]:
+                    if goto_label in label_to_asm:
+                        code_section.append(f"{instr_salto} R0, R1, [0x{label_to_asm[goto_label]:X}]")
+                    else:
+                        code_section.append(f"{instr_salto} R0, R1, [{goto_label}]")
+                else:
+                    if goto_label in label_to_asm:
+                        code_section.append(f"{instr_salto} R1, R0, [0x{label_to_asm[goto_label]:X}]")
+                    else:
+                        code_section.append(f"{instr_salto} R1, R0, [{goto_label}]")
 
             asm_position += 1
 
