@@ -12,9 +12,12 @@ bg_enlace ::= identifier ':enl' bg_2_node //añadir arista grafo enlace
            
 //ctl
 bg_ctl ::= identifier ':tip(' string ',' elementoArreglo ')'
+        |  identifier ':rtip(' elementoArreglo ')'
 
 //parentesco
 bg_parent ::= identifier ':hij'bg_2_node //añadir arista grafo ubicacion
+            | identifier ':rhij'bg_2_node
 
 //link
 bg_exit ::= identifier ':lnk(' elementoArreglo ',' nat ')' //conexiones de salida del bigrafo <m,Y>
+         |  identifier ':rlnk(' elementoArreglo ',' nat ')'
