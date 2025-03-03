@@ -156,6 +156,8 @@ def tac_to_assembly(tac_file):
     # Segunda pasada para generar código
     pila_compare = []  # ✅ Pila para almacenar los operadores de comparación
     for line in tac_lines:
+        debug_print(f"Procesando línea: {line}")
+        # Ignorar directivas de función y parámetros
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
         # Ignorar etiquetas en esta pasada, ya las procesamos en la primera pasada
