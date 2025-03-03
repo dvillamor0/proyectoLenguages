@@ -105,28 +105,28 @@ static char *process_binary_op(Node *node, FILE *output) {
         case NODE_BINARY_OP:
             switch (node->symbol_index) {
                 case TOKEN_RELOP_EQ:
-                    fprintf(output, "%s = %s == %s\n", temp, left, right);
-                    LOG("%s = %s == %s\n", temp, left, right);
-                    break;
-                case TOKEN_RELOP_NE:
                     fprintf(output, "%s = %s != %s\n", temp, left, right);
                     LOG("%s = %s != %s\n", temp, left, right);
                     break;
+                case TOKEN_RELOP_NE:
+                    fprintf(output, "%s = %s == %s\n", temp, left, right);
+                    LOG("%s = %s == %s\n", temp, left, right);
+                    break;
                 case TOKEN_RELOP_LT:
-                    fprintf(output, "%s = %s < %s\n", temp, left, right);
-                    LOG("%s = %s < %s\n", temp, left, right);
+                    fprintf(output, "%s = %s >= %s\n", temp, left, right);
+                    LOG("%s = %s >= %s\n", temp, left, right);
                     break;
                 case TOKEN_RELOP_LE:
-                    fprintf(output, "%s = %s <= %s\n", temp, left, right);
-                    LOG("%s = %s <= %s\n", temp, left, right);
-                    break;
-                case TOKEN_RELOP_GT:
                     fprintf(output, "%s = %s > %s\n", temp, left, right);
                     LOG("%s = %s > %s\n", temp, left, right);
                     break;
+                case TOKEN_RELOP_GT:
+                    fprintf(output, "%s = %s <= %s\n", temp, left, right);
+                    LOG("%s = %s <= %s\n", temp, left, right);
+                    break;
                 case TOKEN_RELOP_GE:
-                    fprintf(output, "%s = %s >= %s\n", temp, left, right);
-                    LOG("%s = %s >= %s\n", temp, left, right);
+                    fprintf(output, "%s = %s < %s\n", temp, left, right);
+                    LOG("%s = %s < %s\n", temp, left, right);
                     break;
                 case TOKEN_PLUS:
                     fprintf(output, "%s = %s + %s\n", temp, left, right);
@@ -163,11 +163,13 @@ static char *process_binary_op(Node *node, FILE *output) {
 // y su cuerpo, e imprime las etiquetas de inicio y fin.
 static void process_function_def(Node *node, FILE *output) {
     fprintf(output, "begin_func %s\n", get_symbol_name(node->symbol_index));
+    LOG("begin_func %s\n", get_symbol_name(node->symbol_index))
     
     if (node->left) {
         Node *param = node->left;
         while (param) {
             fprintf(output, "param %s\n", get_symbol_name(param->symbol_index));
+            LOG("param %s\n", get_symbol_name(param->symbol_index));
             param = param->next;
         }
     }
@@ -177,6 +179,7 @@ static void process_function_def(Node *node, FILE *output) {
     }
     
     fprintf(output, "end_func\n\n");
+    LOG("end_func\n\n");
 }
 
 // Funcion: process_if_statement
@@ -189,14 +192,18 @@ static void process_if_statement(Node *node, FILE *output) {
     char *label_end = new_label();
     
     fprintf(output, "ifz %s goto %s\n", condition, label_else);
+    LOG("ifz %s goto %s\n", condition, label_else);
     
     if (node->right) {
         generate_code(node->right, output);
     }
     
     fprintf(output, "goto %s\n", label_end);
+    LOG("goto %s\n", label_end)
     fprintf(output, "%s:\n", label_else);
+    LOG("%s:\n", label_else)
     fprintf(output, "%s:\n", label_end);
+    LOG("%s:\n", label_end)
 }
 
 // Funcion: process_while_statement
@@ -208,15 +215,19 @@ static void process_while_statement(Node *node, FILE *output) {
     char *label_end = new_label();
     
     fprintf(output, "%s:\n", label_start);
+    LOG( "%s:\n", label_start)
     char *condition = generate_code(node->left, output);
     fprintf(output, "ifz %s goto %s\n", condition, label_end);
+    LOG( "ifz %s goto %s\n", condition, label_end)
     
     if (node->right) {
         generate_code(node->right, output);
     }
     
     fprintf(output, "goto %s\n", label_start);
+    LOG( "goto %s\n", label_start)
     fprintf(output, "%s:\n", label_end);
+    LOG( "%s:\n", label_end)
 }
 
 // Funcion: process_function_call
@@ -230,6 +241,7 @@ static char *process_function_call(Node *node, FILE *output) {
     while (arg) {
         char *arg_result = generate_code(arg, output);
         fprintf(output, "param %s\n", arg_result);
+        LOG("param %s\n", arg_result);
         arg = arg->next;
         arg_count++;
     }
@@ -237,6 +249,7 @@ static char *process_function_call(Node *node, FILE *output) {
     char *temp = new_temp();
     char *func_name = get_symbol_name(node->left->symbol_index);
     fprintf(output, "%s = call %s, %d\n", temp, func_name, arg_count);
+    LOG("%s = call %s, %d\n", temp, func_name, arg_count);
     
     return temp;
 }

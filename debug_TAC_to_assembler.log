@@ -1,0 +1,54 @@
+Dirección de inicio de código: 9
+Dirección de inicio de código: 9
+Dirección de inicio de código: 11
+Dirección de inicio de código: 13
+Dirección de inicio de código: 15
+Dirección de inicio de código: 19
+Dirección de inicio de código: 20
+Dirección de inicio de código: 22
+Dirección de inicio de código: 26
+Dirección de inicio de código: 28
+Dirección de inicio de código: 29
+Dirección de inicio de código: 29
+Dirección de inicio de código: 29
+Dirección de inicio de código: 31
+Tabla de etiquetas: {'L1': 29, 'L2': 29}
+Procesando línea: begin_func main
+Procesando línea: t1 = 2
+Procesando línea: x = t1
+Procesando línea: t2 = 5
+Procesando línea: t3 = x == t2
+Procesando línea: ifz t3 goto L1
+Dirección de inicio de código: 9
+Dirección de inicio de código: 9
+Dirección de inicio de código: 11
+Dirección de inicio de código: 13
+Dirección de inicio de código: 15
+Dirección de inicio de código: 17
+Dirección de inicio de código: 18
+Dirección de inicio de código: 20
+Dirección de inicio de código: 24
+Dirección de inicio de código: 26
+Dirección de inicio de código: 27
+Dirección de inicio de código: 27
+Dirección de inicio de código: 27
+Dirección de inicio de código: 29
+Tabla de etiquetas: {'L1': 27, 'L2': 27}
+Procesando línea: begin_func main
+Procesando línea: t1 = 2
+Procesando línea: x = t1
+Procesando línea: t2 = 5
+Procesando línea: t3 = x == t2
+Procesando línea: ifz t3 goto L1
+Procesando línea: t4 = 5
+Procesando línea: t5 = x + t4
+Procesando línea: x = t5
+Procesando línea: goto L2
+Procesando línea: L1:
+Procesando línea: L2:
+Procesando línea: A = x
+Procesando línea: end_func
+Tabla de constantes: {'0': 0, '2': 1, '5': 2}
+Tabla de variables: {'t1': 3, 'x': 4, 't2': 5, 't3': 6, 't4': 7, 't5': 8, 'A': 9}
+Sección de datos: ['0', '2', '5', '0', '0', '0', '0', '0', '0', '0']
+Sección de código: ['LOAD R0, [0x1]', 'STORE R0, [0x3]', 'LOAD R0, [0x3]', 'STORE R0, [0x4]', 'LOAD R0, [0x2]', 'STORE R0, [0x5]', 'LOAD R0, [0x4]', 'LOAD R1, [0x5]', 'BEQ R0, R1, [0x1B]', 'LOAD R0, [0x2]', 'STORE R0, [0x7]', 'LOAD R0, [0x4]', 'LOAD R1, [0x7]', 'ADD R0, R1, R2', 'STORE R2, [0x8]', 'LOAD R0, [0x8]', 'STORE R0, [0x4]', 'JUMP [0x1B]', 'LOAD R0, [0x4]', 'STORE R0, [0x9]']

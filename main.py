@@ -666,27 +666,12 @@ class MainWindow(QMainWindow):
         return 0
 
     def BEQ(self, instruccion):
-        """
-        Branch if Equal.
+        reg_1 = int(instruccion[:2], 2)
+        reg_2 = int(instruccion[2:4], 2)
+        dir_destino = int(instruccion[4:], 2)
         
-        In this design, BEQ assumes that a CMP instruction has already been executed
-        so that the Zero flag reflects the equality of the two compared operands.
-        
-        The instruction is assumed to encode the branch target address in all its bits.
-        If the Zero flag is 1 (i.e. the last CMP found the operands equal), the
-        program counter is set to the target address.
-        """
-        # Convert the entire instruction to a branch target address.
-        branch_target = int(instruccion, 2)
-        
-        print(f"BEQ: Zero flag = {self.zero}. Branch target = {branch_target}.")
-        if self.zero == 1:
-            self.setCp(branch_target)
-            print(f"BEQ: Branch taken. CP set to {branch_target}.")
-        else:
-            print("BEQ: Branch not taken.")
-        
-        return 0
+        if self.registro[reg_1] == self.registro[reg_2]:
+            self.setCp(dir_destino)
 
     def BNE(self, instruccion):
         reg_1 = int(instruccion[:2], 2)

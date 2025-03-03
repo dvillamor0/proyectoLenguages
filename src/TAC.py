@@ -1,6 +1,10 @@
 import re
 import sys
 
+def debug_print(*args, **kwargs):
+    with open('debug_TAC_to_assembler.log', 'a', encoding='utf-8') as f:
+        print(*args, **kwargs, file=f)
+
 def tac_to_assembly(tac_file):
     # Leer y limpiar el archivo TAC
     with open(tac_file, 'r', encoding='utf-8') as f:
@@ -90,8 +94,9 @@ def tac_to_assembly(tac_file):
     label_to_asm = {}
 
     # Primera pasada para identificar posiciones de etiquetas
-    current_position = 0
+    current_position = len(data_section)-1
     for line in tac_lines:
+        debug_print("Dirección de inicio de código:", current_position)
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
         if line.startswith('L') and ':' in line:
@@ -109,28 +114,32 @@ def tac_to_assembly(tac_file):
         elif '=' in line and ' / ' in line:
             current_position += 4  # LOAD, LOAD, DIV, STORE
         elif '=' in line and ' == ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD, CMP, STORE
         elif '=' in line and ' != ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD
         elif '=' in line and ' < ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD
         elif '=' in line and ' <= ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD
         elif '=' in line and ' > ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD
         elif '=' in line and ' >= ' in line:
-            current_position += 4  # LOAD, LOAD, CMP, STORE
+            current_position += 2  # LOAD, LOAD
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             current_position += 2  # LOAD, STORE
         elif line.startswith('ifz'):
-            current_position += 4  # LOAD, LOAD, CMP, BEQ
+            current_position += 1  # BEQ
         elif line.startswith('goto'):
             current_position += 1  # JUMP
         elif line.startswith('return'):
             current_position += 2  # LOAD, RET
-
+            
+    debug_print("Tabla de etiquetas:", label_to_asm)
+    
     # Segunda pasada para generar código
+    pila_compare = []  # ✅ Pila para almacenar los operadores de comparación
     for line in tac_lines:
+        debug_print(f"Procesando línea: {line}")
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
         if line.startswith('L') and ':' in line:
@@ -223,6 +232,7 @@ def tac_to_assembly(tac_file):
         
         # Manejar operaciones de comparación
         elif '=' in line and ' == ' in line:
+            pila_compare.append('==')
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
             left, right = [x.strip() for x in expr.split(' == ')]
@@ -234,17 +244,12 @@ def tac_to_assembly(tac_file):
             asm_position += 1
             code_section.append(f"LOAD R1, [0x{right_addr:X}]")
             asm_position += 1
-            code_section.append("CMP R0, R1")
-            asm_position += 1
-            # Almacenar el resultado de la comparación (1 si igual, 0 si diferente)
-            code_section.append(f"BEQ R0, R1, [0x{asm_position+2:X}]")
-            asm_position += 1
-            code_section.append(f"STORE R0, [0x{target_addr:X}]")  # Almacenar 0
-            asm_position += 1
-            code_section.append(f"LOAD R2, [0x1]")  # Cargar 1
-            asm_position += 1
-            code_section.append(f"STORE R2, [0x{target_addr:X}]")  # Almacenar 1
-            asm_position += 1
+            # code_section.append(f"STORE R0, [0x{target_addr:X}]")  # Almacenar 0
+            # asm_position += 1
+            # code_section.append(f"LOAD R2, [0x1]")  # Cargar 1
+            # asm_position += 1
+            # code_section.append(f"STORE R2, [0x{target_addr:X}]")  # Almacenar 1
+            # asm_position += 1
 
         # Manejar asignaciones simples: var = literal o var = otra_var
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
@@ -269,10 +274,7 @@ def tac_to_assembly(tac_file):
                     asm_position += 1
                     code_section.append(f"LOAD R1, [0x{right_addr:X}]")
                     asm_position += 1
-                    code_section.append("CMP R0, R1")
-                    asm_position += 1
-                    code_section.append(f"STORE R0, [0x{target_addr:X}]")
-                    asm_position += 1
+                    pila_compare.append(op)
                 else:
                     code_section.append(f"# Expresión de comparación no reconocida: {expr}")
                     asm_position += 1
@@ -293,23 +295,35 @@ def tac_to_assembly(tac_file):
                 asm_position += 1
 
         elif line.startswith('ifz'):
+            comparacion = pila_compare.pop()  # ✅ Extrae el último operador de comparación
             parts = line.split()
             cond = parts[1]
             goto_label = parts[3]
             cond_addr = const_table[cond] if cond.replace('.', '', 1).isdigit() else var_table[cond]
+
+            # Mapeo de operadores a instrucciones de ensamblador
+            instrucciones_salto = {
+                "==": "BEQ",
+                "!=": "BNE",
+                "<": "BLT",
+                ">": "BLT",
+                "<=": "JLE",
+                ">=": "JLE"
+            }
+
+            instr_salto = instrucciones_salto.get(comparacion, "BEQ") 
             
-            code_section.append(f"LOAD R0, [0x{cond_addr:X}]")
-            asm_position += 1
-            code_section.append("LOAD R1, [0x0]")
-            asm_position += 1
-            code_section.append("CMP R0, R1")
-            asm_position += 1
-            
-            if goto_label in label_to_asm:
-                # FIXED: Changed format to match VM's expected bit pattern for BEQ
-                code_section.append(f"BEQ R0, R1, [0x{label_to_asm[goto_label]:X}]")
+            if(comparacion == ">=" or comparacion == ">"):
+                if goto_label in label_to_asm:
+                    code_section.append(f"{instr_salto} R1, R0, [0x{label_to_asm[goto_label]:X}]")
+                else:
+                    code_section.append(f"{instr_salto} R1, R0, [{goto_label}]")
             else:
-                code_section.append(f"BEQ R0, R1, [{goto_label}]")
+                if goto_label in label_to_asm:
+                    code_section.append(f"{instr_salto} R0, R1, [0x{label_to_asm[goto_label]:X}]")
+                else:
+                    code_section.append(f"{instr_salto} R0, R1, [{goto_label}]")
+
             asm_position += 1
 
         elif line.startswith('goto'):
@@ -347,7 +361,11 @@ def tac_to_assembly(tac_file):
                 if f"[{label}]" in modified_instr:
                     modified_instr = modified_instr.replace(f"[{label}]", f"[0x{pos:X}]")
             fixed_code_section.append(modified_instr)
-
+    
+    debug_print("Tabla de constantes:", const_table)
+    debug_print("Tabla de variables:", var_table)
+    debug_print("Sección de datos:", data_section)
+    debug_print("Sección de código:", fixed_code_section)
     return data_section, fixed_code_section
 
 def main():

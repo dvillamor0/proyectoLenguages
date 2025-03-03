@@ -61,8 +61,12 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
     gcc -o ..\compilados\linkerLoader lex.yy.c -lfl
 
     flex preprocessor.l
-    gcc -o ..\compilados\preprocessor lex.yy.c -lfl
 
+    bison -d .\analizador_sintactico.y
+    flex .\analizador_lexico.l
+    gcc -c .\ast.c
+    gcc -c lex.yy.c analizador_sintactico.tab.c analizador_semantico.c intermediate_code.c
+    gcc -o ..\compilados\compiler ast.o lex.yy.o analizador_sintactico.tab.o analizador_semantico.o intermediate_code.o
     ```
 
 #### En Linux
