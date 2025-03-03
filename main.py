@@ -1213,6 +1213,12 @@ class MainWindow(QMainWindow):
         
         # Set the Negative flag: 1 if result is negative, else 0.
         self.setNegative(1 if result < 0 else 0)
+
+        # Set the Carry flag: 1 if there is a carry, else 0.
+        self.setCarry(1 if result < 0 else 0)
+
+        # Set the Overflow flag: 1 if there is an overflow, else 0.
+        self.setDesb(1 if result > 32767 or result < -32768 else 0)
         
         # (Optional: you could also set a carry flag if desired.)
         print(f"CMP: Comparing R{reg_1}({value1}) with R{reg_2}({value2}).")
