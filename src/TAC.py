@@ -2,6 +2,18 @@ import re
 import sys
 
 def tac_to_assembly(tac_file):
+    """
+    Traduce código de Tres Direcciones (TAC) a instrucciones de ensamblador para una máquina virtual simple.
+    
+    Este proceso incluye:
+    1. Construcción de tablas de constantes y variables
+    2. Asignación de direcciones de memoria
+    3. Generación de código ensamblador equivalente
+    4. Resolución de etiquetas de salto
+    
+    @param tac_file: Ruta al archivo TAC de entrada
+    @return: Tupla con (sección de datos, sección de código)
+    """
     # Leer y limpiar el archivo TAC
     with open(tac_file, 'r', encoding='utf-8') as f:
         tac_lines = [line.strip() for line in f if line.strip()]
@@ -131,12 +143,14 @@ def tac_to_assembly(tac_file):
 
     # Segunda pasada para generar código
     for line in tac_lines:
+        # Ignorar directivas de función y parámetros
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
+        # Ignorar etiquetas en esta pasada, ya las procesamos en la primera pasada
         if line.startswith('L') and ':' in line:
             continue
 
-        # Ejemplo: manejo de la suma en operaciones aritméticas
+        # Operación de suma: a = b + c
         if '=' in line and ' + ' in line:
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
@@ -160,7 +174,7 @@ def tac_to_assembly(tac_file):
             code_section.append(f"STORE R2, [0x{target_addr:X}]")
             asm_position += 1
 
-        # Manejar otras operaciones aritméticas
+        # Operación de resta: a = b - c
         elif '=' in line and ' - ' in line:
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
@@ -181,6 +195,7 @@ def tac_to_assembly(tac_file):
             code_section.append(f"STORE R2, [0x{target_addr:X}]")
             asm_position += 1
 
+        # Operación de multiplicación: a = b * c
         elif '=' in line and ' * ' in line:
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
@@ -201,6 +216,7 @@ def tac_to_assembly(tac_file):
             code_section.append(f"STORE R2, [0x{target_addr:X}]")
             asm_position += 1
 
+        # Operación de división: a = b / c
         elif '=' in line and ' / ' in line:
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
@@ -221,7 +237,7 @@ def tac_to_assembly(tac_file):
             code_section.append(f"STORE R2, [0x{target_addr:X}]")
             asm_position += 1
         
-        # Manejar operaciones de comparación
+        # Operación de igualdad: a = b == c
         elif '=' in line and ' == ' in line:
             target, expr = [x.strip() for x in line.split('=', 1)]
             target_addr = var_table[target]
@@ -276,22 +292,26 @@ def tac_to_assembly(tac_file):
                 else:
                     code_section.append(f"# Expresión de comparación no reconocida: {expr}")
                     asm_position += 1
+            # Asignación de constante
             elif expr.replace('.', '', 1).isdigit():
                 const_addr = const_table[expr]
                 code_section.append(f"LOAD R0, [0x{const_addr:X}]")
                 asm_position += 1
                 code_section.append(f"STORE R0, [0x{target_addr:X}]")
                 asm_position += 1
+            # Asignación de variable
             elif expr in var_table:
                 source_addr = var_table[expr]
                 code_section.append(f"LOAD R0, [0x{source_addr:X}]")
                 asm_position += 1
                 code_section.append(f"STORE R0, [0x{target_addr:X}]")
                 asm_position += 1
+            # Caso no reconocido
             else:
                 code_section.append(f"# Expresión no reconocida: {expr}")
                 asm_position += 1
 
+        # Instrucción condicional: ifz condición goto etiqueta
         elif line.startswith('ifz'):
             parts = line.split()
             cond = parts[1]
@@ -312,6 +332,7 @@ def tac_to_assembly(tac_file):
                 code_section.append(f"BEQ R0, R1, [{goto_label}]")
             asm_position += 1
 
+        # Salto incondicional: goto etiqueta
         elif line.startswith('goto'):
             goto_label = line.split()[1]
             if goto_label in label_to_asm:
@@ -320,6 +341,7 @@ def tac_to_assembly(tac_file):
                 code_section.append(f"JUMP [{goto_label}]")
             asm_position += 1
 
+        # Retorno de función: return variable
         elif line.startswith('return'):
             ret_var = line.split()[1]
             if ret_var.replace('.', '', 1).isdigit():
@@ -332,6 +354,7 @@ def tac_to_assembly(tac_file):
             code_section.append("RET")
             asm_position += 1
 
+        # Instrucción no implementada o no reconocida
         else:
             code_section.append(f"# Instrucción no implementada: {line}")
             asm_position += 1
@@ -351,6 +374,13 @@ def tac_to_assembly(tac_file):
     return data_section, fixed_code_section
 
 def main():
+    """
+    Función principal que procesa los argumentos de línea de comandos, 
+    llama al traductor TAC-a-ensamblador y escribe el resultado en un archivo.
+    
+    Uso desde línea de comandos: python TAC.py <archivo_entrada.tac>
+    El archivo de salida tendrá el mismo nombre pero con extensión .asm
+    """
     if len(sys.argv) != 2:
         print("Uso: python TAC.py <archivo_entrada.tac>")
         sys.exit(1)

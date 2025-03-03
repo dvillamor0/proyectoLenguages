@@ -1,14 +1,3 @@
-# import sys
-# from Diseño_GUI import *
-# from PyQt5.QtWidgets import QApplication
-
-# app = QApplication(sys.argv)
-# window = Ui_MainWindow()
-# Form = QtWidgets.QMainWindow()
-# window.setupUi(Form)
-# Form.show()
-# sys.exit(app.exec_())
-
 import sys
 import struct
 import time
@@ -24,16 +13,26 @@ import subprocess
 import os
 
 class MainWindow(QMainWindow):
+    """
+    Clase principal que implementa una máquina virtual con capacidades de compilación,
+    ensamblado, enlazado y ejecución de instrucciones de bajo nivel.
+    Proporciona una interfaz gráfica para interactuar con todas estas funcionalidades.
+    """
     def __init__(self):
+        """
+        Inicializa la ventana principal, configurando la interfaz gráfica y
+        estableciendo el estado inicial de la máquina virtual (registros, banderas, etc.).
+        También configura los manejadores de eventos para los botones de la interfaz.
+        """
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.cp = 0
-        self.registro = [0] * 4
-        self.carry = 0
-        self.zero = 0
-        self.negative = 0
-        self.desbordamiento = 0
+        self.cp = 0  # Contador de programa
+        self.registro = [0] * 4  # Registros de propósito general (A, B, C, D)
+        self.carry = 0  # Bandera de acarreo
+        self.zero = 0  # Bandera de cero
+        self.negative = 0  # Bandera de negativo
+        self.desbordamiento = 0  # Bandera de desbordamiento
         self.config_input = {"text": "", "reg_input": 0, "Exxecute_all": False}
         self.set_REG_Values([0,0,0,0])
         self.setCarry(0)
@@ -51,6 +50,7 @@ class MainWindow(QMainWindow):
         self.ui.Exxecute_instructions.clicked.connect(self.LeerInstrucciones)
         self.ui.input_button.clicked.connect(self.getInput)
         self.ui.Charge_cp.clicked.connect(self.cargarCp)
+        # Diccionario que mapea nombres de instrucciones a sus implementaciones correspondientes
         self.funciones = {
             "NOP" : self.NOP,
             "LOAD" : self.LOAD,
@@ -87,6 +87,10 @@ class MainWindow(QMainWindow):
         }
 
     def cargarCp(self):
+        """
+        Carga un nuevo valor para el contador de programa (CP) desde la interfaz.
+        Verifica que el valor sea un entero válido antes de actualizarlo.
+        """
         valor = self.ui.CP_Set.toPlainText()
         try:
             valor = int(valor)
@@ -96,6 +100,11 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
              
     def getInput(self):
+        """
+        Procesa la entrada del usuario desde la interfaz gráfica y la almacena en el registro
+        especificado por config_input["reg_input"]. Si "Exxecute_all" está establecido,
+        continúa la ejecución de instrucciones después de recibir la entrada.
+        """
         valor = self.ui.Input.toPlainText()
         self.guardar_en_registro(self.config_input["reg_input"], float(valor))
         Llama_all = self.config_input['Exxecute_all']
@@ -107,6 +116,14 @@ class MainWindow(QMainWindow):
             self.LeerInstrucciones()
         
     def setCp(self,new_cp):
+        """
+        Actualiza el contador de programa (CP) con el nuevo valor proporcionado
+        y refleja este cambio en la interfaz gráfica. También actualiza la
+        visualización de la memoria según el nuevo CP.
+        
+        Args:
+            new_cp (int): Nuevo valor para el contador de programa
+        """
         try:
             self.cp = new_cp
             self.ui.CP_Set.setPlainText(str(new_cp))
@@ -116,6 +133,13 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Enlazador]: "+ str(e))
             
     def setDir(self,new_dir):
+        """
+        Actualiza el registro de dirección con el nuevo valor proporcionado
+        y actualiza la interfaz gráfica correspondiente.
+        
+        Args:
+            new_dir (int): Nuevo valor para el registro de dirección
+        """
         try:
             self.dir = new_dir
             self.ui.DIR.setPlainText(str(new_dir))
@@ -124,7 +148,11 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Instruccion]: "+ str(e))
         
     def actualizarTablaMemoria(self):
-        """ Actualiza la tabla de memoria en la interfaz. """
+        """ 
+        Actualiza la visualización de la tabla de memoria en la interfaz.
+        Resalta la fila correspondiente al CP actual y muestra los últimos
+        100 registros de la memoria en la tabla de pila.
+        """
         self.ui.table_memoria.setRowCount(len(self.memoria))
 
         for i, (direccion, valor) in enumerate(self.memoria.items()):
@@ -148,11 +176,26 @@ class MainWindow(QMainWindow):
             self.ui.table_pila.setItem(i, 0, item)
  
     def guardar_en_registro(self, indice, value):
+        """
+        Almacena un valor en el registro especificado y actualiza la 
+        visualización de los registros en la interfaz.
+        
+        Args:
+            indice (int): Índice del registro (0-3 para A, B, C, D)
+            value: Valor a almacenar en el registro
+        """
         temp_reg = self.registro
         temp_reg[indice] = value
         self.set_REG_Values(temp_reg)
         
     def set_REG_Values(self,arreglo):
+        """
+        Actualiza todos los registros con los valores proporcionados en el arreglo
+        y actualiza sus representaciones tanto en formato decimal como binario en la interfaz.
+        
+        Args:
+            arreglo (list): Lista de 4 valores para los registros A, B, C y D
+        """
         self.registro[0] = arreglo[0]
         self.registro[1] = arreglo[1]
         self.registro[2] = arreglo[2]
@@ -163,7 +206,15 @@ class MainWindow(QMainWindow):
         self.ui.REG_D.setText(str(arreglo[3]))
         
         def convertir_a_binario(valor):
-            """Convierte un valor a binario según su tipo (int o float)."""
+            """
+            Convierte un valor a su representación binaria de 16 bits dependiendo de su tipo.
+            
+            Args:
+                valor: Valor a convertir (int, float, str, bool)
+            
+            Returns:
+                str: Representación binaria del valor en 16 bits
+            """
             if isinstance(valor, int):
                 return int_to_bin16(valor)
             elif isinstance(valor, float):
@@ -183,32 +234,65 @@ class MainWindow(QMainWindow):
         self.ui.BIN_D.setText(convertir_a_binario(arreglo[3]))
       
     def setCarry(self,caryy):
+        """
+        Actualiza el valor de la bandera de acarreo y su visualización en la interfaz.
+        
+        Args:
+            caryy (int): Nuevo valor para la bandera de acarreo (0 o 1)
+        """
         self.carry = caryy
         self.ui.REG_Carry.setText(str(caryy))
         self.ui.BIN_Carry.setText(int_to_bin16(caryy))
       
     def setZero(self,zero):
+        """
+        Actualiza el valor de la bandera de cero y su visualización en la interfaz.
+        
+        Args:
+            zero (int): Nuevo valor para la bandera de cero (0 o 1)
+        """
         self.zero = zero
         self.ui.REG_Zero.setText(str(zero))
         self.ui.BIN_Zero.setText(int_to_bin16(zero))
         
     def setNegative(self,negative):
+        """
+        Actualiza el valor de la bandera de negativo y su visualización en la interfaz.
+        
+        Args:
+            negative (int): Nuevo valor para la bandera de negativo (0 o 1)
+        """
         self.negative = negative
         self.ui.REG_Neg.setText(str(negativo))
         self.ui.BIN_Neg.setText(int_to_bin16(negativo))
         
     def setDesb(self,desbordamiento):
+        """
+        Actualiza el valor de la bandera de desbordamiento y su visualización en la interfaz.
+        
+        Args:
+            desbordamiento (int): Nuevo valor para la bandera de desbordamiento (0 o 1)
+        """
         self.desbordamiento = desbordamiento
         self.ui.REG_Desb.setText(str(desbordamiento))
         self.ui.BIN_Desb.setText(int_to_bin16(desbordamiento))
     
     def resetBanderas(self):
+        """
+        Reinicia todas las banderas (carry, zero, negative, desbordamiento) a 0.
+        Útil después de ciertas operaciones para limpiar el estado de las banderas.
+        """
         self.setCarry(0)
         self.setZero(0)
         self.setNegative(0)
         self.setDesb(0)
         
     def Preprocesado(self):
+        """
+        Realiza el preprocesamiento del código fuente utilizando un ejecutable externo (flex).
+        Lee el código fuente desde la interfaz, lo escribe en un archivo temporal,
+        ejecuta el preprocesador y muestra el resultado en la interfaz.
+        """
         texto = self.ui.codigofuente_input.toPlainText()  # Obtener el texto del QTextEdit
 
         # Crear un archivo temporal para pasar el contenido al analizador Flex
@@ -233,8 +317,23 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Preprocesado]: "+ str(e))
         
     def Compilador(self):
+        """
+        Ejecuta el proceso de compilación del código preprocesado.
+        Utiliza un ejecutable externo para compilar el código y generar
+        un archivo de código TAC (Three-Address Code), que luego se convierte
+        a ensamblador mediante otro script Python.
+        
+        Maneja archivos temporales para la entrada/salida y muestra el resultado
+        en la interfaz gráfica.
+        """
         def log_debug(message):
-            """ Escribe en un archivo de depuración. """
+            """ 
+            Escribe mensajes de depuración en un archivo de log.
+            Útil para rastrear el proceso de compilación.
+            
+            Args:
+                message (str): Mensaje a registrar en el archivo de depuración
+            """
             with open("debug.log", "a", encoding="utf-8") as debug_file:
                 debug_file.write(message + "\n")
         # Obtener el código preprocesado de la UI
@@ -330,6 +429,11 @@ class MainWindow(QMainWindow):
 
         
     def Ensamblador(self):
+        """
+        Ejecuta el proceso de ensamblado del código en lenguaje ensamblador.
+        Toma el código ensamblador de la interfaz, lo escribe en un archivo temporal,
+        ejecuta el ensamblador externo y muestra el código binario resultante en la interfaz.
+        """
         texto = self.ui.assembler_input.toPlainText()  # Obtener el texto del QTextEdit
 
         # Crear un archivo temporal para pasar el contenido al analizador Flex
@@ -354,6 +458,14 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Ensamblador]: "+ str(e))
         
     def EnlazadorCargador(self):
+        """
+        Ejecuta el proceso de enlazado y carga del código binario en la memoria.
+        Toma la dirección de referencia y el código binario de la interfaz,
+        ejecuta el enlazador-cargador externo y carga el código resultante en la
+        memoria de la máquina virtual a partir de la dirección de referencia.
+        
+        También actualiza el contador de programa para apuntar a la dirección inicial del programa.
+        """
         direccion_referencia = self.ui.linker_input.toPlainText()
         try:
             direccion_referencia = int(direccion_referencia)
@@ -416,10 +528,27 @@ class MainWindow(QMainWindow):
 
         
     def LeerDato(self,direccion):
+        """
+        Lee un dato almacenado en la dirección de memoria especificada.
+        Útil para instrucciones que requieren acceder a valores en memoria.
+        
+        Args:
+            direccion (int): Dirección de memoria a leer
+            
+        Returns:
+            El valor almacenado en la dirección de memoria, procesado según 
+            su tipo de dato (entero, float, booleano, etc.)
+        """
         instruccion = self.memoria.leer_memoria(direccion)
         return self.EjecutarComando(instruccion)
         
     def LeerInstruccion(self):
+        """
+        Lee y ejecuta la instrucción ubicada en la dirección actual del contador de programa.
+        Después de la ejecución, incremente el CP para apuntar a la siguiente instrucción.
+        
+        Es utilizada para la ejecución paso a paso del programa cargado en memoria.
+        """
         instruccion = self.memoria.leer_memoria(self.cp)
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":False} 
         try:
@@ -429,6 +558,13 @@ class MainWindow(QMainWindow):
             self.ui.Output.setPlainText("[Error Ejecutando]: "+ str(e))
             
     def LeerInstrucciones(self):
+        """
+        Lee y ejecuta instrucciones desde la dirección actual del CP hasta encontrar
+        una instrucción HALT, IN o un valor 0 en memoria.
+        
+        Es utilizada para la ejecución continua del programa cargado en memoria.
+        Si encuentra una instrucción IN, pausa la ejecución y espera la entrada del usuario.
+        """
         instruccion = self.memoria.leer_memoria(self.cp)
         while(self.IdentificarComando(instruccion) != 'HALT' 
               and self.IdentificarComando(instruccion) != 'IN' 
@@ -444,6 +580,17 @@ class MainWindow(QMainWindow):
                 self.ui.Output.setPlainText("[Error Ejecutando]: "+ str(e))
         
     def EjecutarComando(self,instruccion):
+        """
+        Identifica y ejecuta el comando representado por la instrucción binaria.
+        Extrae el código de operación (opcode) y llama a la función correspondiente
+        pasando los bits restantes de la instrucción como parámetros.
+        
+        Args:
+            instruccion: Instrucción binaria a ejecutar
+            
+        Returns:
+            El resultado de la ejecución de la instrucción
+        """
         nombre_comando = self.IdentificarComando(instruccion)
         print("🚀 ~ nombre_comando:", nombre_comando)
         self.setDir(instruccion)
@@ -461,6 +608,17 @@ class MainWindow(QMainWindow):
             print(f"Error: La función {nombre_comando} no está definida.")
 
     def IdentificarComando(self,instruccion):
+        """
+        Identifica el tipo de comando/instrucción a partir de su representación binaria.
+        Extrae los primeros 5 bits de la instrucción para determinar el código de operación
+        y devuelve el nombre del comando correspondiente.
+        
+        Args:
+            instruccion: Instrucción binaria a identificar
+            
+        Returns:
+            str: Nombre del comando identificado, o "ERROR" si no se puede identificar
+        """
         commandos = [
             "NOP", "LOAD", "STORE", "MOVE", "ADD", "SUB", "MUL", "DIV", "AND", "OR", "NOR",
             "NOT", "SHL", "SHR", "ROL", "ROR", "JUMP", "BEQ", "BNE", "BLT", "JLE", "PUSH", 
@@ -484,6 +642,17 @@ class MainWindow(QMainWindow):
             return "ERROR"
 
     def NOP(self,instruccion):
+        """
+        Implementa la instrucción NOP (No Operation).
+        En esta implementación, NOP se utiliza para interpretar y devolver
+        un valor de datos según su tipo (booleano, natural, entero, float o carácter).
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen información del dato
+            
+        Returns:
+            El valor del dato según su tipo identificado
+        """
         type_dato = instruccion[:6]
         print("🚀 ~ instruccion:", instruccion)
         tipo_dato = int(type_dato, 2)
@@ -505,6 +674,16 @@ class MainWindow(QMainWindow):
             return "ERROR"
         
     def LOAD(self, instruccion):
+        """
+        Implementa la instrucción LOAD que carga un valor desde la memoria a un registro.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro destino
+                            y la dirección de memoria origen
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_destino = int(instruccion[:2], 2)
         dir_origen = int(instruccion[2:], 2)
         
@@ -519,6 +698,16 @@ class MainWindow(QMainWindow):
         print(f"LOAD: Register {reg_destino} now has value {self.registro[reg_destino]}")
       
     def STORE(self, instruccion):
+        """
+        Implementa la instrucción STORE que almacena el valor de un registro en la memoria.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro origen
+                            y la dirección de memoria destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_origen = int(instruccion[:2], 2)
         dir_destino = int(instruccion[2:], 2)
         
@@ -531,12 +720,33 @@ class MainWindow(QMainWindow):
         return 0
         
     def MOVE(self,instruccion):
+        """
+        Implementa la instrucción MOVE que copia el valor de un registro a otro.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            origen y destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_destino = int(instruccion[:2], 2)
         reg_origen = int(instruccion[2:4], 2)
         self.guardar_en_registro(reg_origen,self.LeerDato(reg_destino))
         return 0
         
     def ADD(self, instruccion):
+        """
+        Implementa la instrucción ADD que suma los valores de dos registros
+        y almacena el resultado en un tercero.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         # Check these bit positions - they might be incorrect
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
@@ -560,6 +770,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def SUB(self,instruccion):
+        """
+        Implementa la instrucción SUB que resta el valor del segundo registro del primero
+        y almacena el resultado en un tercero. También actualiza las banderas Zero y Negative.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -572,6 +793,18 @@ class MainWindow(QMainWindow):
         return 0
         
     def MUL(self,instruccion):
+        """
+        Implementa la instrucción MUL que multiplica los valores de dos registros
+        y almacena el resultado en un tercero. Actualiza las banderas de Desbordamiento,
+        Carry y Zero según corresponda.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -585,6 +818,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def DIV(self,instruccion):
+        """
+        Implementa la instrucción DIV que divide el valor del primer registro entre el segundo
+        y almacena el resultado en un tercero. Actualiza la bandera Zero si el resultado es cero.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -595,6 +839,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def AND(self,instruccion):
+        """
+        Implementa la instrucción AND que realiza la operación lógica AND bit a bit
+        entre los valores de dos registros y almacena el resultado en un tercero.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -602,6 +857,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def OR(self,instruccion):
+        """
+        Implementa la instrucción OR que realiza la operación lógica OR bit a bit
+        entre los valores de dos registros y almacena el resultado en un tercero.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -609,6 +875,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def NOR(self,instruccion):
+        """
+        Implementa la instrucción NOR que realiza la operación lógica NOR bit a bit
+        entre los valores de dos registros y almacena el resultado en un tercero.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            operandos y el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         reg_destino = int(instruccion[4:6], 2)
@@ -616,23 +893,63 @@ class MainWindow(QMainWindow):
         return 0
         
     def NOT(self,instruccion):
+        """
+        Implementa la instrucción NOT que invierte bit a bit el valor del registro especificado.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro a invertir
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         self.guardar_en_registro(reg_1,int(~(self.registro[reg_1])))
         return 0
         
     def SHL(self,instruccion):
+        """
+        Implementa la instrucción SHL (Shift Left) que desplaza a la izquierda los bits
+        del primer registro tantas posiciones como indique el valor del segundo registro.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros operandos
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         self.guardar_en_registro(reg_1,self.registro[reg_1] << self.registro[reg_2])
         return 0
         
     def SHR(self,instruccion):
+        """
+        Implementa la instrucción SHR (Shift Right) que desplaza a la derecha los bits
+        del primer registro tantas posiciones como indique el valor del segundo registro.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros operandos
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)  
         reg_2 = int(instruccion[2:4], 2) 
         self.guardar_en_registro(reg_1,self.registro[reg_1] >> self.registro[reg_2])
         return 0
         
     def ROL(self, instruccion):
+        """
+        Implementa la instrucción ROL (Rotate Left) que rota a la izquierda los bits
+        del primer registro tantas posiciones como indique el valor del segundo registro.
+        A diferencia de SHL, los bits desplazados fuera del registro se vuelven a insertar por la derecha.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros operandos
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)  # Índice del registro destino
         reg_2 = int(instruccion[2:4], 2)  # Índice del registro que contiene el número de rotaciones
 
@@ -647,6 +964,17 @@ class MainWindow(QMainWindow):
         return 0
         
     def ROR(self, instruccion):
+        """
+        Implementa la instrucción ROR (Rotate Right) que rota a la derecha los bits
+        del primer registro tantas posiciones como indique el valor del segundo registro.
+        A diferencia de SHR, los bits desplazados fuera del registro se vuelven a insertar por la izquierda.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros operandos
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)  # Índice del registro destino
         reg_2 = int(instruccion[2:4], 2)  # Índice del registro que contiene el número de rotaciones
 
@@ -661,20 +989,29 @@ class MainWindow(QMainWindow):
         return 0
 
     def JUMP(self,instruccion):
+        """
+        Implementa la instrucción JUMP que realiza un salto incondicional a la dirección especificada.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen la dirección destino del salto
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         dir_destino = int(instruccion, 2)        
         self.setCp(dir_destino)
         return 0
 
     def BEQ(self, instruccion):
         """
-        Branch if Equal.
+        Implementa la instrucción BEQ (Branch if Equal) que realiza un salto condicional
+        a la dirección especificada si la bandera Zero está activa (resultado de una comparación previa).
         
-        In this design, BEQ assumes that a CMP instruction has already been executed
-        so that the Zero flag reflects the equality of the two compared operands.
+        Args:
+            instruccion (str): Bits de la instrucción que contienen la dirección destino del salto
         
-        The instruction is assumed to encode the branch target address in all its bits.
-        If the Zero flag is 1 (i.e. the last CMP found the operands equal), the
-        program counter is set to the target address.
+        Returns:
+            int: 0 para indicar éxito
         """
         # Convert the entire instruction to a branch target address.
         branch_target = int(instruccion, 2)
@@ -689,6 +1026,18 @@ class MainWindow(QMainWindow):
         return 0
 
     def BNE(self, instruccion):
+        """
+        Implementa la instrucción BNE (Branch if Not Equal) que realiza un salto condicional
+        si los valores de los dos registros especificados son diferentes.
+        También actualiza la bandera Negative.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros a comparar
+                            y la dirección destino del salto
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
@@ -698,6 +1047,18 @@ class MainWindow(QMainWindow):
             self.setCp(dir_destino)
 
     def BLT(self, instruccion):
+        """
+        Implementa la instrucción BLT (Branch if Less Than) que realiza un salto condicional
+        si el valor del primer registro es menor que el del segundo registro.
+        También actualiza la bandera Negative.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros a comparar
+                            y la dirección destino del salto
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
@@ -707,6 +1068,18 @@ class MainWindow(QMainWindow):
             self.setCp(dir_destino)
 
     def JLE(self, instruccion):
+        """
+        Implementa la instrucción JLE (Jump if Less or Equal) que realiza un salto condicional
+        si el valor del primer registro es menor o igual que el del segundo registro.
+        Actualiza las banderas Negative y Zero según corresponda.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros a comparar
+                            y la dirección destino del salto
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)
         reg_2 = int(instruccion[2:4], 2)
         dir_destino = int(instruccion[4:], 2)
@@ -720,30 +1093,80 @@ class MainWindow(QMainWindow):
             self.setCp(dir_destino)
 
     def PUSH(self,instruccion):
+        """
+        Implementa la instrucción PUSH que guarda el valor del registro especificado
+        en la pila de la máquina virtual.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro origen
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_index = int(instruccion[:2], 2)
         direccion = self.registro[reg_index]
         self.memoria.push_stack(direccion)
         return 0
 
     def POP(self,instruccion):
+        """
+        Implementa la instrucción POP que recupera un valor de la pila
+        y lo almacena en el registro especificado.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_index = int(instruccion[:2], 2)
         direccion = self.memoria.pop_stack()
         self.guardar_en_registro(reg_index,direccion)
         return 0
 
     def CALL(self,instruccion):
+        """
+        Implementa la instrucción CALL que guarda la dirección de retorno (CP actual)
+        en la pila y salta a la subrutina ubicada en la dirección especificada.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen la dirección de la subrutina
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         direccion = int(instruccion, 2)
         self.memoria.push_stack(self.cp)
         self.setCp(direccion)
         return 0
 
     def RET(self,instruccion):
+        """
+        Implementa la instrucción RET que recupera la dirección de retorno de la pila
+        y establece el CP a dicha dirección (menos 1, para compensar el incremento posterior).
+        
+        Args:
+            instruccion (str): Bits de la instrucción (no utilizados en esta instrucción)
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         direccion = self.memoria.pop_stack()
         self.setCp(direccion-1)
         return 0
 
     def IN(self, instruccion):
-        """Espera la entrada del usuario y la almacena en el registro correspondiente."""
+        """
+        Implementa la instrucción IN que solicita una entrada al usuario
+        y la almacena en el registro especificado. Configura la interfaz para
+        esperar la entrada del usuario antes de continuar la ejecución.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro destino
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         print("IN", instruccion)
         reg = int(instruccion[:2], 2)  # Obtener el índice del registro
         self.config_input = {"text":"","reg_input":reg,"Exxecute_all":self.config_input['Exxecute_all']}
@@ -751,19 +1174,31 @@ class MainWindow(QMainWindow):
         self.ui.Read_Next_Instruction.setDisabled(True)
             
     def OUT(self,instruccion):
+        """
+        Implementa la instrucción OUT que muestra el valor del registro especificado
+        en la salida de la interfaz gráfica.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro origen
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_1 = int(instruccion[:2], 2)        
         self.ui.Output.setPlainText(str(self.registro[reg_1]))
         return 0
 
     def CMP(self, instruccion):
         """
-        Compare the values in two registers.
+        Implementa la instrucción CMP que compara los valores de dos registros
+        y establece las banderas Zero y Negative según el resultado de la comparación.
+        Esta instrucción es útil antes de ejecutar instrucciones de salto condicional.
         
-        Assumes that the instruction encodes:
-        - The first 2 bits: register index for operand 1
-        - The next 2 bits: register index for operand 2
-        It subtracts the second operand from the first, sets the zero flag
-        if the result is zero, and the negative flag if the result is negative.
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros a comparar
+        
+        Returns:
+            int: 0 para indicar éxito
         """
         # Extract register indices from the first 4 bits.
         reg_1 = int(instruccion[:2], 2)
@@ -786,21 +1221,61 @@ class MainWindow(QMainWindow):
         return 0
 
     def CLR(self,instruccion):
+        """
+        Implementa la instrucción CLR (Clear) que pone a cero un registro o una posición de memoria.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen el registro o dirección a limpiar
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         print("CLR",instruccion)
         return 0
 
     def LOADR(self,instruccion):
+        """
+        Implementa la instrucción LOADR (Load Register) que copia el valor
+        de un registro a otro sin acceder a memoria.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            destino y origen
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_destino = int(instruccion[:2], 2)
         reg_origen = int(instruccion[2:4], 2)
         self.registro[reg_destino] = self.registro[reg_origen]
 
     def STORER(self,instruccion):
+        """
+        Implementa la instrucción STORER (Store Register) que almacena en memoria
+        el valor de un registro en la dirección especificada por otro registro.
+        
+        Args:
+            instruccion (str): Bits de la instrucción que contienen los registros
+                            origen y dirección
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         reg_origen = int(instruccion[:2], 2)
         dir_destino = int(instruccion[2:], 2)
         self.memoria.escribir_memoria(reg_origen,self.LeerDato(dir_destino))
         return 0
 
     def HALT(self,instruccion):
+        """
+        Implementa la instrucción HALT que detiene la ejecución del programa.
+        
+        Args:
+            instruccion (str): Bits de la instrucción (no utilizados en esta instrucción)
+        
+        Returns:
+            int: 0 para indicar éxito
+        """
         return 0  
         
 if __name__ == '__main__':
