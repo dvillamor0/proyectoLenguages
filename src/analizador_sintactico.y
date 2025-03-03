@@ -1,4 +1,13 @@
 %{
+    /**
+     * @archivo: analizador_sintactico.y
+     * @descripción: Analizador sintáctico para un lenguaje de programación personalizado
+     *              que construye un Árbol de Sintaxis Abstracta (AST)
+     * @autor: [Nombre del autor]
+     * @fecha: [Fecha de creación/modificación]
+     * @versión: 1.0
+     */
+    
     // Inclusión de las bibliotecas estándar necesarias para la entrada/salida y manejo de memoria.
     #include <stdio.h>
     #include <stdlib.h>
@@ -9,24 +18,50 @@
     #include "analizador_semantico.h"
     #include "intermediate_code.h" 
 
-    // Declaración externa de funciones y variables utilizadas en el proceso de análisis léxico.
+    /**
+     * @declaraciones_externas: Elementos definidos en otros archivos del compilador
+     * @descripción: Funciones y variables exportadas por el analizador léxico (yylex)
+     */
     extern int yylex();
     extern FILE* yyin;
     extern int yylineno;
+    
+    /**
+     * @función: yyerror
+     * @descripción: Función para manejar errores durante el análisis sintáctico
+     * @parámetros: const char *s - Mensaje de error
+     */
     void yyerror(const char *s);
 
-    // Declaración de la raíz del árbol de sintaxis abstracta.
+    /**
+     * @variable: ast_root
+     * @descripción: Puntero a la raíz del Árbol de Sintaxis Abstracta (AST)
+     * @inicialización: NULL
+     */
     Node* ast_root = NULL;
 %}
 
-%define parse.error verbose  // Configuración para mostrar errores de parseo de forma detallada.
+/**
+ * @directiva: parse.error
+ * @descripción: Configura Bison para mostrar mensajes de error detallados
+ *              durante el análisis sintáctico
+ */
+%define parse.error verbose
 
+/**
+ * @unión: %union
+ * @descripción: Define los tipos de datos que pueden ser asociados con símbolos
+ *              de la gramática (terminales y no terminales)
+ */
 %union {
-    int symbol_index;         // Unión para almacenar índices de símbolos.
-    struct Node *node;        // Unión para almacenar nodos del AST.
+    int symbol_index;         // Índice en la tabla de símbolos para identificadores y valores
+    struct Node *node;        // Puntero a nodo del AST para construcciones sintácticas
 }
 
-// Declaración de tokens con sus tipos de datos asociados.
+/**
+ * @tokens: Declaración de tokens con sus tipos asociados
+ * @descripción: Define los tokens (símbolos terminales) reconocidos por el analizador léxico
+ */
 %token <symbol_index> TOKEN_ID TOKEN_NUMBER
 %token TOKEN_FUN TOKEN_RET TOKEN_IF TOKEN_WHILE TOKEN_ENT TOKEN_FLO TOKEN_NAT TOKEN_ARREGLO
 %token TOKEN_RELOP_LT TOKEN_RELOP_LE TOKEN_RELOP_EQ TOKEN_RELOP_NE TOKEN_RELOP_GT TOKEN_RELOP_GE
@@ -35,25 +70,32 @@
 %token TOKEN_LBRACK TOKEN_RBRACK 
 %type <symbol_index> relop type
 
-// Declaración de no terminales y su tipo asociado (puntero a nodo).
+/**
+ * @no_terminales: Declaración de símbolos no terminales con sus tipos asociados
+ * @descripción: Define los símbolos no terminales de la gramática y su tipo de dato asociado
+ */
 %type <node> program function_list function param_list param
 %type <node> block statement_list statement declaration_stmt assignment_stmt
 %type <node> if_stmt while_stmt return_stmt condition expr arg_list
 %type <node> array_decl array_literal array_access array_elements
 
 
-// Declaración de la precedencia y asociatividad de los operadores.
+/**
+ * @precedencia: Declaración de precedencia y asociatividad de operadores
+ * @descripción: Define la precedencia relativa y asociatividad de los operadores
+ *              (menor precedencia arriba, mayor precedencia abajo)
+ */
 %left TOKEN_PLUS TOKEN_MINUS
 %left TOKEN_MULT TOKEN_DIV
 %nonassoc TOKEN_RELOP_LT TOKEN_RELOP_LE TOKEN_RELOP_EQ TOKEN_RELOP_NE TOKEN_RELOP_GT TOKEN_RELOP_GE
 
 %%
 
-/*
- * Regla: program
- * ---------------
- * Define la producción principal del programa.
- * Se crea el nodo raíz del AST (tipo NODE_PROGRAM) a partir de la lista de funciones.
+/**
+ * @regla: program
+ * @descripción: Punto de entrada de la gramática que define un programa
+ *              como una lista de funciones
+ * @acción_semántica: Crea el nodo raíz del AST de tipo NODE_PROGRAM
  */
 program 
     : function_list    { 
@@ -62,10 +104,11 @@ program
     }
     ;
 
-/*
- * Regla: function_list
- * --------------------
- * Define la lista de funciones. Puede ser una única función o una lista de ellas.
+/**
+ * @regla: function_list
+ * @descripción: Define una lista de funciones que puede contener
+ *              una o más declaraciones de funciones
+ * @acción_semántica: Mantiene una lista enlazada de nodos de función
  */
 function_list
     : function                        { $$ = $1; }
@@ -78,10 +121,11 @@ function_list
                                      }
     ;
 
-/*
- * Regla: function
- * ----------------
- * Define la estructura de una función: palabra clave, identificador, parámetros y bloque.
+/**
+ * @regla: function
+ * @descripción: Define la estructura de una función con su nombre,
+ *              lista de parámetros y bloque de código
+ * @acción_semántica: Crea un nodo de función en el AST con los parámetros y el bloque
  */
 function
     : TOKEN_FUN TOKEN_ID TOKEN_LPAREN param_list TOKEN_RPAREN block
@@ -92,11 +136,11 @@ function
                                      }
     ;
 
-/*
- * Regla: param_list
- * -----------------
- * Define la lista de parámetros de una función.
- * Puede estar vacía o contener uno o más parámetros separados por comas.
+/**
+ * @regla: param_list
+ * @descripción: Define la lista de parámetros de una función,
+ *              que puede estar vacía o contener varios parámetros separados por comas
+ * @acción_semántica: Construye una lista enlazada de nodos de parámetros
  */
 param_list
     : /* empty */                     { $$ = NULL; }
@@ -110,10 +154,10 @@ param_list
                                      }
     ;
 
-/*
- * Regla: param
- * ------------
- * Define un parámetro, que consta de un tipo y un identificador.
+/**
+ * @regla: param
+ * @descripción: Define un parámetro individual con su tipo y nombre
+ * @acción_semántica: Crea un nodo identificador para el parámetro
  */
 param
     : type TOKEN_ID                   {
@@ -123,10 +167,10 @@ param
                                      }
     ;
 
-/*
- * Regla: type
- * -----------
- * Define los tipos de datos válidos para los parámetros y declaraciones (entero o flotante).
+/**
+ * @regla: type
+ * @descripción: Define los tipos de datos primitivos del lenguaje
+ * @acción_semántica: Retorna el token correspondiente al tipo
  */
 type
     : TOKEN_ENT                      { $$ = TOKEN_ENT; }
@@ -134,20 +178,22 @@ type
     | TOKEN_NAT                      { $$ = TOKEN_NAT; }
     ;
 
-/*
- * Regla: block
- * ------------
- * Define un bloque de código, delimitado por llaves, que contiene una lista de sentencias.
+/**
+ * @regla: block
+ * @descripción: Define un bloque de código delimitado por llaves
+ *              que contiene una lista de sentencias
+ * @acción_semántica: Crea un nodo de bloque que contiene las sentencias
  */
 block
     : TOKEN_LBRACE statement_list TOKEN_RBRACE
                                      { $$ = create_node(NODE_BLOCK, $2, NULL); }
     ;
 
-/*
- * Regla: statement_list
- * ---------------------
- * Define una lista de sentencias dentro de un bloque.
+/**
+ * @regla: statement_list
+ * @descripción: Define una lista de sentencias dentro de un bloque,
+ *              que puede estar vacía o contener múltiples sentencias
+ * @acción_semántica: Construye una lista enlazada de nodos de sentencias
  */
 statement_list
     : /* empty */                     { $$ = NULL; }
@@ -164,10 +210,10 @@ statement_list
                                      }
     ;
 
-/*
- * Regla: statement
- * ----------------
- * Define las diferentes sentencias válidas en el lenguaje.
+/**
+ * @regla: statement
+ * @descripción: Define los diferentes tipos de sentencias permitidas en el lenguaje
+ * @acción_semántica: Pasa el nodo creado por la regla específica
  */
 statement
     : declaration_stmt
@@ -178,10 +224,11 @@ statement
     | array_decl
     ;
 
-/*
- * Regla: declaration_stmt
- * ------------------------
- * Define una sentencia de declaración, con asignación inicial.
+/**
+ * @regla: declaration_stmt
+ * @descripción: Define una sentencia de declaración de variable con
+ *              tipo, nombre y valor inicial
+ * @acción_semántica: Crea un nodo de declaración con el identificador y la expresión
  */
 declaration_stmt
     : type TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON
@@ -193,10 +240,11 @@ declaration_stmt
                                      }
     ;
 
-/*
- * Regla: assignment_stmt
- * -----------------------
- * Define una sentencia de asignación a una variable existente.
+/**
+ * @regla: assignment_stmt
+ * @descripción: Define una sentencia de asignación a una variable
+ *              existente o a un elemento de un arreglo
+ * @acción_semántica: Crea un nodo de asignación con el destino y el valor
  */
 assignment_stmt
     : TOKEN_ID TOKEN_ASSIGN expr TOKEN_SEMICOLON {
@@ -209,39 +257,42 @@ assignment_stmt
     }
     ;
 
-/*
- * Regla: if_stmt
- * --------------
- * Define una sentencia condicional (if) con su condición y bloque de sentencias.
+/**
+ * @regla: if_stmt
+ * @descripción: Define una sentencia condicional if con su condición
+ *              y bloque de código asociado
+ * @acción_semántica: Crea un nodo if con la condición y el bloque
  */
 if_stmt
     : TOKEN_IF TOKEN_LPAREN condition TOKEN_RPAREN block
                                      { $$ = create_node(NODE_IF, $3, $5); }
     ;
 
-/*
- * Regla: while_stmt
- * -----------------
- * Define una sentencia de bucle while con su condición y bloque de sentencias.
+/**
+ * @regla: while_stmt
+ * @descripción: Define una sentencia de bucle while con su condición
+ *              y bloque de código a repetir
+ * @acción_semántica: Crea un nodo while con la condición y el bloque
  */
 while_stmt
     : TOKEN_WHILE TOKEN_LPAREN condition TOKEN_RPAREN block
                                      { $$ = create_node(NODE_WHILE, $3, $5); }
     ;
 
-/*
- * Regla: return_stmt
- * ------------------
- * Define una sentencia de retorno, que devuelve el resultado de una expresión.
+/**
+ * @regla: return_stmt
+ * @descripción: Define una sentencia de retorno de valor desde una función
+ * @acción_semántica: Crea un nodo return con la expresión a retornar
  */
 return_stmt
     : TOKEN_RET expr TOKEN_SEMICOLON  { $$ = create_node(NODE_RETURN, $2, NULL); }
     ;
 
-/*
- * Regla: condition
- * ----------------
- * Define la condición de sentencias if y while, compuesta por una expresión relacional.
+/**
+ * @regla: condition
+ * @descripción: Define una condición como una expresión relacional
+ *              (comparación entre dos expresiones)
+ * @acción_semántica: Crea un nodo de operación binaria con el operador relacional
  */
 condition
     : expr relop expr                { 
@@ -250,10 +301,10 @@ condition
                                      }
     ;
 
-/*
- * Regla: relop
- * ------------
- * Define los operadores relacionales válidos.
+/**
+ * @regla: relop
+ * @descripción: Define los operadores de relación para comparaciones
+ * @acción_semántica: Retorna el token correspondiente al operador
  */
 relop
     : TOKEN_RELOP_LT                 { $$ = TOKEN_RELOP_LT; }
@@ -264,10 +315,17 @@ relop
     | TOKEN_RELOP_GE                 { $$ = TOKEN_RELOP_GE; }
     ;
 
-/*
- * Regla: expr
- * -----------
- * Define las expresiones aritméticas y de llamada a función.
+/**
+ * @regla: expr
+ * @descripción: Define las expresiones del lenguaje, incluyendo:
+ *              - Identificadores
+ *              - Números
+ *              - Acceso a elementos de arreglos
+ *              - Literales de arreglos
+ *              - Llamadas a funciones
+ *              - Operaciones aritméticas
+ *              - Expresiones agrupadas con paréntesis
+ * @acción_semántica: Crea los nodos correspondientes según el tipo de expresión
  */
 expr
     : TOKEN_ID {
@@ -310,11 +368,11 @@ expr
     }
     ;
 
-/*
- * Regla: arg_list
- * ---------------
- * Define la lista de argumentos en la llamada a una función.
- * Puede estar vacía o contener uno o más argumentos separados por comas.
+/**
+ * @regla: arg_list
+ * @descripción: Define la lista de argumentos para una llamada a función,
+ *              que puede estar vacía o contener múltiples expresiones
+ * @acción_semántica: Construye una lista enlazada de nodos de expresiones
  */
 arg_list
     : /* empty */                     { $$ = NULL; }
@@ -328,6 +386,11 @@ arg_list
                                      }
     ;
 
+/**
+ * @regla: array_decl
+ * @descripción: Define la declaración de arreglos, con o sin inicialización
+ * @acción_semántica: Crea nodos para representar la declaración y tamaño del arreglo
+ */
 array_decl
     : TOKEN_ARREGLO type TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK TOKEN_SEMICOLON {
         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
@@ -354,6 +417,12 @@ array_decl
     }
     ;
 
+/**
+ * @regla: array_literal
+ * @descripción: Define un literal de arreglo como una lista de elementos
+ *              encerrados entre corchetes
+ * @acción_semántica: Crea un nodo para representar el literal de arreglo
+ */
 array_literal
     : TOKEN_LBRACK array_elements TOKEN_RBRACK {
         $$ = create_node(NODE_ARRAY_LITERAL, $2, NULL);
@@ -363,6 +432,11 @@ array_literal
     }
     ;
 
+/**
+ * @regla: array_elements
+ * @descripción: Define la lista de elementos dentro de un literal de arreglo
+ * @acción_semántica: Construye una lista enlazada de nodos de expresiones
+ */
 array_elements
     : expr {
         $$ = $1;
@@ -375,6 +449,11 @@ array_elements
     }
     ;
 
+/**
+ * @regla: array_access
+ * @descripción: Define el acceso a un elemento de un arreglo mediante su índice
+ * @acción_semántica: Crea un nodo para representar el acceso por índice
+ */
 array_access
     : TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK {
         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
@@ -385,22 +464,43 @@ array_access
 
 %%
 
-/*
- * Función: yyerror
- * ----------------
- * Función de manejo de errores de parseo.
- * Imprime un mensaje de error junto con el número de línea donde ocurrió.
+/**
+ * @función: yyerror
+ * @descripción: Función para manejo de errores sintácticos detectados durante el parseo
+ * 
+ * @parámetros:
+ *   - s: Mensaje de error proporcionado por Bison
+ * 
+ * @comportamiento:
+ *   Imprime un mensaje de error en stderr que incluye:
+ *   - El mensaje de error original
+ *   - El número de línea donde ocurrió el error (obtenido de yylineno)
  */
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
 }
 
-/*
- * Función: main
- * -------------
- * Función principal del compilador.
- * Se encarga de inicializar el proceso de compilación, abrir el archivo de entrada,
- * ejecutar el análisis sintáctico, el análisis semántico y la generación de código intermedio.
+/**
+ * @función: main
+ * @descripción: Punto de entrada principal del compilador que coordina
+ *              las fases de análisis y generación de código
+ * 
+ * @parámetros:
+ *   - argc: Número de argumentos de línea de comandos
+ *   - argv: Array de cadenas de argumentos
+ * 
+ * @retorno:
+ *   - 0: Compilación exitosa
+ *   - 1: Error durante la compilación
+ * 
+ * @flujo_de_ejecución:
+ *   1. Verifica los argumentos de línea de comandos
+ *   2. Abre el archivo de entrada
+ *   3. Ejecuta el análisis sintáctico (yyparse)
+ *   4. Si el análisis es exitoso:
+ *      a. Ejecuta el análisis semántico
+ *      b. Genera código intermedio
+ *   5. Muestra mensajes de progreso y estado
  */
 int main(int argc, char **argv) {
     // Mensaje de inicio del compilador.

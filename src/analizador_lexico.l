@@ -1,4 +1,11 @@
 %{
+    /**
+     * @archivo: analizador_lexico.l
+     * @descripción: Analizador léxico para un lenguaje de programación personalizado
+     * @autor: [Nombre del autor]
+     * @fecha: [Fecha de creación/modificación]
+     */
+    
     // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
     #include <stdio.h>
     #include <stdlib.h>
@@ -6,15 +13,29 @@
     // Inclusión del header generado por el analizador sintactico.
     #include "analizador_sintactico.tab.h"
 
-    // Definicion del maximo de simbolos en la tabla.
+    /**
+     * @constante: MAX_SYMBOLS
+     * @descripción: Define el tamaño máximo de la tabla de símbolos
+     * @valor: 1000 entradas
+     */
     #define MAX_SYMBOLS 1000
 
-    // Constantes para identificar el tipo de simbolo.
-    #define SYMTAB_IDENTIFIER 1
-    #define SYMTAB_NUMBER 2
-    #define SYMTAB_NATURAL 3
+    /**
+     * @constantes: Tipos de símbolos
+     * @descripción: Identificadores para categorizar las entradas en la tabla de símbolos
+     */
+    #define SYMTAB_IDENTIFIER 1  // Identificador (variables, funciones)
+    #define SYMTAB_NUMBER 2      // Número de punto flotante
+    #define SYMTAB_NATURAL 3     // Número natural (entero sin signo)
 
-    // Estructura que representa una entrada en la tabla de simbolos.
+    /**
+     * @estructura: SymbolEntry
+     * @descripción: Representa una entrada en la tabla de símbolos
+     * @miembros:
+     *   - name: Nombre o lexema del símbolo
+     *   - type: Tipo del símbolo según las constantes definidas
+     *   - value: Unión que almacena el valor según el tipo del símbolo
+     */
     typedef struct {
         char *name;   // Nombre del simbolo.
         int type;     // Tipo de simbolo (identificador o numero).
@@ -26,12 +47,33 @@
         } value;
     } SymbolEntry;
 
-    // Declaracion de la tabla de simbolos y contador de entradas.
+    /**
+     * @variable: symbol_table
+     * @descripción: Tabla de símbolos implementada como un arreglo de entradas
+     */
     SymbolEntry symbol_table[MAX_SYMBOLS];
+    
+    /**
+     * @variable: symbol_count
+     * @descripción: Contador que mantiene el número actual de símbolos en la tabla
+     * @inicialización: 0
+     */
     int symbol_count = 0;
 
-    // Declaracion de las funciones para instalar identificadores y numeros.
+    /**
+     * @función: install_id
+     * @descripción: Instala un identificador en la tabla de símbolos
+     * @parámetros: char *lexeme - Cadena que representa el identificador
+     * @retorno: Índice del símbolo en la tabla
+     */
     int install_id(char *lexeme);
+    
+    /**
+     * @función: install_num
+     * @descripción: Instala un número en la tabla de símbolos
+     * @parámetros: char *lexeme - Cadena que representa el número
+     * @retorno: Índice del símbolo en la tabla
+     */
     int install_num(char *lexeme);
 %}
 
@@ -87,21 +129,19 @@ COMMENT     #[^\n]*\n
 .           { printf("Lexical Error: Unexpected character %s\n", yytext); }
 %%
 
-/*
- * Funcion: install_id
- * ---------------------
- * Instala un identificador en la tabla de simbolos.
+/**
+ * @función: install_id
+ * @descripción: Instala un identificador en la tabla de símbolos. Si el identificador
+ *              ya existe, retorna su índice. Si no, crea una nueva entrada.
  *
- * Parametro:
- *   lexeme - Cadena que representa el identificador.
+ * @parámetros:
+ *   - lexeme: Cadena que representa el identificador a instalar
  *
- * Retorna:
- *   Indice del simbolo en la tabla.
+ * @retorno: Índice del símbolo en la tabla
  *
- * Procedimiento:
- *   - Verifica si la tabla esta llena.
- *   - Busca si el identificador ya existe.
- *   - Si no existe, lo agrega y aumenta el contador.
+ * @complejidad: O(n) donde n es el número actual de símbolos en la tabla
+ * 
+ * @manejo_errores: Termina el programa si la tabla está llena
  */
 int install_id(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
@@ -109,6 +149,7 @@ int install_id(char *lexeme) {
         exit(1);
     }
     
+    // Busca el identificador en la tabla existente
     for (int i = 0; i < symbol_count; i++) {
         if (symbol_table[i].type == SYMTAB_IDENTIFIER && 
             strcmp(symbol_table[i].name, lexeme) == 0) {
@@ -116,26 +157,26 @@ int install_id(char *lexeme) {
         }
     }
     
+    // Si no existe, crea una nueva entrada
     symbol_table[symbol_count].name = strdup(lexeme);
     symbol_table[symbol_count].type = SYMTAB_IDENTIFIER;
     return symbol_count++;
 }
 
-/*
- * Funcion: install_num
- * ----------------------
- * Instala un numero en la tabla de simbolos.
+/**
+ * @función: install_num
+ * @descripción: Instala un número en la tabla de símbolos. Convierte el lexema
+ *              a un valor numérico de punto flotante y lo almacena.
  *
- * Parametro:
- *   lexeme - Cadena que representa el numero.
+ * @parámetros:
+ *   - lexeme: Cadena que representa el número a instalar
  *
- * Retorna:
- *   Indice del simbolo en la tabla.
+ * @retorno: Índice del símbolo en la tabla
  *
- * Procedimiento:
- *   - Verifica si la tabla esta llena.
- *   - Agrega el numero, convirtiendo la cadena a valor numerico.
- *   - Aumenta el contador y retorna el indice.
+ * @observaciones: A diferencia de los identificadores, no verifica duplicados
+ *                de números. Cada número se instala como una nueva entrada.
+ *
+ * @manejo_errores: Termina el programa si la tabla está llena
  */
 int install_num(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
@@ -143,6 +184,7 @@ int install_num(char *lexeme) {
         exit(1);
     }
     
+    // Crea una nueva entrada para el número
     symbol_table[symbol_count].name = strdup(lexeme);
     symbol_table[symbol_count].type = SYMTAB_NUMBER;
     symbol_table[symbol_count].value.number_value = atof(lexeme);
