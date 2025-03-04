@@ -1150,7 +1150,8 @@ class MainWindow(QMainWindow):
             int: 0 para indicar éxito
         """
         direccion = self.memoria.pop_stack()
-        self.setCp(direccion-1)
+        if(direccion):
+            self.setCp(direccion-1)
         return 0
 
     def IN(self, instruccion):
