@@ -113,8 +113,8 @@ def tac_to_assembly(tac_file):
     # Primera pasada para identificar posiciones de etiquetas
     current_position = len(data_section)
     for line in tac_lines:
-        if line.startswith('begin_func') and 'main' in line:
-            label = 'main'
+        if line.startswith('begin_func'):
+            label = line.split(' ')[1]            
             label_to_asm[label] = current_position
             continue
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
