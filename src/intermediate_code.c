@@ -446,6 +446,7 @@ static char *generate_code(Node *node, FILE *output) {
             char *expr_result = generate_code(node->right, output);
             char *var_name = get_symbol_name(node->left->symbol_index);
             fprintf(output, "%s = %s\n", var_name, expr_result ? expr_result : "0");
+            LOG("%s = %s\n", var_name, expr_result ? expr_result : "0");
             result = var_name;
             break;
         }
@@ -453,6 +454,7 @@ static char *generate_code(Node *node, FILE *output) {
         case NODE_RETURN: {
             char *expr_result = generate_code(node->left, output);
             fprintf(output, "return %s\n", expr_result);
+            LOG("return %s\n", expr_result);
             break;
         }
             

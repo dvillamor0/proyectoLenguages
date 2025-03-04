@@ -51,8 +51,6 @@ Para compilar el proyecto, necesitas generar los ejecutables a partir de los arc
    Para generar los archivos `.c` a partir de los archivos `.l`, abre una terminal (como Cygwin o el terminal de MSYS2) y navega al directorio `src`. Luego, ejecuta el siguiente comando para cada archivo `.l`:
 
    ```bash
-    flex analizador.l
-    gcc -o ..\compilados\analizador lex.yy.c -lfl
 
     flex ensamblador.l
     gcc -o ..\compilados\ensamblador lex.yy.c -lfl

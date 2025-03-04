@@ -1,5 +1,0 @@
-Fun main() {
-	Ent num1 = 2;
-	Ent num2 = 3;
-	Ent result = num1 + num2;
-}

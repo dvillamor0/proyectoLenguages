@@ -113,8 +113,11 @@ def tac_to_assembly(tac_file):
     # Primera pasada para identificar posiciones de etiquetas
     current_position = len(data_section)-1
     for line in tac_lines:
-        debug_print("Dirección de inicio de código:", current_position)
-        if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
+        if line.startswith('begin_func') and "main" not  in line:
+            label = line.split()[1]
+            label_to_asm[label] = current_position
+            continue
+        if line.startswith('end_func'):
             continue
         if line.startswith('L') and ':' in line:
             label = line.split(':')[0]
@@ -144,6 +147,8 @@ def tac_to_assembly(tac_file):
             current_position += 2  # LOAD, LOAD
         elif '=' in line and not line.startswith('ifz') and not line.startswith('goto'):
             current_position += 2  # LOAD, STORE
+        elif 'param' in line:
+            current_position += 2  # LOAD, STORE
         elif line.startswith('ifz'):
             current_position += 1  # BEQ
         elif line.startswith('goto'):
@@ -155,6 +160,8 @@ def tac_to_assembly(tac_file):
     
     # Segunda pasada para generar código
     pila_compare = []  # ✅ Pila para almacenar los operadores de comparación
+    line_back = tac_lines[0] # Almacena la linea anterior
+    pila_parametro = []
     for line in tac_lines:
         debug_print(f"Procesando línea: {line}")
         # Ignorar directivas de función y parámetros
@@ -327,8 +334,17 @@ def tac_to_assembly(tac_file):
                 print("solo funciona con un argumento, argumentos:",num_args)
                 code_section.append(f"STORE R0, [0x{target_addr:X}]")
                 asm_position += 1
-
-            # Caso no reconocido
+            elif 'param' in line:
+                # Caso no reconocido
+                if( 'begin_func' in line_back):
+                    a = pila_parametro.pop()
+                    source_addr = var_table[a]
+                    code_section.append(f"LOAD R0, [0x{source_addr:X}]")
+                    asm_position += 1
+                    code_section.append(f"STORE R0, [0x{target_addr:X}]")
+                    asm_position += 1
+                else:
+                    pila_parametro.append(line.split()[1])                    
             else:
                 code_section.append(f"# Expresión no reconocida: {expr}")
                 asm_position += 1
@@ -369,8 +385,9 @@ def tac_to_assembly(tac_file):
                         code_section.append(f"{instr_salto} R0, R1, [0x{label_to_asm[goto_label]:X}]")
                     else:
                         code_section.append(f"{instr_salto} R0, R1, [{goto_label}]")
-
             asm_position += 1
+        if (line != tac_lines[0]):
+            line_back = line
 
         # Salto incondicional: goto etiqueta
         elif line.startswith('goto'):
