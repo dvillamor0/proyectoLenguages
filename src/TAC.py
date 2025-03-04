@@ -152,7 +152,7 @@ def tac_to_assembly(tac_file):
         elif line.startswith('goto'):
             current_position += 1  # JUMP
         elif line.startswith('return'):
-            current_position += 2  # LOAD, RET
+            current_position += 3  # LOAD, OUT HALT
             
     debug_print("Tabla de etiquetas:", label_to_asm)
     
@@ -402,7 +402,9 @@ def tac_to_assembly(tac_file):
                 
             code_section.append(f"LOAD R0, [0x{ret_addr:X}]")
             asm_position += 1
-            code_section.append("RET")
+            code_section.append("OUT R0")
+            asm_position += 1
+            code_section.append("HALT")
             asm_position += 1
 
         # Instrucción no implementada o no reconocida
