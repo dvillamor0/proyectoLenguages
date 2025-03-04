@@ -111,9 +111,12 @@ def tac_to_assembly(tac_file):
     label_to_asm = {}
 
     # Primera pasada para identificar posiciones de etiquetas
-    current_position = len(data_section)-1
+    current_position = len(data_section)
     for line in tac_lines:
-        debug_print("Dirección de inicio de código:", current_position)
+        if line.startswith('begin_func') and 'main' in line:
+            label = 'main'
+            label_to_asm[label] = current_position
+            continue
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
         if line.startswith('L') and ':' in line:
@@ -158,6 +161,14 @@ def tac_to_assembly(tac_file):
     for line in tac_lines:
         debug_print(f"Procesando línea: {line}")
         # Ignorar directivas de función y parámetros
+        if line == tac_lines[0]:
+            label = 'main'
+            target_addr = var_table[target]
+            label_addr = label_to_asm[label]
+            print("address:",label_to_asm,label_addr)
+            code_section.append(f"CALL [0x{label_addr:X}]")
+            asm_position += 1
+            continue
         if line.startswith('begin_func') or line.startswith('end_func') or line.startswith('param'):
             continue
         # Ignorar etiquetas en esta pasada, ya las procesamos en la primera pasada
