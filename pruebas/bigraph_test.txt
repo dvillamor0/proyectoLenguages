@@ -1,0 +1,46 @@
+Fun main() {
+    # Declarar un bigraph vacío
+    Big b1;
+    
+    # Declarar un bigraph con nodos iniciales
+    Big b2 = ["a", "b", "c"];
+    
+    # Añadir nodo
+    b1:nod("a");
+    
+    # Reemplazar nodo
+    b2:nod("c", "d");
+    
+    # Eliminar nodo
+    b2:rnod("b");
+    
+    # Declarar un arreglo de nodos
+    Arreglo nodos = ["a", "b", "c", "d"];
+    
+    # Agregar enlace entre nodos
+    b2:enl(nodos[0], nodos[3]);
+    
+    # Agregar tipo a nodo
+    b2:tip("pc", nodos[0]);
+    
+    # Eliminar tipo de nodo
+    b2:rtip("pc", nodos[0]);
+    
+    # Declarar otro bigraph para composición
+    Big b3;
+    
+    # Componer bigraphs
+    b3:enl(b1, b2);
+    
+    # Eliminar enlace
+    b2:renl(nodos[0], nodos[3]);
+    
+    # Agregar relación padre-hijo
+    b2:hij(nodos[2], nodos[0]);
+    
+    # Establecer límite de enlaces
+    b2:lnk(nodos[0], 2);
+    
+    # Eliminar límite de enlaces
+    b2:rlnk(nodos[0]);
+} 

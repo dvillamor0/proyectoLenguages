@@ -279,3 +279,172 @@ STORE R2, [0x7]
 LOAD R0, [0x7]
 STORE R0, [0x8]
 
+🔹 Código fuente escrito en /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpcwwzikk0.out:
+Fun main() {
+    
+    Big b1;
+    
+    
+    Big b2 = ["a", "b", "c"];
+    
+    
+    b1:nod("a");
+    
+    
+    b2:nod("c", "d");
+    
+    
+    b2:rnod("b");
+    
+    
+    Arreglo nodos = ["a", "b", "c", "d"];
+    
+    
+    b2:enl(nodos[0], nodos[3]);
+    
+    
+    b2:tip("pc", nodos[0]);
+    
+    
+    b2:rtip("pc", nodos[0]);
+    
+    
+    Big b3;
+    
+    
+    b3:enl(b1, b2);
+    
+    
+    b2:renl(nodos[0], nodos[3]);
+    
+    
+    b2:hij(nodos[2], nodos[0]);
+    
+    
+    b2:lnk(nodos[0], 2);
+    
+    
+    b2:rlnk(nodos[0]);
+}
+🔹 Archivos temporales creados:
+OUT: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmp46xwyrfe.out
+ASM: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmp46xwyrfe.asm
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmp46xwyrfe.tac:
+
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmp46xwyrfe.tac:
+
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmp46xwyrfe.asm:
+0
+
+🔹 Código fuente escrito en /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpieo_wjh9.out:
+Fun main() {
+    
+    Big b1;
+    
+    
+    Big b2 = ["a", "b", "c"];
+    
+    
+    b1:nod("a");
+    
+    
+    b2:nod("c", "d");
+    
+    
+    b2:rnod("b");
+    
+    
+    Arreglo nodos = ["a", "b", "c", "d"];
+    
+    
+    b2:enl(nodos[0], nodos[3]);
+    
+    
+    b2:tip("pc", nodos[0]);
+    
+    
+    b2:rtip("pc", nodos[0]);
+    
+    
+    Big b3;
+    
+    
+    b3:enl(b1, b2);
+    
+    
+    b2:renl(nodos[0], nodos[3]);
+    
+    
+    b2:hij(nodos[2], nodos[0]);
+    
+    
+    b2:lnk(nodos[0], 2);
+    
+    
+    b2:rlnk(nodos[0]);
+}
+🔹 Archivos temporales creados:
+OUT: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpf9qu271g.out
+ASM: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpf9qu271g.asm
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpf9qu271g.tac:
+
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpf9qu271g.tac:
+
+🔹 Código fuente escrito en /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpidacnwst.out:
+Fun main() {
+    
+    Big b1;
+    
+    
+    Big b2 = ["a", "b", "c"];
+    
+    
+    b1:nod("a");
+    
+    
+    b2:nod("c", "d");
+    
+    
+    b2:rnod("b");
+    
+    
+    Arreglo nodos = ["a", "b", "c", "d"];
+    
+    
+    b2:enl(nodos[0], nodos[3]);
+    
+    
+    b2:tip("pc", nodos[0]);
+    
+    
+    b2:rtip("pc", nodos[0]);
+    
+    
+    Big b3;
+    
+    
+    b3:enl(b1, b2);
+    
+    
+    b2:renl(nodos[0], nodos[3]);
+    
+    
+    b2:hij(nodos[2], nodos[0]);
+    
+    
+    b2:lnk(nodos[0], 2);
+    
+    
+    b2:rlnk(nodos[0]);
+}
+🔹 Archivos temporales creados:
+OUT: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpxpz7929j.out
+ASM: /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpxpz7929j.asm
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpxpz7929j.tac:
+
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpxpz7929j.tac:
+
+🔹 Contenido de /var/folders/mj/2gc51m7j2tv20m1xxrcmvmtm0000gn/T/tmpxpz7929j.asm:
+0
+2
+

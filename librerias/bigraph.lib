@@ -1,0 +1,359 @@
+# Biblioteca para operaciones con bigrafos según la teoría de Robin Milner
+# Esta biblioteca implementa las funciones básicas para manejar bigrafos
+
+# Crea un nuevo bigrafo vacío
+def _new_bigraph():
+    # En tiempo de ejecución, un bigrafo se representa como un diccionario con:
+    # - nodes: conjunto de nodos
+    # - edges1: conjunto de enlaces1 (source)
+    # - edges2: conjunto de enlaces2 (target)
+    # - types1: diccionario de tipos y sus nodos asociados
+    # - types2: diccionario de nodos y sus tipos asociados
+    # - parents: diccionario de padres y sus hijos
+    # - children: diccionario de hijos y sus padres
+    # - links: diccionario de nodos y sus límites de enlaces
+    return {
+        'nodes': set(),
+        'edges1': {},
+        'edges2': {},
+        'types1': {},
+        'types2': {},
+        'parents': {},
+        'children': {},
+        'links': {}
+    }
+
+# Agrega un nodo al bigrafo
+def _bigraph_add_node(bg, node):
+    bg['nodes'].add(node)
+    bg['edges1'][node] = set()
+    bg['edges2'][node] = set()
+    bg['types2'][node] = set()
+    bg['parents'][node] = set()
+    bg['children'][node] = set()
+    return 1
+
+# Reemplaza un nodo en el bigrafo
+def _bigraph_replace_node(bg, old_node, new_node):
+    if old_node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % old_node)
+        return 0
+    
+    bg['nodes'].remove(old_node)
+    bg['nodes'].add(new_node)
+    
+    # Transferir enlaces
+    if old_node in bg['edges1']:
+        bg['edges1'][new_node] = bg['edges1'][old_node]
+        del bg['edges1'][old_node]
+        
+    if old_node in bg['edges2']:
+        bg['edges2'][new_node] = bg['edges2'][old_node]
+        del bg['edges2'][old_node]
+    
+    # Transferir tipos
+    if old_node in bg['types2']:
+        bg['types2'][new_node] = bg['types2'][old_node]
+        del bg['types2'][old_node]
+        
+    # Actualizar tipos1
+    for type_name, nodes in bg['types1'].items():
+        if old_node in nodes:
+            nodes.remove(old_node)
+            nodes.add(new_node)
+    
+    # Transferir relaciones padre-hijo
+    if old_node in bg['parents']:
+        bg['parents'][new_node] = bg['parents'][old_node]
+        del bg['parents'][old_node]
+        
+    if old_node in bg['children']:
+        bg['children'][new_node] = bg['children'][old_node]
+        del bg['children'][old_node]
+        
+    # Actualizar otras relaciones padre-hijo
+    for parent, children in bg['parents'].items():
+        if old_node in children:
+            children.remove(old_node)
+            children.add(new_node)
+            
+    for child, parents in bg['children'].items():
+        if old_node in parents:
+            parents.remove(old_node)
+            parents.add(new_node)
+            
+    # Transferir límites de enlaces
+    if old_node in bg['links']:
+        bg['links'][new_node] = bg['links'][old_node]
+        del bg['links'][old_node]
+    
+    return 1
+
+# Elimina un nodo del bigrafo
+def _bigraph_remove_node(bg, node):
+    if node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node)
+        return 0
+        
+    bg['nodes'].remove(node)
+    
+    # Eliminar enlaces
+    if node in bg['edges1']:
+        del bg['edges1'][node]
+        
+    if node in bg['edges2']:
+        del bg['edges2'][node]
+        
+    # Eliminar de otros enlaces
+    for source, targets in bg['edges1'].items():
+        if node in targets:
+            targets.remove(node)
+            
+    for target, sources in bg['edges2'].items():
+        if node in sources:
+            sources.remove(node)
+    
+    # Eliminar tipos
+    if node in bg['types2']:
+        del bg['types2'][node]
+        
+    # Eliminar de tipos1
+    for type_name, nodes in bg['types1'].items():
+        if node in nodes:
+            nodes.remove(node)
+    
+    # Eliminar relaciones padre-hijo
+    if node in bg['parents']:
+        del bg['parents'][node]
+        
+    if node in bg['children']:
+        del bg['children'][node]
+        
+    # Eliminar de otras relaciones padre-hijo
+    for parent, children in bg['parents'].items():
+        if node in children:
+            children.remove(node)
+            
+    for child, parents in bg['children'].items():
+        if node in parents:
+            parents.remove(node)
+            
+    # Eliminar límites de enlaces
+    if node in bg['links']:
+        del bg['links'][node]
+    
+    return 1
+
+# Agrega un enlace entre dos nodos
+def _bigraph_add_edge(bg, node1, node2):
+    if node1 not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node1)
+        return 0
+        
+    if node2 not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node2)
+        return 0
+    
+    # Verificar límites de enlaces si existen
+    if node1 in bg['links']:
+        if len(bg['edges1'].get(node1, set())) >= bg['links'][node1]:
+            print("Error: Nodo %s alcanzó su límite de enlaces" % node1)
+            return 0
+            
+    if node2 in bg['links']:
+        if len(bg['edges2'].get(node2, set())) >= bg['links'][node2]:
+            print("Error: Nodo %s alcanzó su límite de enlaces" % node2)
+            return 0
+    
+    # Inicializar conjuntos si no existen
+    if node1 not in bg['edges1']:
+        bg['edges1'][node1] = set()
+        
+    if node2 not in bg['edges2']:
+        bg['edges2'][node2] = set()
+    
+    # Agregar enlaces
+    bg['edges1'][node1].add(node2)
+    bg['edges2'][node2].add(node1)
+    
+    return 1
+
+# Elimina un enlace entre dos nodos
+def _bigraph_remove_edge(bg, node1, node2):
+    if node1 not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node1)
+        return 0
+        
+    if node2 not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node2)
+        return 0
+        
+    if node1 not in bg['edges1']:
+        return 0
+        
+    if node2 not in bg['edges2']:
+        return 0
+    
+    # Eliminar enlaces
+    if node2 in bg['edges1'][node1]:
+        bg['edges1'][node1].remove(node2)
+        
+    if node1 in bg['edges2'][node2]:
+        bg['edges2'][node2].remove(node1)
+    
+    return 1
+
+# Agrega un tipo a un nodo
+def _bigraph_add_type(bg, type_name, node):
+    if node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node)
+        return 0
+    
+    # Inicializar conjuntos si no existen
+    if type_name not in bg['types1']:
+        bg['types1'][type_name] = set()
+        
+    if node not in bg['types2']:
+        bg['types2'][node] = set()
+    
+    # Agregar tipo
+    bg['types1'][type_name].add(node)
+    bg['types2'][node].add(type_name)
+    
+    return 1
+
+# Elimina un tipo de un nodo
+def _bigraph_remove_type(bg, type_name, node):
+    if node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node)
+        return 0
+        
+    if type_name not in bg['types1']:
+        return 0
+        
+    if node not in bg['types2']:
+        return 0
+    
+    # Eliminar tipo
+    if node in bg['types1'][type_name]:
+        bg['types1'][type_name].remove(node)
+        
+    if type_name in bg['types2'][node]:
+        bg['types2'][node].remove(type_name)
+    
+    # Eliminar entradas vacías
+    if not bg['types1'][type_name]:
+        del bg['types1'][type_name]
+        
+    if not bg['types2'][node]:
+        del bg['types2'][node]
+    
+    return 1
+
+# Agrega una relación padre-hijo
+def _bigraph_add_parent(bg, parent, child):
+    if parent not in bg['nodes']:
+        print("Error: Nodo padre %s no existe en el bigrafo" % parent)
+        return 0
+        
+    if child not in bg['nodes']:
+        print("Error: Nodo hijo %s no existe en el bigrafo" % child)
+        return 0
+    
+    # Inicializar conjuntos si no existen
+    if parent not in bg['parents']:
+        bg['parents'][parent] = set()
+        
+    if child not in bg['children']:
+        bg['children'][child] = set()
+    
+    # Agregar relación
+    bg['parents'][parent].add(child)
+    bg['children'][child].add(parent)
+    
+    return 1
+
+# Establece el límite de enlaces para un nodo
+def _bigraph_set_link(bg, node, limit):
+    if node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node)
+        return 0
+    
+    # Convertir a entero
+    try:
+        limit = int(limit)
+    except:
+        print("Error: Límite debe ser un número entero")
+        return 0
+    
+    # Verificar que sea positivo
+    if limit < 0:
+        print("Error: Límite debe ser no negativo")
+        return 0
+    
+    # Establecer límite
+    bg['links'][node] = limit
+    
+    return 1
+
+# Elimina el límite de enlaces para un nodo
+def _bigraph_remove_link(bg, node):
+    if node not in bg['nodes']:
+        print("Error: Nodo %s no existe en el bigrafo" % node)
+        return 0
+        
+    if node in bg['links']:
+        del bg['links'][node]
+    
+    return 1
+
+# Compone dos bigrafos
+def _bigraph_compose(bg1, bg2):
+    # Crear un nuevo bigrafo
+    result = _new_bigraph()
+    
+    # Copiar nodos
+    for node in bg1['nodes']:
+        _bigraph_add_node(result, node)
+        
+    for node in bg2['nodes']:
+        # Evitar duplicados
+        if node not in result['nodes']:
+            _bigraph_add_node(result, node)
+    
+    # Copiar enlaces
+    for node1, targets in bg1['edges1'].items():
+        for node2 in targets:
+            _bigraph_add_edge(result, node1, node2)
+            
+    for node1, targets in bg2['edges1'].items():
+        for node2 in targets:
+            _bigraph_add_edge(result, node1, node2)
+    
+    # Copiar tipos
+    for type_name, nodes in bg1['types1'].items():
+        for node in nodes:
+            _bigraph_add_type(result, type_name, node)
+            
+    for type_name, nodes in bg2['types1'].items():
+        for node in nodes:
+            _bigraph_add_type(result, type_name, node)
+    
+    # Copiar relaciones padre-hijo
+    for parent, children in bg1['parents'].items():
+        for child in children:
+            _bigraph_add_parent(result, parent, child)
+            
+    for parent, children in bg2['parents'].items():
+        for child in children:
+            _bigraph_add_parent(result, parent, child)
+    
+    # Copiar límites de enlaces (prioridad para bg2)
+    for node, limit in bg1['links'].items():
+        if node not in bg2['links']:  # Evitar sobreescribir límites de bg2
+            _bigraph_set_link(result, node, limit)
+            
+    for node, limit in bg2['links'].items():
+        _bigraph_set_link(result, node, limit)
+    
+    return result 

@@ -1,12 +1,12 @@
 Program   ::= Imports Declarations MainBlock
 Imports   ::= ImportStmt*
 ImportStmt ::= "import" LibraryName ";"
-LibraryName ::= "math" | "string"
+LibraryName ::= "math" | "string" | "bigraph"
 
 Declarations ::= ( VarDecl | TypeDecl )*
 VarDecl   ::= Type Identifier ( "=" Expression )? ";"
-Type      ::= BasicType | UserType
-BasicType ::= "int" | "float" | "string"
+Type      ::= BasicType | UserType | "Big"
+BasicType ::= "int" | "float" | "string" | "Arreglo"
 UserType  ::= Identifier
 
 TypeDecl  ::= "type" Identifier "{" FieldDecl* "}"
@@ -18,7 +18,20 @@ Statement ::= Assignment
            | WhileStmt
            | ForStmt
            | IOStmt
+           | BigrStmt
            | ";"
+
+BigrStmt  ::= Identifier ":" BigrOp
+BigrOp    ::= "nod" "(" StringExpr ( "," StringExpr )? ")" ";" 
+           | "rnod" "(" StringExpr ")" ";"
+           | "enl" "(" Expression "," Expression ")" ";"
+           | "renl" "(" Expression "," Expression ")" ";"
+           | "tip" "(" StringExpr "," Expression ")" ";"
+           | "rtip" "(" StringExpr "," Expression ")" ";"
+           | "enl" "(" Identifier "," Identifier ")" ";" /* Para composición de bigrafos */
+           | "hij" "(" Expression "," Expression ")" ";"
+           | "lnk" "(" Expression "," Expression ")" ";"
+           | "rlnk" "(" Expression ")" ";"
 
 IfStmt    ::= "if" "(" BoolExpr ")" "{" Statement* "}"
            ( "else" "{" Statement* "}" )?
@@ -34,7 +47,9 @@ Expression ::= ArithExpr | BoolExpr | StringExpr
 ArithExpr  ::= Term ( ("+" | "-") Term )*
 Term       ::= Factor ( ("*" | "/") Factor )*
 Factor     ::= Power ( "^" Power )*
-Power      ::= Number | Identifier | "(" ArithExpr ")" | FunctionCall
+Power      ::= Number | Identifier | "(" ArithExpr ")" | FunctionCall | ArrayAccess
+
+ArrayAccess ::= Identifier "[" ArithExpr "]"
 
 BoolExpr   ::= BoolTerm ( ("or" | "||") BoolTerm )*
 BoolTerm   ::= BoolFactor ( ("and" | "&&") BoolFactor )*
@@ -56,3 +71,7 @@ Float      ::= Digit+ "." Digit+
 Digit      ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 StringExpr ::= StringLiteral
 StringLiteral ::= '"' [^"]* '"' | "'" [^']* "'"
+
+Assignment ::= Identifier "=" Expression ";"
+            | Identifier "[" ArithExpr "]" "=" Expression ";" /* Array assignment */
+            | "Big" Identifier ( "=" "[" StringExpr ( "," StringExpr )* "]" )? ";" /* Bigraph declaration */

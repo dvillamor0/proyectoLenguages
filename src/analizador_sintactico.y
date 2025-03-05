@@ -27,12 +27,16 @@
 }
 
 // Declaración de tokens con sus tipos de datos asociados.
-%token <symbol_index> TOKEN_ID TOKEN_NUMBER
+%token <symbol_index> TOKEN_ID TOKEN_NUMBER TOKEN_STRING
 %token TOKEN_FUN TOKEN_RET TOKEN_IF TOKEN_WHILE TOKEN_ENT TOKEN_FLO TOKEN_NAT TOKEN_ARREGLO
 %token TOKEN_RELOP_LT TOKEN_RELOP_LE TOKEN_RELOP_EQ TOKEN_RELOP_NE TOKEN_RELOP_GT TOKEN_RELOP_GE
 %token TOKEN_PLUS TOKEN_MINUS TOKEN_MULT TOKEN_DIV TOKEN_ASSIGN
 %token TOKEN_SEMICOLON TOKEN_COMMA TOKEN_LPAREN TOKEN_RPAREN TOKEN_LBRACE TOKEN_RBRACE
-%token TOKEN_LBRACK TOKEN_RBRACK 
+%token TOKEN_LBRACK TOKEN_RBRACK
+
+/* Bigraph operation tokens */
+%token TOKEN_BIG TOKEN_NOD TOKEN_RNOD TOKEN_ENL TOKEN_RENL TOKEN_TIP TOKEN_RTIP TOKEN_HIJ TOKEN_LNK TOKEN_RLNK
+
 %type <symbol_index> relop type
 
 // Declaración de no terminales y su tipo asociado (puntero a nodo).
@@ -41,6 +45,9 @@
 %type <node> if_stmt while_stmt return_stmt condition expr arg_list
 %type <node> array_decl array_literal array_access array_elements
 
+/* Bigraph non-terminals */
+%type <node> bigraph_decl bigraph_init bigraph_operation bigraph_array_access
+%type <node> node_list string_expr
 
 // Declaración de la precedencia y asociatividad de los operadores.
 %left TOKEN_PLUS TOKEN_MINUS
@@ -176,6 +183,8 @@ statement
     | while_stmt
     | return_stmt
     | array_decl
+    | bigraph_operation
+    | TOKEN_SEMICOLON              { $$ = NULL; }
     ;
 
 /*
@@ -380,6 +389,138 @@ array_access
         Node *id = create_node(NODE_IDENTIFIER, NULL, NULL);
         id->symbol_index = $1;
         $$ = create_node(NODE_ARRAY_ACCESS, id, $3);
+    }
+    ;
+
+/* 
+ * Bigraph-related grammar rules
+ */
+
+// Bigraph declaration
+bigraph_decl
+    : TOKEN_BIG TOKEN_ID TOKEN_SEMICOLON {
+        // Declare empty bigraph
+        Node *node = create_node(NODE_BIGRAPH_DECL, NULL, NULL);
+        node->symbol_index = $2;
+        $$ = node;
+    }
+    | TOKEN_BIG TOKEN_ID TOKEN_ASSIGN bigraph_init TOKEN_SEMICOLON {
+        // Declare and initialize bigraph
+        Node *node = create_node(NODE_BIGRAPH_DECL, $4, NULL);
+        node->symbol_index = $2;
+        $$ = node;
+    }
+    ;
+
+// Bigraph initialization with array of nodes
+bigraph_init
+    : TOKEN_LBRACK node_list TOKEN_RBRACK {
+        $$ = $2;
+    }
+    ;
+
+// List of node names for initialization
+node_list
+    : string_expr {
+        $$ = $1;
+    }
+    | node_list TOKEN_COMMA string_expr {
+        $$ = $1;
+        Node *last = $1;
+        while(last->next) last = last->next;
+        last->next = $3;
+    }
+    ;
+
+// String expression (for node names)
+string_expr
+    : TOKEN_STRING {
+        Node *node = create_node(NODE_STRING_LITERAL, NULL, NULL);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    ;
+
+// Array access for bigraph operations
+bigraph_array_access
+    : TOKEN_ID TOKEN_LBRACK expr TOKEN_RBRACK {
+        Node *node = create_node(NODE_ARRAY_ACCESS, NULL, $3);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    ;
+
+// Bigraph operations
+bigraph_operation
+    : TOKEN_ID TOKEN_NOD TOKEN_LPAREN string_expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Add node: b1:nod("a");
+        Node *node = create_node(NODE_BIGRAPH_ADD_NODE, $4, NULL);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_NOD TOKEN_LPAREN string_expr TOKEN_COMMA string_expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Replace node: b2:nod("c","d");
+        Node *node = create_node(NODE_BIGRAPH_REPLACE_NODE, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_RNOD TOKEN_LPAREN string_expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Remove node: b2:rnod("b");
+        Node *node = create_node(NODE_BIGRAPH_REMOVE_NODE, $4, NULL);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_ENL TOKEN_LPAREN expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Add edge: b2:enl(nodos[0],nodos[3]);
+        Node *node = create_node(NODE_BIGRAPH_ADD_EDGE, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_RENL TOKEN_LPAREN expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Remove edge: b2:renl(nodos[0],nodos[3]);
+        Node *node = create_node(NODE_BIGRAPH_REMOVE_EDGE, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_TIP TOKEN_LPAREN string_expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Add type relation: b2:tip("pc",nodos[0]);
+        Node *node = create_node(NODE_BIGRAPH_ADD_TYPE, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_RTIP TOKEN_LPAREN string_expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Remove type relation: b2:rtip("pc",nodos[0]);
+        Node *node = create_node(NODE_BIGRAPH_REMOVE_TYPE, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_ENL TOKEN_LPAREN TOKEN_ID TOKEN_COMMA TOKEN_ID TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Compose bigraphs: b3:enl(b1,b2);
+        Node *left = create_node(NODE_IDENTIFIER, NULL, NULL);
+        left->symbol_index = $4;
+        Node *right = create_node(NODE_IDENTIFIER, NULL, NULL);
+        right->symbol_index = $6;
+        Node *node = create_node(NODE_BIGRAPH_COMPOSE, left, right);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_HIJ TOKEN_LPAREN expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Add parent-child relation: b2:hij(nodos[2],nodos[0]);
+        Node *node = create_node(NODE_BIGRAPH_ADD_PARENT, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_LNK TOKEN_LPAREN expr TOKEN_COMMA expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Set link count: b2:lnk(nodos[0],2);
+        Node *node = create_node(NODE_BIGRAPH_SET_LINK, $4, $6);
+        node->symbol_index = $1;
+        $$ = node;
+    }
+    | TOKEN_ID TOKEN_RLNK TOKEN_LPAREN expr TOKEN_RPAREN TOKEN_SEMICOLON {
+        // Remove link count: b2:rlnk(nodos[0]);
+        Node *node = create_node(NODE_BIGRAPH_REMOVE_LINK, $4, NULL);
+        node->symbol_index = $1;
+        $$ = node;
     }
     ;
 

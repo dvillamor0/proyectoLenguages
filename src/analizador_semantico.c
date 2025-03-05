@@ -11,6 +11,7 @@ extern struct {
     union {
         double number_value;
         char *string_value;
+        unsigned int natural_value;
     } value;
 } symbol_table[];
 
@@ -23,7 +24,9 @@ typedef enum {
     TYPE_VOID,
     TYPE_ARRAY_INTEGER,  
     TYPE_ARRAY_FLOAT,    
-    TYPE_ARRAY_NATURAL   
+    TYPE_ARRAY_NATURAL,
+    TYPE_BIGRAPH,        // Tipo para bigrafos
+    TYPE_STRING          // Tipo para strings
 } DataType;
 
 // Estructura que contiene la informacion de un simbolo
@@ -324,6 +327,104 @@ static DataType check_types(Node *node, SymbolTable *table) {
     }
 }
 
+// Añadimos funciones de verificación para operaciones de bigrafo
+static void check_bigraph_operation(Node *node, SymbolTable *table) {
+    if (!node) return;
+    
+    char *bigraph_id = symbol_table[node->symbol_index].name;
+    SymbolInfo *info = lookup_symbol(table, bigraph_id);
+    
+    if (!info) {
+        printf("Error semántico: El bigrafo '%s' no ha sido declarado.\n", bigraph_id);
+        return;
+    }
+    
+    if (info->type != TYPE_BIGRAPH) {
+        printf("Error semántico: '%s' no es un bigrafo.\n", bigraph_id);
+        return;
+    }
+    
+    // Verificaciones específicas según la operación
+    switch (node->type) {
+        case NODE_BIGRAPH_ADD_NODE:
+        case NODE_BIGRAPH_REMOVE_NODE:
+            // Comprobar que el argumento es una cadena
+            if (node->left && node->left->type == NODE_STRING_LITERAL) {
+                // El argumento es una cadena, correcto
+            } else {
+                printf("Error semántico: Se esperaba una cadena como nombre de nodo en operación sobre bigrafo '%s'.\n", bigraph_id);
+            }
+            break;
+            
+        case NODE_BIGRAPH_REPLACE_NODE:
+            // Comprobar que ambos argumentos son cadenas
+            if (node->left && node->left->type == NODE_STRING_LITERAL &&
+                node->right && node->right->type == NODE_STRING_LITERAL) {
+                // Ambos argumentos son cadenas, correcto
+            } else {
+                printf("Error semántico: Se esperaban dos cadenas como nombres de nodos en operación de reemplazo sobre bigrafo '%s'.\n", bigraph_id);
+            }
+            break;
+            
+        case NODE_BIGRAPH_ADD_EDGE:
+        case NODE_BIGRAPH_REMOVE_EDGE:
+        case NODE_BIGRAPH_ADD_PARENT:
+            // Comprobar expresiones para los nodos
+            if (node->left) check_types(node->left, table);
+            if (node->right) check_types(node->right, table);
+            break;
+            
+        case NODE_BIGRAPH_ADD_TYPE:
+        case NODE_BIGRAPH_REMOVE_TYPE:
+            // Comprobar que el primer argumento es una cadena
+            if (node->left && node->left->type == NODE_STRING_LITERAL) {
+                // El primer argumento es una cadena, correcto
+                if (node->right) check_types(node->right, table);
+            } else {
+                printf("Error semántico: Se esperaba una cadena como tipo en operación sobre bigrafo '%s'.\n", bigraph_id);
+            }
+            break;
+            
+        case NODE_BIGRAPH_SET_LINK:
+            // Comprobar que primer argumento es un nodo y el segundo es un número (natural)
+            if (node->left) check_types(node->left, table);
+            if (node->right) {
+                DataType right_type = check_types(node->right, table);
+                if (right_type != TYPE_INTEGER && right_type != TYPE_NATURAL) {
+                    printf("Error semántico: Se esperaba un número natural para el límite de enlace en bigrafo '%s'.\n", bigraph_id);
+                }
+            }
+            break;
+            
+        case NODE_BIGRAPH_REMOVE_LINK:
+            // Comprobar que el argumento es un nodo
+            if (node->left) check_types(node->left, table);
+            break;
+            
+        case NODE_BIGRAPH_COMPOSE:
+            // Comprobar que los argumentos son bigrafos
+            if (node->left && node->left->type == NODE_IDENTIFIER) {
+                char *left_id = symbol_table[node->left->symbol_index].name;
+                SymbolInfo *left_info = lookup_symbol(table, left_id);
+                if (!left_info || left_info->type != TYPE_BIGRAPH) {
+                    printf("Error semántico: '%s' no es un bigrafo válido para composición.\n", left_id);
+                }
+            }
+            
+            if (node->right && node->right->type == NODE_IDENTIFIER) {
+                char *right_id = symbol_table[node->right->symbol_index].name;
+                SymbolInfo *right_info = lookup_symbol(table, right_id);
+                if (!right_info || right_info->type != TYPE_BIGRAPH) {
+                    printf("Error semántico: '%s' no es un bigrafo válido para composición.\n", right_id);
+                }
+            }
+            break;
+            
+        default:
+            break;
+    }
+}
+
 // Funcion: analyze_semantics
 // ----------------------------
 // Realiza el analisis semantico sobre el arbol de sintaxis abstracta (AST).
@@ -462,10 +563,45 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
             DataType return_type = check_types(root->left, table);
             break;
         }
-
         
+        case NODE_BIGRAPH_DECL: {
+            // Declaración de bigrafo
+            char *name = symbol_table[root->symbol_index].name;
+            SymbolInfo *info = lookup_symbol(table, name);
+            
+            if (info) {
+                printf("Error semántico: El bigrafo '%s' ya ha sido declarado.\n", name);
+            } else {
+                add_symbol(table, name, TYPE_BIGRAPH);
+                
+                // Si hay nodos iniciales (bigrafo con array de nodos)
+                if (root->left) {
+                    Node *current = root->left;
+                    while (current) {
+                        if (current->type != NODE_STRING_LITERAL) {
+                            printf("Error semántico: Los nodos iniciales de un bigrafo deben ser cadenas de texto.\n");
+                        }
+                        current = current->next;
+                    }
+                }
+            }
+            break;
+        }
+        
+        case NODE_BIGRAPH_ADD_NODE:
+        case NODE_BIGRAPH_REPLACE_NODE:
+        case NODE_BIGRAPH_REMOVE_NODE:
+        case NODE_BIGRAPH_ADD_EDGE:
+        case NODE_BIGRAPH_REMOVE_EDGE:
+        case NODE_BIGRAPH_ADD_TYPE:
+        case NODE_BIGRAPH_REMOVE_TYPE:
+        case NODE_BIGRAPH_ADD_PARENT:
+        case NODE_BIGRAPH_SET_LINK:
+        case NODE_BIGRAPH_REMOVE_LINK:
+        case NODE_BIGRAPH_COMPOSE:
+            check_bigraph_operation(root, table);
+            break;
     }
-    
     
     if (root->next) {
         analyze_semantics(root->next, table);

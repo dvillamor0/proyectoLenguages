@@ -22,6 +22,7 @@ from vista.Diseno_GUI import *
 from vista.prueba import *
 import subprocess
 import os
+import platform
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -216,8 +217,12 @@ class MainWindow(QMainWindow):
             temp_file.write(texto.encode("utf-8"))
             temp_file_path = temp_file.name
 
-        # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
-        flex_executable = "./compilados/preprocesador.exe"  # Asegúrate de que `scanner` es el ejecutable de Flex generado con `gcc`
+        # Determinar el nombre del ejecutable según el sistema operativo
+        if platform.system() == "Windows":
+            flex_executable = "./compilados/preprocesador.exe"
+        else:
+            flex_executable = "./compilados/preprocesador"  # Para macOS y Linux
+            
         try:
             result = subprocess.run(
                 [flex_executable, temp_file_path],  # Ejecuta el scanner con el archivo temporal
@@ -239,7 +244,9 @@ class MainWindow(QMainWindow):
         codigo = self.ui.codigo_preprocesado_input.toPlainText()
 
         # Definir rutas absolutas para evitar problemas de ubicación
-        compiler_executable = os.path.abspath("./compilados/compiler.exe")
+        compiler_executable = os.path.abspath("./compilados/compiler")
+        if platform.system() == "Windows":
+            compiler_executable += ".exe"
         output_file = "./archivos_salida/compilador.out"
         output_file_tac = "./archivos_salida/compilador.tac"
         output_file_asm = "./archivos_salida/compilador.asm"
@@ -270,51 +277,62 @@ class MainWindow(QMainWindow):
                 capture_output=True,  # Captura salida para depuración
                 text=True
             )
-
+            
+            log_debug(f"🔹 Resultado de la ejecución del compilador:\nSalida: {result.stdout}\nError: {result.stderr}")
 
             # Esperar a que se genere el archivo de salida (.tac)
-            timeout = 5  # Tiempo máximo de espera en segundos
-            start_time = time.time()
-
-            while not os.path.exists(temp_input_tac):
-                if time.time() - start_time > timeout:
-                    self.ui.Output.setPlainText("[Error]: Tiempo de espera agotado. El compilador no generó el archivo .tac")
+            time.sleep(0.1)
+            
+            # Verificar si el archivo .tac se generó correctamente
+            if os.path.exists(temp_input_tac):
+                with open(temp_input_tac, "r", encoding="utf-8") as tac_file:
+                    tac_content = tac_file.read()
+                log_debug(f"🔹 Contenido de {temp_input_tac}:\n{tac_content}")
+                
+                # Verificar si el archivo TAC está vacío
+                if not tac_content.strip():
+                    log_debug("⚠️ El archivo TAC está vacío. Verifique la generación de código intermedio para operaciones BigGraph.")
+                    self.ui.Output.setPlainText("Error: El archivo TAC está vacío. No se pudo generar código para operaciones BigGraph.")
                     return
-                time.sleep(0.1)  # Esperar 100ms antes de volver a comprobar
+            else:
+                log_debug(f"⚠️ No se pudo encontrar el archivo TAC: {temp_input_tac}")
+                self.ui.Output.setPlainText("Error: No se generó el archivo TAC.")
+                return
             
-            with open(temp_input_tac, "r", encoding="utf-8") as source_file:
-                source_code = source_file.read()
-            log_debug(f"🔹 Contenido de {temp_input_tac}:\n{source_code}")
-            
-            with open(temp_input_tac, "r", encoding="utf-8") as source_file:
-                source_code = source_file.read()
-            log_debug(f"🔹 Contenido de {temp_input_tac}:\n{source_code}")
-            
-            # # Ejecutar TAC.py con el archivo de salida del compilador
+            # Ejecutar TAC.py con el archivo de salida del compilador
+            log_debug(f"🔹 Ejecutando: python {tac_script} {temp_input_tac}")
             result_tac = subprocess.run(
-                ["python", tac_script, temp_input_tac],
-                capture_output=False,
-                text=False
+                ["python3", tac_script, temp_input_tac],
+                capture_output=True,
+                text=True
             )
             
-            timeout = 5  # Tiempo máximo de espera en segundos
-            start_time = time.time()
-
-            while not os.path.exists(temp_asm_path):
-                if time.time() - start_time > timeout:
-                    self.ui.Output.setPlainText("[Error]: Tiempo de espera agotado. El compilador no generó el archivo .tac")
-                    return
-                time.sleep(0.1)  # Esperar 100ms antes de volver a comprobar
-
-            # # Verificar si la conversión TAC → ASM fue exitosa
+            log_debug(f"🔹 Resultado de la ejecución de TAC.py:\nSalida: {result_tac.stdout}\nError: {result_tac.stderr}")
+            
+            # Verificar si la conversión TAC → ASM fue exitosa
             if result_tac.returncode != 0:
                 self.ui.Output.setPlainText(f"[Error TAC]: {result_tac.stderr}")
                 return
             
-            with open(temp_asm_path, "r", encoding="utf-8") as asm_file:
-                asm_code = asm_file.read()
-            log_debug(f"🔹 Contenido de {temp_asm_path}:\n{asm_code}")
-            self.ui.assembler_input.setPlainText(asm_code)
+            # Esperar a que se genere el archivo de salida (.asm)
+            time.sleep(0.1)
+            
+            # Verificar si el archivo .asm se generó correctamente
+            if os.path.exists(temp_asm_path):
+                with open(temp_asm_path, "r", encoding="utf-8") as asm_file:
+                    asm_content = asm_file.read()
+                log_debug(f"🔹 Contenido de {temp_asm_path}:\n{asm_content}")
+                
+                # Verificar si el archivo ASM tiene contenido útil
+                if len(asm_content.strip().split('\n')) <= 2:
+                    log_debug("⚠️ El archivo ASM tiene muy pocas instrucciones. Posible problema con la generación de código BigGraph.")
+                
+                # Actualizar la UI con el contenido ASM
+                self.ui.assembler_input.setPlainText(asm_content)
+            else:
+                log_debug(f"⚠️ No se pudo encontrar el archivo ASM: {temp_asm_path}")
+                self.ui.Output.setPlainText("Error: No se generó el archivo ASM.")
+                return
 
         finally:
             # Limpiar archivo temporal de entrada si aún existe
@@ -335,7 +353,7 @@ class MainWindow(QMainWindow):
 
         # Ejecutar el analizador léxico en Flex (asumiendo que ya compilaste el ejecutable)
         flex_executable = "./compilados/ensamblador"
-        if os.name != 'posix':
+        if platform.system() == "Windows":
             flex_executable += ".exe"
         try:
             result = subprocess.run(
@@ -367,7 +385,7 @@ class MainWindow(QMainWindow):
 
             # Definir el comando y agregar la extensión si es Windows
             comando = "./compilados/linkerloader"
-            if os.name != 'posix':
+            if platform.system() == "Windows":
                 comando += ".exe"
 
             # Ejecutar el linkerloader pasando los tres parámetros:

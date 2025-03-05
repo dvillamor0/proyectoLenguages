@@ -13,6 +13,7 @@
     #define SYMTAB_IDENTIFIER 1
     #define SYMTAB_NUMBER 2
     #define SYMTAB_NATURAL 3
+    #define SYMTAB_STRING 4
 
     // Estructura que representa una entrada en la tabla de simbolos.
     typedef struct {
@@ -22,7 +23,6 @@
             double number_value;  // Valor numerico (para numeros).
             char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
             unsigned int natural_value; // Valor para numeros naturales.
-
         } value;
     } SymbolEntry;
 
@@ -33,6 +33,7 @@
     // Declaracion de las funciones para instalar identificadores y numeros.
     int install_id(char *lexeme);
     int install_num(char *lexeme);
+    int install_string(char *lexeme);
 %}
 
 %option noyywrap
@@ -45,6 +46,7 @@ ID          {LETTER}({LETTER}|{DIGIT})*
 NUMBER      {DIGIT}+(\.{DIGIT}+)?([Ee][+-]?{DIGIT}+)?  
 WHITESPACE  [ \t\n\r]+
 COMMENT     #[^\n]*\n
+STRING      \"[^\"]*\"
 
 %%
 {WHITESPACE}    { /* Skip whitespace */ }
@@ -59,6 +61,17 @@ COMMENT     #[^\n]*\n
 "Nat"       { return TOKEN_NAT; }
 "Arreglo"   { return TOKEN_ARREGLO; }
 
+/* Bigraph tokens */
+"Big"       { return TOKEN_BIG; }
+":nod"      { return TOKEN_NOD; }
+":rnod"     { return TOKEN_RNOD; }
+":enl"      { return TOKEN_ENL; }
+":renl"     { return TOKEN_RENL; }
+":tip"      { return TOKEN_TIP; }
+":rtip"     { return TOKEN_RTIP; }
+":hij"      { return TOKEN_HIJ; }
+":lnk"      { return TOKEN_LNK; }
+":rlnk"     { return TOKEN_RLNK; }
 
 "<"         { return TOKEN_RELOP_LT; }
 "<="        { return TOKEN_RELOP_LE; }
@@ -83,6 +96,7 @@ COMMENT     #[^\n]*\n
 
 {ID}        { yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
 {NUMBER}    { yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
+{STRING}    { yylval.symbol_index = install_string(yytext); return TOKEN_STRING; }
 
 .           { printf("Lexical Error: Unexpected character %s\n", yytext); }
 %%
@@ -146,5 +160,32 @@ int install_num(char *lexeme) {
     symbol_table[symbol_count].name = strdup(lexeme);
     symbol_table[symbol_count].type = SYMTAB_NUMBER;
     symbol_table[symbol_count].value.number_value = atof(lexeme);
+    return symbol_count++;
+}
+
+/*
+ * Funcion: install_string
+ * -----------------------
+ * Instala una cadena en la tabla de simbolos.
+ *
+ * Parametro:
+ *   lexeme - Cadena entre comillas.
+ *
+ * Retorna:
+ *   Indice del simbolo en la tabla.
+ */
+int install_string(char *lexeme) {
+    if (symbol_count >= MAX_SYMBOLS) {
+        fprintf(stderr, "Symbol table full\n");
+        exit(1);
+    }
+    
+    // Quitar las comillas
+    char *str = strdup(lexeme + 1);  // Omitir la comilla inicial
+    str[strlen(str) - 1] = '\0';     // Quitar la comilla final
+    
+    symbol_table[symbol_count].name = strdup(lexeme);
+    symbol_table[symbol_count].type = SYMTAB_STRING;
+    symbol_table[symbol_count].value.string_value = str;
     return symbol_count++;
 }

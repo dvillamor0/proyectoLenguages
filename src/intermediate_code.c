@@ -326,15 +326,178 @@ static void process_array_declaration(Node *node, FILE *output) {
     }
 }
 
+// Nuevas funciones para generar código para operaciones de bigrafos
+static void process_bigraph_declaration(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    
+    // Declara un bigraph vacío
+    fprintf(output, "# Declaración de bigraph %s\n", bigraph_name);
+    fprintf(output, "%s = _new_bigraph()\n", bigraph_name);
+    
+    // Si tiene nodos iniciales, los agrega
+    if (node->left) {
+        Node *current = node->left;
+        int node_index = 0;
+        
+        fprintf(output, "# Inicialización con nodos\n");
+        
+        while (current) {
+            if (current->type == NODE_STRING_LITERAL) {
+                char *node_name = symbol_table[current->symbol_index].name;
+                // Quitar comillas del nombre del nodo
+                char *clean_name = strdup(node_name + 1);
+                clean_name[strlen(clean_name) - 1] = '\0';
+                
+                fprintf(output, "_bigraph_add_node(%s, %s)\n", bigraph_name, clean_name);
+                free(clean_name);
+            }
+            current = current->next;
+            node_index++;
+        }
+    }
+}
+
+static void process_bigraph_add_node(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *node_name = symbol_table[node->left->symbol_index].name;
+    
+    // Quitar comillas del nombre del nodo
+    char *clean_name = strdup(node_name + 1);
+    clean_name[strlen(clean_name) - 1] = '\0';
+    
+    fprintf(output, "# Agregar nodo a bigraph\n");
+    fprintf(output, "_bigraph_add_node(%s, %s)\n", bigraph_name, clean_name);
+    free(clean_name);
+}
+
+static void process_bigraph_replace_node(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *old_node = symbol_table[node->left->symbol_index].name;
+    char *new_node = symbol_table[node->right->symbol_index].name;
+    
+    // Quitar comillas de los nombres de nodos
+    char *clean_old = strdup(old_node + 1);
+    clean_old[strlen(clean_old) - 1] = '\0';
+    
+    char *clean_new = strdup(new_node + 1);
+    clean_new[strlen(clean_new) - 1] = '\0';
+    
+    fprintf(output, "# Reemplazar nodo en bigraph\n");
+    fprintf(output, "_bigraph_replace_node(%s, %s, %s)\n", bigraph_name, clean_old, clean_new);
+    
+    free(clean_old);
+    free(clean_new);
+}
+
+static void process_bigraph_remove_node(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *node_name = symbol_table[node->left->symbol_index].name;
+    
+    // Quitar comillas del nombre del nodo
+    char *clean_name = strdup(node_name + 1);
+    clean_name[strlen(clean_name) - 1] = '\0';
+    
+    fprintf(output, "# Eliminar nodo de bigraph\n");
+    fprintf(output, "_bigraph_remove_node(%s, %s)\n", bigraph_name, clean_name);
+    
+    free(clean_name);
+}
+
+static void process_bigraph_add_edge(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *left_node = generate_code(node->left, output);
+    char *right_node = generate_code(node->right, output);
+    
+    fprintf(output, "# Agregar enlace entre nodos\n");
+    fprintf(output, "_bigraph_add_edge(%s, %s, %s)\n", bigraph_name, left_node, right_node);
+}
+
+static void process_bigraph_remove_edge(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *left_node = generate_code(node->left, output);
+    char *right_node = generate_code(node->right, output);
+    
+    fprintf(output, "# Eliminar enlace entre nodos\n");
+    fprintf(output, "_bigraph_remove_edge(%s, %s, %s)\n", bigraph_name, left_node, right_node);
+}
+
+static void process_bigraph_add_type(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *type_name = symbol_table[node->left->symbol_index].name;
+    char *node_name = generate_code(node->right, output);
+    
+    // Quitar comillas del nombre del tipo
+    char *clean_type = strdup(type_name + 1);
+    clean_type[strlen(clean_type) - 1] = '\0';
+    
+    fprintf(output, "# Agregar tipo a nodo\n");
+    fprintf(output, "_bigraph_add_type(%s, %s, %s)\n", bigraph_name, clean_type, node_name);
+    
+    free(clean_type);
+}
+
+static void process_bigraph_remove_type(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *type_name = symbol_table[node->left->symbol_index].name;
+    char *node_name = generate_code(node->right, output);
+    
+    // Quitar comillas del nombre del tipo
+    char *clean_type = strdup(type_name + 1);
+    clean_type[strlen(clean_type) - 1] = '\0';
+    
+    fprintf(output, "# Eliminar tipo de nodo\n");
+    fprintf(output, "_bigraph_remove_type(%s, %s, %s)\n", bigraph_name, clean_type, node_name);
+    
+    free(clean_type);
+}
+
+static void process_bigraph_add_parent(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *parent_node = generate_code(node->left, output);
+    char *child_node = generate_code(node->right, output);
+    
+    fprintf(output, "# Agregar relación padre-hijo\n");
+    fprintf(output, "_bigraph_add_parent(%s, %s, %s)\n", bigraph_name, parent_node, child_node);
+}
+
+static void process_bigraph_set_link(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *node_name = generate_code(node->left, output);
+    char *link_count = generate_code(node->right, output);
+    
+    fprintf(output, "# Establecer límite de enlaces\n");
+    fprintf(output, "_bigraph_set_link(%s, %s, %s)\n", bigraph_name, node_name, link_count);
+}
+
+static void process_bigraph_remove_link(Node *node, FILE *output) {
+    char *bigraph_name = symbol_table[node->symbol_index].name;
+    char *node_name = generate_code(node->left, output);
+    
+    fprintf(output, "# Eliminar límite de enlaces\n");
+    fprintf(output, "_bigraph_remove_link(%s, %s)\n", bigraph_name, node_name);
+}
+
+static void process_bigraph_compose(Node *node, FILE *output) {
+    char *result_bigraph = symbol_table[node->symbol_index].name;
+    char *left_bigraph = symbol_table[node->left->symbol_index].name;
+    char *right_bigraph = symbol_table[node->right->symbol_index].name;
+    
+    fprintf(output, "# Componer bigrafos\n");
+    fprintf(output, "%s = _bigraph_compose(%s, %s)\n", result_bigraph, left_bigraph, right_bigraph);
+}
+
 // Funcion: generate_code
 // -----------------------
 // Genera el codigo intermedio de forma recursiva para el AST.
 // Dependiendo del tipo de nodo, se invocan diferentes funciones
 // para procesar la operacion correspondiente.
 static char *generate_code(Node *node, FILE *output) {
-    if (!node) return NULL;
+    if (!node) return strdup("");
     
     char *result = NULL;
+    
+    // Log para debugging
+    fprintf(stdout, "Generating code for node type: %d\n", node->type);
     
     switch (node->type) {
         case NODE_PROGRAM:
@@ -430,6 +593,71 @@ static char *generate_code(Node *node, FILE *output) {
         case NODE_ARRAY_TYPE:
             // These nodes are handled by their parent nodes
             break;
+            
+        case NODE_BIGRAPH_DECL:
+            fprintf(stdout, "Processing BigGraph declaration: symbol_index=%d\n", node->symbol_index);
+            process_bigraph_declaration(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_ADD_NODE:
+            fprintf(stdout, "Processing BigGraph add node\n");
+            process_bigraph_add_node(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_REPLACE_NODE:
+            fprintf(stdout, "Processing BigGraph replace node\n");
+            process_bigraph_replace_node(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_REMOVE_NODE:
+            fprintf(stdout, "Processing BigGraph remove node\n");
+            process_bigraph_remove_node(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_ADD_EDGE:
+            fprintf(stdout, "Processing BigGraph add edge\n");
+            process_bigraph_add_edge(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_REMOVE_EDGE:
+            fprintf(stdout, "Processing BigGraph remove edge\n");
+            process_bigraph_remove_edge(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_ADD_TYPE:
+            fprintf(stdout, "Processing BigGraph add type\n");
+            process_bigraph_add_type(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_REMOVE_TYPE:
+            fprintf(stdout, "Processing BigGraph remove type\n");
+            process_bigraph_remove_type(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_ADD_PARENT:
+            fprintf(stdout, "Processing BigGraph add parent\n");
+            process_bigraph_add_parent(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_SET_LINK:
+            fprintf(stdout, "Processing BigGraph set link\n");
+            process_bigraph_set_link(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_REMOVE_LINK:
+            fprintf(stdout, "Processing BigGraph remove link\n");
+            process_bigraph_remove_link(node, output);
+            return strdup("");
+            
+        case NODE_BIGRAPH_COMPOSE:
+            fprintf(stdout, "Processing BigGraph compose\n");
+            process_bigraph_compose(node, output);
+            return strdup("");
+            
+        case NODE_STRING_LITERAL: {
+            char *str_value = symbol_table[node->symbol_index].name;
+            return strdup(str_value);
+        }
     }
     
     if (node->next && node->type != NODE_BLOCK) {
