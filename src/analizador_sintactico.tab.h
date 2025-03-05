@@ -62,23 +62,27 @@ extern int yydebug;
     TOKEN_WHILE = 263,             /* TOKEN_WHILE  */
     TOKEN_ENT = 264,               /* TOKEN_ENT  */
     TOKEN_FLO = 265,               /* TOKEN_FLO  */
-    TOKEN_RELOP_LT = 266,          /* TOKEN_RELOP_LT  */
-    TOKEN_RELOP_LE = 267,          /* TOKEN_RELOP_LE  */
-    TOKEN_RELOP_EQ = 268,          /* TOKEN_RELOP_EQ  */
-    TOKEN_RELOP_NE = 269,          /* TOKEN_RELOP_NE  */
-    TOKEN_RELOP_GT = 270,          /* TOKEN_RELOP_GT  */
-    TOKEN_RELOP_GE = 271,          /* TOKEN_RELOP_GE  */
-    TOKEN_PLUS = 272,              /* TOKEN_PLUS  */
-    TOKEN_MINUS = 273,             /* TOKEN_MINUS  */
-    TOKEN_MULT = 274,              /* TOKEN_MULT  */
-    TOKEN_DIV = 275,               /* TOKEN_DIV  */
-    TOKEN_ASSIGN = 276,            /* TOKEN_ASSIGN  */
-    TOKEN_SEMICOLON = 277,         /* TOKEN_SEMICOLON  */
-    TOKEN_COMMA = 278,             /* TOKEN_COMMA  */
-    TOKEN_LPAREN = 279,            /* TOKEN_LPAREN  */
-    TOKEN_RPAREN = 280,            /* TOKEN_RPAREN  */
-    TOKEN_LBRACE = 281,            /* TOKEN_LBRACE  */
-    TOKEN_RBRACE = 282             /* TOKEN_RBRACE  */
+    TOKEN_NAT = 266,               /* TOKEN_NAT  */
+    TOKEN_ARREGLO = 267,           /* TOKEN_ARREGLO  */
+    TOKEN_RELOP_LT = 268,          /* TOKEN_RELOP_LT  */
+    TOKEN_RELOP_LE = 269,          /* TOKEN_RELOP_LE  */
+    TOKEN_RELOP_EQ = 270,          /* TOKEN_RELOP_EQ  */
+    TOKEN_RELOP_NE = 271,          /* TOKEN_RELOP_NE  */
+    TOKEN_RELOP_GT = 272,          /* TOKEN_RELOP_GT  */
+    TOKEN_RELOP_GE = 273,          /* TOKEN_RELOP_GE  */
+    TOKEN_PLUS = 274,              /* TOKEN_PLUS  */
+    TOKEN_MINUS = 275,             /* TOKEN_MINUS  */
+    TOKEN_MULT = 276,              /* TOKEN_MULT  */
+    TOKEN_DIV = 277,               /* TOKEN_DIV  */
+    TOKEN_ASSIGN = 278,            /* TOKEN_ASSIGN  */
+    TOKEN_SEMICOLON = 279,         /* TOKEN_SEMICOLON  */
+    TOKEN_COMMA = 280,             /* TOKEN_COMMA  */
+    TOKEN_LPAREN = 281,            /* TOKEN_LPAREN  */
+    TOKEN_RPAREN = 282,            /* TOKEN_RPAREN  */
+    TOKEN_LBRACE = 283,            /* TOKEN_LBRACE  */
+    TOKEN_RBRACE = 284,            /* TOKEN_RBRACE  */
+    TOKEN_LBRACK = 285,            /* TOKEN_LBRACK  */
+    TOKEN_RBRACK = 286             /* TOKEN_RBRACK  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -87,12 +91,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 ".\\analizador_sintactico.y"
+#line 56 ".\\analizador_sintactico.y"
 
-    int symbol_index;         // Unión para almacenar índices de símbolos.
-    struct Node *node;        // Unión para almacenar nodos del AST.
+    int symbol_index;         // Índice en la tabla de símbolos para identificadores y valores
+    struct Node *node;        // Puntero a nodo del AST para construcciones sintácticas
 
-#line 96 "analizador_sintactico.tab.h"
+#line 100 "analizador_sintactico.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -1,6 +1,7 @@
-#import <math>
-# This is a comment that will be removed
 Fun main() {
-    Flo number = 16.0;
-    Flo root = sqrt(number);   # This comment will be removed
+	Ent num1 = 2;
+	if (2 > 5 ){
+		num1 = num1 + 5;
+	}
+	Ret num1;
 }

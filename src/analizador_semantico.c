@@ -5,6 +5,10 @@
 #include "analizador_semantico.h"
 #include "analizador_sintactico.tab.h" 
 
+/**
+ * Tabla de símbolos externa proporcionada por el analizador léxico/sintáctico.
+ * Contiene los nombres y valores de los símbolos encontrados durante el análisis.
+ */
 extern struct {
     char *name;
     int type;
@@ -14,15 +18,36 @@ extern struct {
     } value;
 } symbol_table[];
 
-// Enumeracion de tipos de datos
+/**
+ * @brief Enumeración que define los tipos de datos soportados por el lenguaje
+ * 
+ * Incluye tipos básicos (entero, flotante, natural), tipo void,
+ * y tipos derivados para arreglos de diferentes tipos de elementos.
+ */
 typedef enum {
     TYPE_UNKNOWN,
     TYPE_INTEGER,
     TYPE_FLOAT,
-    TYPE_VOID
+    TYPE_NATURAL,
+    TYPE_VOID,
+    TYPE_ARRAY_INTEGER,  
+    TYPE_ARRAY_FLOAT,    
+    TYPE_ARRAY_NATURAL   
 } DataType;
 
-// Estructura que contiene la informacion de un simbolo
+/**
+ * @brief Estructura que almacena la información de un símbolo
+ * 
+ * Contiene todos los metadatos relevantes para variables, funciones y arreglos:
+ * - Nombre del símbolo
+ * - Tipo de dato
+ * - Indicador si es función
+ * - Tipo de retorno (para funciones)
+ * - Tipos de parámetros (para funciones)
+ * - Número de parámetros (para funciones)
+ * - Tamaño del arreglo (para arreglos)
+ * - Tipo de elementos (para arreglos)
+ */
 typedef struct {
     char *name;
     DataType type;
@@ -30,16 +55,22 @@ typedef struct {
     DataType return_type;
     DataType *param_types;
     int param_count;
+    int array_size;     
+    DataType element_type; 
 } SymbolInfo;
 
-// Estructura que representa la tabla de simbolos
+/**
+ * @brief Estructura que representa la tabla de símbolos completa
+ * 
+ * Es una colección dinámica de símbolos con gestión automática de capacidad.
+ */
 typedef struct {
-    SymbolInfo *entries;
-    int size;
-    int capacity;
+    SymbolInfo *entries;  // Arreglo dinámico de entradas
+    int size;             // Número actual de símbolos
+    int capacity;         // Capacidad total disponible
 } SymbolTable;
 
-// Declaracion de funciones estaticas para manejo de la tabla de simbolos y analisis semantico
+// Declaración de funciones estáticas para manejo de la tabla de símbolos y análisis semántico
 static SymbolTable* create_symbol_table();
 static void add_symbol(SymbolTable *table, const char *name, DataType type);
 static void add_function(SymbolTable *table, const char *name, DataType return_type);
@@ -47,9 +78,13 @@ static SymbolInfo* lookup_symbol(SymbolTable *table, const char *name);
 static DataType check_types(Node *node, SymbolTable *table);
 static void analyze_semantics(Node *root, SymbolTable *table);
 
-// Funcion: create_symbol_table
-// ------------------------------
-// Crea e inicializa una tabla de simbolos con capacidad inicial de 100 entradas.
+/**
+ * @brief Crea e inicializa una tabla de símbolos
+ * 
+ * Reserva memoria para la tabla y su arreglo de entradas con una capacidad inicial.
+ * 
+ * @return Puntero a la nueva tabla de símbolos inicializada
+ */
 static SymbolTable* create_symbol_table() {
     SymbolTable *table = malloc(sizeof(SymbolTable));
     table->capacity = 100;
@@ -58,10 +93,15 @@ static SymbolTable* create_symbol_table() {
     return table;
 }
 
-// Funcion: add_symbol
-// -------------------
-// Agrega un simbolo (variable) a la tabla de simbolos.
-// Si la tabla esta llena, duplica su capacidad.
+/**
+ * @brief Agrega un símbolo (variable) a la tabla de símbolos
+ * 
+ * Si la tabla está llena, duplica automáticamente su capacidad antes de agregar.
+ * 
+ * @param table Tabla de símbolos donde agregar
+ * @param name Nombre del símbolo a agregar
+ * @param type Tipo de dato del símbolo
+ */
 static void add_symbol(SymbolTable *table, const char *name, DataType type) {
     if (table->size >= table->capacity) {
         table->capacity *= 2;
@@ -71,13 +111,20 @@ static void add_symbol(SymbolTable *table, const char *name, DataType type) {
     table->entries[table->size].name = strdup(name);
     table->entries[table->size].type = type;
     table->entries[table->size].is_function = 0;
+    table->entries[table->size].array_size = 0;  
     table->size++;
 }
 
-// Funcion: add_function
-// ---------------------
-// Agrega una funcion a la tabla de simbolos.
-// Si la tabla esta llena, duplica su capacidad.
+/**
+ * @brief Agrega una función a la tabla de símbolos
+ * 
+ * Registra una función con su tipo de retorno y prepara la estructura para
+ * almacenar información sobre sus parámetros.
+ * 
+ * @param table Tabla de símbolos donde agregar
+ * @param name Nombre de la función
+ * @param return_type Tipo de retorno de la función
+ */
 static void add_function(SymbolTable *table, const char *name, DataType return_type) {
     if (table->size >= table->capacity) {
         table->capacity *= 2;
@@ -93,10 +140,57 @@ static void add_function(SymbolTable *table, const char *name, DataType return_t
     table->size++;
 }
 
-// Funcion: lookup_symbol
-// ------------------------
-// Busca un simbolo en la tabla por su nombre.
-// Retorna un puntero a la informacion del simbolo o NULL si no se encuentra.
+/**
+ * @brief Agrega un arreglo a la tabla de símbolos
+ * 
+ * Determina el tipo de arreglo basado en el tipo de sus elementos y
+ * almacena metadatos adicionales como tamaño y tipo de elementos.
+ * 
+ * @param table Tabla de símbolos donde agregar
+ * @param name Nombre del arreglo
+ * @param elemType Tipo de los elementos del arreglo
+ * @param size Tamaño del arreglo (número de elementos)
+ */
+static void add_array_symbol(SymbolTable *table, const char *name, DataType elemType, int size) {
+    if (table->size >= table->capacity) {
+        table->capacity *= 2;
+        table->entries = realloc(table->entries, sizeof(SymbolInfo) * table->capacity);
+    }
+    
+    // Determina el tipo de arreglo basado en el tipo de elementos
+    DataType arrayType;
+    switch (elemType) {
+        case TYPE_INTEGER:
+            arrayType = TYPE_ARRAY_INTEGER;
+            break;
+        case TYPE_FLOAT:
+            arrayType = TYPE_ARRAY_FLOAT;
+            break;
+        case TYPE_NATURAL:
+            arrayType = TYPE_ARRAY_NATURAL;
+            break;
+        default:
+            fprintf(stderr, "Semantic Error: Cannot create array of type %d\n", elemType);
+            arrayType = TYPE_UNKNOWN;
+    }
+    
+    table->entries[table->size].name = strdup(name);
+    table->entries[table->size].type = arrayType;
+    table->entries[table->size].element_type = elemType;
+    table->entries[table->size].is_function = 0;
+    table->entries[table->size].array_size = size;
+    table->size++;
+}
+
+/**
+ * @brief Busca un símbolo en la tabla por su nombre
+ * 
+ * Recorre secuencialmente todas las entradas hasta encontrar una coincidencia.
+ * 
+ * @param table Tabla de símbolos donde buscar
+ * @param name Nombre del símbolo a buscar
+ * @return Puntero a la información del símbolo o NULL si no se encuentra
+ */
 static SymbolInfo* lookup_symbol(SymbolTable *table, const char *name) {
     for (int i = 0; i < table->size; i++) {
         if (strcmp(table->entries[i].name, name) == 0) {
@@ -106,33 +200,66 @@ static SymbolInfo* lookup_symbol(SymbolTable *table, const char *name) {
     return NULL;
 }
 
-// Funcion: get_type_from_token
-// ----------------------------
-// Asigna un tipo de dato segun el token recibido.
-// Se utiliza para determinar el tipo de una variable.
+/**
+ * @brief Convierte un token de tipo a su representación interna de tipo de dato
+ * 
+ * @param token Token que representa un tipo de dato (TOKEN_ENT, TOKEN_FLO, etc.)
+ * @return Tipo de dato correspondiente al token
+ */
 static DataType get_type_from_token(int token) {
     switch (token) {
         case TOKEN_ENT:
             return TYPE_INTEGER;
         case TOKEN_FLO:
             return TYPE_FLOAT;
+        case TOKEN_NAT:
+            return TYPE_NATURAL;
         default:
             return TYPE_UNKNOWN;
     }
 }
 
-// Funcion: check_types
-// ---------------------
-// Realiza el analisis de tipos de una expresion representada por un nodo del AST.
-// Retorna el tipo de dato resultante de la expresion.
+/**
+ * @brief Obtiene el tipo de elemento correspondiente a un tipo de arreglo
+ * 
+ * @param arrayType Tipo de arreglo (TYPE_ARRAY_INTEGER, etc.)
+ * @return Tipo de los elementos contenidos en el arreglo
+ */
+static DataType get_element_type(DataType arrayType) {
+    switch (arrayType) {
+        case TYPE_ARRAY_INTEGER:
+            return TYPE_INTEGER;
+        case TYPE_ARRAY_FLOAT:
+            return TYPE_FLOAT;
+        case TYPE_ARRAY_NATURAL:
+            return TYPE_NATURAL;
+        default:
+            return TYPE_UNKNOWN;
+    }
+}
+
+/**
+ * @brief Verifica y deduce el tipo de una expresión en el AST
+ * 
+ * Analiza recursivamente cada nodo para determinar su tipo resultante,
+ * realizando verificaciones de compatibilidad de tipos donde corresponda.
+ * 
+ * @param node Nodo del AST a verificar
+ * @param table Tabla de símbolos actual
+ * @return Tipo de dato resultante de la expresión
+ */
 static DataType check_types(Node *node, SymbolTable *table) {
     if (!node) return TYPE_VOID;
     
     switch (node->type) {
         case NODE_NUMBER: {
-            // Obtiene el string numerico desde la tabla de simbolos
+            // Identifica el tipo del número basado en su representación y tipo asignado
+            if (symbol_table[node->symbol_index].type == 3) {  
+                return TYPE_NATURAL;
+            }
+            
+            // Determina si es flotante o entero basado en la presencia de punto decimal o notación científica
             const char *num_str = symbol_table[node->symbol_index].name;
-            // Retorna TYPE_FLOAT si contiene punto o notacion exponencial, sino TYPE_INTEGER
             return (strchr(num_str, '.') || strchr(num_str, 'e') || strchr(num_str, 'E'))
                    ? TYPE_FLOAT : TYPE_INTEGER;
         }
@@ -149,10 +276,11 @@ static DataType check_types(Node *node, SymbolTable *table) {
         }
         
         case NODE_BINARY_OP: {
-            // Comprueba los tipos de las subexpresiones y determina el tipo de la operacion
+            // Comprueba los tipos de las subexpresiones y determina el tipo de la operación
             DataType left_type = check_types(node->left, table);
             DataType right_type = check_types(node->right, table);
             
+            // Las operaciones entre tipos mixtos producen resultados tipo float
             if (left_type == TYPE_FLOAT || right_type == TYPE_FLOAT) {
                 return TYPE_FLOAT;
             }
@@ -160,7 +288,7 @@ static DataType check_types(Node *node, SymbolTable *table) {
         }
         
         case NODE_FUNCTION_CALL: {
-            // Obtiene el nombre de la funcion y verifica que sea una funcion
+            // Obtiene el nombre de la función y verifica que sea una función
             const char *func_name = symbol_table[node->left->symbol_index].name;
             SymbolInfo *func = lookup_symbol(table, func_name);
             
@@ -169,7 +297,7 @@ static DataType check_types(Node *node, SymbolTable *table) {
                 return TYPE_UNKNOWN;
             }
             
-            // Verifica los argumentos de la llamada a la funcion
+            // Verifica los argumentos de la llamada a la función
             Node *arg = node->right;
             int arg_count = 0;
             while (arg) {
@@ -189,42 +317,121 @@ static DataType check_types(Node *node, SymbolTable *table) {
             
             return func->return_type;
         }
+
+        case NODE_ARRAY_ACCESS: {
+            // Verifica que el identificador sea un arreglo
+            const char *id_name = symbol_table[node->left->symbol_index].name;
+            SymbolInfo *info = lookup_symbol(table, id_name);
+            if (!info) {
+                fprintf(stderr, "Semantic Error: Undefined identifier '%s'\n", id_name);
+                return TYPE_UNKNOWN;
+            }
+            
+            // Comprueba que sea un tipo de arreglo
+            if (info->type != TYPE_ARRAY_INTEGER && 
+                info->type != TYPE_ARRAY_FLOAT && 
+                info->type != TYPE_ARRAY_NATURAL) {
+                fprintf(stderr, "Semantic Error: '%s' is not an array\n", id_name);
+                return TYPE_UNKNOWN;
+            }
+            
+            // Verifica que el índice sea un entero o natural
+            DataType index_type = check_types(node->right, table);
+            if (index_type != TYPE_INTEGER && index_type != TYPE_NATURAL) {
+                fprintf(stderr, "Semantic Error: Array index must be integer or natural, got %d\n", index_type);
+            }
+            
+            // Retorna el tipo de elemento del arreglo
+            return info->element_type;
+        }
+        
+        case NODE_ARRAY_LITERAL: {
+            // Verifica que todos los elementos tengan el mismo tipo
+            DataType element_type = TYPE_UNKNOWN;
+            Node *element = node->left;
+            
+            if (element) {
+                element_type = check_types(element, table);
+                element = element->next;
+                
+                while (element) {
+                    DataType current_type = check_types(element, table);
+                    if (current_type != element_type) {
+                        fprintf(stderr, "Semantic Error: Array elements must have the same type\n");
+                        break;
+                    }
+                    element = element->next;
+                }
+            }
+            
+            // Determina el tipo de arreglo basado en el tipo de elementos
+            switch (element_type) {
+                case TYPE_INTEGER:
+                    return TYPE_ARRAY_INTEGER;
+                case TYPE_FLOAT:
+                    return TYPE_ARRAY_FLOAT;
+                case TYPE_NATURAL:
+                    return TYPE_ARRAY_NATURAL;
+                default:
+                    return TYPE_UNKNOWN;
+            }
+        }
+        
+        case NODE_ARRAY_ASSIGNMENT: {
+            // Verifica el acceso al arreglo
+            DataType element_type = check_types(node->left, table);
+            
+            // Verifica el valor que se está asignando
+            DataType value_type = check_types(node->right, table);
+            
+            // Comprueba compatibilidad de tipos
+            if (element_type != value_type) {
+                fprintf(stderr, "Semantic Error: Type mismatch in array assignment\n");
+            }
+            
+            return element_type;
+        }
         
         default:
             return TYPE_UNKNOWN;
     }
 }
 
-// Funcion: analyze_semantics
-// ----------------------------
-// Realiza el analisis semantico sobre el arbol de sintaxis abstracta (AST).
-// Verifica declaraciones, asignaciones, llamadas a funciones y estructuras de control.
+/**
+ * @brief Realiza el análisis semántico completo sobre el AST
+ * 
+ * Recorre el árbol de forma recursiva, procesando cada nodo según su tipo,
+ * verificando declaraciones, asignaciones, operaciones y estructuras de control.
+ * 
+ * @param root Nodo raíz del AST a analizar
+ * @param table Tabla de símbolos a utilizar/actualizar
+ */
 static void analyze_semantics(Node *root, SymbolTable *table) {
     if (!root) return;
     
     switch (root->type) {
         case NODE_FUNCTION: {
-            // Procesa una definicion de funcion
+            // Procesa una definición de función
             const char *func_name = symbol_table[root->symbol_index].name;
             DataType return_type = TYPE_VOID;
             add_function(table, func_name, return_type);
             
-            // Procesa los parametros de la funcion
+            // Procesa los parámetros de la función
             Node *param = root->left;
             while (param) {
                 const char *param_name = symbol_table[param->symbol_index].name;
-                DataType param_type = TYPE_FLOAT;  // Se asume que el tipo de parametro es float
+                DataType param_type = TYPE_FLOAT;  // Se asume que el tipo de parámetro es float
                 add_symbol(table, param_name, param_type);
                 param = param->next;
             }
             
-            // Analiza el cuerpo de la funcion
+            // Analiza el cuerpo de la función
             analyze_semantics(root->right, table);
             break;
         }
         
         case NODE_DECLARATION: {
-            // Procesa una declaracion de variable
+            // Procesa una declaración de variable
             const char *var_name = symbol_table[root->left->symbol_index].name;
             DataType expr_type = check_types(root->right, table);
             add_symbol(table, var_name, expr_type);
@@ -232,7 +439,7 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
         }
         
         case NODE_ASSIGNMENT: {
-            // Procesa una asignacion a una variable
+            // Procesa una asignación a una variable
             const char *var_name = symbol_table[root->left->symbol_index].name;
             SymbolInfo *var = lookup_symbol(table, var_name);
             
@@ -244,7 +451,7 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
             DataType expr_type = check_types(root->right, table);
             if (var->type != expr_type) {
                 if (var->type == TYPE_FLOAT && expr_type == TYPE_INTEGER) {
-                    // Conversion permitida de entero a float
+                    // Conversión permitida de entero a float
                 } else {
                     fprintf(stderr, "Semantic Error: Type mismatch in assignment to '%s'\n", var_name);
                 }
@@ -252,9 +459,77 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
             break;
         }
         
+        case NODE_ARRAY_DECL: {
+            // Procesa una declaración de arreglo
+            const char *array_name = symbol_table[root->left->symbol_index].name;
+            
+            // Verifica si es una declaración con inicialización
+            if (root->right && root->right->type == NODE_ARRAY_INIT) {
+                // Obtiene el tipo y tamaño
+                Node *size_and_type = root->right->left;
+                Node *init_value = root->right->right;
+                
+                // Verifica la expresión de tamaño
+                DataType size_type = check_types(size_and_type->left, table);
+                if (size_type != TYPE_INTEGER && size_type != TYPE_NATURAL) {
+                    fprintf(stderr, "Semantic Error: Array size must be an integer or natural\n");
+                }
+                
+                // Obtiene el tipo de elemento del nodo NODE_ARRAY_TYPE
+                DataType elem_type = get_type_from_token(size_and_type->right->symbol_index);
+                
+                // Verifica el inicializador
+                DataType init_type = check_types(init_value, table);
+                
+                // Determina el tipo de arreglo esperado basado en el tipo de elemento
+                DataType expected_array_type;
+                switch (elem_type) {
+                    case TYPE_INTEGER:
+                        expected_array_type = TYPE_ARRAY_INTEGER;
+                        break;
+                    case TYPE_FLOAT:
+                        expected_array_type = TYPE_ARRAY_FLOAT;
+                        break;
+                    case TYPE_NATURAL:
+                        expected_array_type = TYPE_ARRAY_NATURAL;
+                        break;
+                    default:
+                        expected_array_type = TYPE_UNKNOWN;
+                }
+                
+                // Verifica si el tipo del inicializador coincide con el tipo de arreglo esperado
+                if (init_type != expected_array_type) {
+                    fprintf(stderr, "Semantic Error: Array initializer type mismatch\n");
+                }
+                
+                // Agrega el arreglo a la tabla de símbolos
+                // Para simplificar, no se calcula el tamaño exacto en tiempo de compilación
+                add_array_symbol(table, array_name, elem_type, 0);
+            } else {
+                // Declaración simple de arreglo sin inicialización
+                DataType elem_type = get_type_from_token(root->right->symbol_index);
+                
+                // Verifica la expresión de tamaño
+                DataType size_type = check_types(root->right, table);
+                if (size_type != TYPE_INTEGER && size_type != TYPE_NATURAL) {
+                    fprintf(stderr, "Semantic Error: Array size must be an integer or natural\n");
+                }
+                
+                // Agrega el arreglo a la tabla de símbolos
+                add_array_symbol(table, array_name, elem_type, 0);
+            }
+            break;
+        }
+        
+        case NODE_ARRAY_ASSIGNMENT: {
+            // La semántica del acceso al arreglo se verifica en check_types
+            check_types(root, table);
+            break;
+        }
+        
         case NODE_IF:
         case NODE_WHILE: {
-            // Procesa estructuras de control: if y while
+            // Verifica que la condición sea un valor numérico
             DataType cond_type = check_types(root->left, table);
             if (cond_type != TYPE_INTEGER && cond_type != TYPE_FLOAT) {
                 fprintf(stderr, "Semantic Error: Condition must be numeric\n");
@@ -264,24 +539,35 @@ static void analyze_semantics(Node *root, SymbolTable *table) {
         }
         
         case NODE_RETURN: {
-            // Procesa una sentencia de retorno
+            // Verifica el tipo del valor de retorno
             DataType return_type = check_types(root->left, table);
             break;
         }
     }
     
+    // Continúa con el siguiente nodo en la secuencia
     if (root->next) {
         analyze_semantics(root->next, table);
     }
 }
 
-// Funcion: init_semantic_analysis
-// -------------------------------
-// Inicializa el analisis semantico del AST.
-// Crea una tabla de simbolos, instala funciones predefinidas y analiza el arbol.
+/**
+ * @brief Inicializa y ejecuta el análisis semántico del AST
+ * 
+ * Punto de entrada principal para el análisis semántico:
+ * 1. Crea una tabla de símbolos
+ * 2. Instala funciones predefinidas
+ * 3. Analiza el AST completo
+ * 
+ * @param ast Árbol de sintaxis abstracta completo a analizar
+ */
 void init_semantic_analysis(Node *ast) {
     SymbolTable *table = create_symbol_table();
+    
+    // Registra funciones predefinidas del lenguaje
     add_function(table, "sqrt", TYPE_FLOAT);
     add_function(table, "power", TYPE_FLOAT);
+    
+    // Inicia el proceso de análisis semántico
     analyze_semantics(ast, table);
 }

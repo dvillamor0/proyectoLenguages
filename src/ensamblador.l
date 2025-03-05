@@ -6,9 +6,19 @@
 #include <stdint.h>
 #include <math.h>
 
+/* 
+ * Definición de constantes booleanas para mejorar la legibilidad del código
+ * y evitar el uso de literales numéricos.
+ */
 #define TRUE 1
 #define FALSE 0
 
+/**
+ * Convierte un carácter a su representación binaria de 16 bits
+ * con 5 ceros iniciales para completar 21 bits.
+ * 
+ * @param c Puntero al carácter a convertir
+ */
 void binary_from_char(const char *c) {
     unsigned short utf16 = (unsigned char)c[0]; 
 
@@ -20,6 +30,11 @@ void binary_from_char(const char *c) {
     printf("\n");
 }
 
+/**
+ * Imprime la representación binaria de un número entero en 21 bits
+ * 
+ * @param num Número entero a convertir a binario
+ */
 void print_binary(int num) {
     unsigned int mask = 1 << 20; // Máscara para el bit más significativo (bit 20, el bit más a la izquierda en 21 bits)
     
@@ -34,6 +49,12 @@ void print_binary(int num) {
     }
 }
 
+/**
+ * Convierte un número de punto flotante a su representación binaria en 21 bits
+ * usando un formato personalizado de 1 bit de signo + 10 bits de numerador + 10 bits de denominador.
+ * 
+ * @param str Cadena que contiene el número flotante a convertir
+ */
 void binary_from_float_21_bits(const char *str) {
     double value = atof(str); // Convertir la cadena a un número flotante
 
@@ -90,6 +111,12 @@ void binary_from_float_21_bits(const char *str) {
     }
 }
 
+/**
+ * Imprime la representación binaria de un número entero con signo en 21 bits
+ * utilizando complemento a 2 para números negativos.
+ * 
+ * @param num Número entero a convertir
+ */
 void print_binary_from_entero(int num) {
     // Asegurar que el número cabe en 21 bits con signo (-1048576 a 1048575)
     if (num < -1048576 || num > 1048575) {
@@ -105,6 +132,13 @@ void print_binary_from_entero(int num) {
     }
 }
 
+/**
+ * Obtiene la representación binaria de 5 bits para un comando del ensamblador.
+ * 
+ * @param command Comando a convertir
+ * @param esRegistro Indica si el operando es un registro
+ * @return Cadena con la representación binaria del comando
+ */
 char* GetBinarioCommand(const char *command, int esRegistro) {
     static char binary[6];
     const char *commands[] = {
@@ -114,6 +148,7 @@ char* GetBinarioCommand(const char *command, int esRegistro) {
     };
     const int num_commands = sizeof(commands) / sizeof(commands[0]);
 
+    // Caso especial para LOAD y STORE cuando el operando es un registro
     if (esRegistro && (strcmp(command, "LOAD") == 0 || strcmp(command, "STORE") == 0)) {
         if (strcmp(command, "LOAD") == 0) {
             strcpy(binary, "11101");
@@ -123,6 +158,7 @@ char* GetBinarioCommand(const char *command, int esRegistro) {
         return binary;
     }
 
+    // Buscar el comando en la tabla y generar su código binario
     for (int i = 0; i < num_commands; i++) {
         if (strcmp(command, commands[i]) == 0) {
             for (int j = 0; j < 5; j++) {
@@ -137,6 +173,12 @@ char* GetBinarioCommand(const char *command, int esRegistro) {
     return binary;
 }
 
+/**
+ * Convierte un registro (R0-R3) a su representación binaria de 2 bits.
+ * 
+ * @param reg Cadena que contiene el nombre del registro
+ * @return Cadena con la representación binaria del registro
+ */
 char* GetBinarioRegistro(const char *reg){
     static char binary[3];
 
@@ -165,6 +207,13 @@ char* GetBinarioRegistro(const char *reg){
     return binary;
 }
 
+/**
+ * Extrae y convierte una dirección relativa en formato hexadecimal [0xXXXX]
+ * a su valor decimal entre paréntesis.
+ * 
+ * @param reg Cadena que contiene la dirección relativa
+ * @return Cadena con el valor decimal entre paréntesis
+ */
 char* GetRelativeDirection(const char *reg){
     static char result[20];
 
@@ -188,6 +237,13 @@ char* GetRelativeDirection(const char *reg){
     }
 }
 
+/**
+ * Concatena un número con una dirección, rellenando con ceros si es necesario.
+ * 
+ * @param numero Cadena con el número
+ * @param direccion Cadena con la dirección
+ * @return Cadena concatenada
+ */
 char* ConcatenarDireccion(const char *numero, const char *direccion) {
     static char resultado[32];
     int numero_len = strlen(numero);
@@ -202,6 +258,13 @@ char* ConcatenarDireccion(const char *numero, const char *direccion) {
     return resultado;
 }
 
+/**
+ * Obtiene la representación binaria del segundo registro o dirección.
+ * 
+ * @param reg Cadena con el registro o dirección
+ * @param numero Cadena con el número (para concatenar)
+ * @return Cadena con la representación binaria
+ */
 char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
     static char result[32];
     char limpio[32];
@@ -217,6 +280,12 @@ char* GetBinarioSecondRegistro(const char *reg, const char *numero) {
     return result;
 }
 
+/**
+ * Verifica si una cadena contiene paréntesis.
+ * 
+ * @param str Cadena a verificar
+ * @return 1 si contiene paréntesis, 0 en caso contrario
+ */
 int contieneParentesis(const char *str) {
     while (*str != '\0') {  // Mientras no lleguemos al final de la cadena
         if (*str == '(') {   // Si encontramos '('
@@ -227,6 +296,12 @@ int contieneParentesis(const char *str) {
     return 0;  // Si no se encontró '('
 }
 
+/**
+ * Completa una cadena con ceros hasta llegar a 32 caracteres.
+ * 
+ * @param numero Cadena a completar
+ * @return Cadena con ceros adicionales
+ */
 char* CompletarCeros(const char *numero){
     static char resultado[32];
     int numero_len = strlen(numero);
@@ -239,6 +314,15 @@ char* CompletarCeros(const char *numero){
     return resultado;
 }
 
+/**
+ * Genera la representación binaria completa de una instrucción del ensamblador
+ * con sus parámetros.
+ * 
+ * @param command Comando de la instrucción
+ * @param reg1 Primer registro o dirección
+ * @param reg2 Segundo registro o dirección
+ * @param reg3 Tercer registro o dirección
+ */
 void GenerarBinarioParams(const char *command, const char *reg1, const char *reg2, const char *reg3) {
     //printf("Comando: %s\n", command);
     int esRegistro2 = (reg2[0] == 'R') ? TRUE : FALSE;
@@ -271,6 +355,11 @@ void GenerarBinarioParams(const char *command, const char *reg1, const char *reg
     printf("\n"); 
 }
 
+/**
+ * Imprime los valores ASCII de cada carácter en una cadena.
+ * 
+ * @param str Cadena a procesar
+ */
 void printAscii(const char *str) {
     printf("ASCII: ");
     for (int i = 0; str[i] != '\0'; i++) {
@@ -466,6 +555,14 @@ boolean     (F|f)(A|a)(L|l)(S|s)(E|e)|(T|t)(R|r)(U|u)(E|e)
 }
 %%
 
+/**
+ * Función principal del programa.
+ * Procesa un archivo de entrada con código ensamblador y genera su representación binaria.
+ * 
+ * @param argc Número de argumentos
+ * @param argv Vector de argumentos
+ * @return Código de salida del programa
+ */
 int main(int argc, char **argv) {
     if (argc < 2 || argc > 3) {
         fprintf(stderr, "Uso: %s <archivo_python> [archivo_salida]\n", argv[0]);

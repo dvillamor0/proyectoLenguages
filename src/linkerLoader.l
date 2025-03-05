@@ -4,7 +4,16 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-// Funcion para imprimir un numero en binario con exactamente 21 bits
+/**
+ * @brief Imprime un número en formato binario utilizando exactamente 21 bits
+ * 
+ * Esta función convierte un número entero a su representación binaria
+ * y lo escribe en el archivo de salida especificado, asegurando que
+ * siempre se impriman exactamente 21 bits (desde el más significativo al menos).
+ * 
+ * @param output Puntero al archivo donde se escribirá la salida
+ * @param num Número entero a convertir y mostrar en binario
+ */
 void print_binary(FILE* output, int num) {
     unsigned int mask = 1 << 20; // Mascara para el bit mas significativo (bit 20)
     
@@ -19,12 +28,28 @@ void print_binary(FILE* output, int num) {
     }
 }
 
-// Funcion para detectar si una linea contiene una direccion relativa
+/**
+ * @brief Verifica si una línea contiene una dirección relativa entre paréntesis
+ * 
+ * Una dirección relativa se identifica por la presencia de paréntesis
+ * de apertura y cierre en la línea de texto.
+ * 
+ * @param line Cadena de texto a analizar
+ * @return 1 si la línea contiene una dirección relativa, 0 en caso contrario
+ */
 int contains_relative_address(const char* line) {
     return (strstr(line, "(") != NULL && strstr(line, ")") != NULL);
 }
 
-// Funcion para extraer el numero entre parentesis
+/**
+ * @brief Extrae el valor numérico de una dirección relativa entre paréntesis
+ * 
+ * Busca el primer paréntesis de apertura y el primer paréntesis de cierre
+ * en la línea, y extrae el número entero que se encuentra entre ellos.
+ * 
+ * @param line Cadena de texto de la cual extraer la dirección
+ * @return El valor numérico de la dirección relativa, o 0 si no se encuentra
+ */
 int extract_address(const char* line) {
     const char* start = strchr(line, '(');
     if (start == NULL) return 0;
@@ -40,7 +65,18 @@ int extract_address(const char* line) {
     return atoi(num_str);
 }
 
-// Funcion para reemplazar la direccion relativa con la absoluta
+/**
+ * @brief Reemplaza una dirección relativa por su equivalente absoluta en formato binario
+ * 
+ * Esta función toma una línea de texto que contiene una dirección relativa,
+ * calcula su dirección absoluta sumando la base, y reemplaza la dirección relativa
+ * con la representación binaria de 21 bits de la dirección absoluta.
+ * 
+ * @param line Línea de texto original con la dirección relativa
+ * @param rel_addr Valor de la dirección relativa
+ * @param base_addr Dirección base para el cálculo de la dirección absoluta
+ * @return Puntero a una cadena estática con la línea modificada
+ */
 char* replace_address(const char* line, int rel_addr, int base_addr) {
     static char result[1024];
     const char* start = strchr(line, '(');
@@ -75,6 +111,7 @@ char* replace_address(const char* line, int rel_addr, int base_addr) {
     return result;
 }
 
+// Variable global que almacena la dirección base actual para cálculos de relocalización
 int direccionInicial = 0;  // Direccion base para la relocalizacion
 
 %}
@@ -108,7 +145,17 @@ dir         \([0-9]+\)
 
 %%
 
-// Funcion principal que procesa el archivo de entrada y genera el archivo de salida
+/**
+ * @brief Procesa un archivo de entrada, reemplazando direcciones relativas por absolutas
+ * 
+ * Esta función lee un archivo línea por línea, identifica las direcciones relativas,
+ * las convierte a direcciones absolutas en formato binario, y escribe el resultado
+ * en un archivo de salida.
+ * 
+ * @param input_file Ruta al archivo de entrada
+ * @param output_file Ruta al archivo de salida
+ * @param base_address Dirección base para los cálculos de relocalización
+ */
 void process_file(const char* input_file, const char* output_file, int base_address) {
     FILE* in = fopen(input_file, "r");
     FILE* out = fopen(output_file, "w");
@@ -148,6 +195,16 @@ void process_file(const char* input_file, const char* output_file, int base_addr
     printf("Processing complete. Output written to %s\n", output_file);
 }
 
+/**
+ * @brief Función principal del programa
+ * 
+ * Procesa los argumentos de línea de comandos, establece los valores predeterminados
+ * si es necesario, y llama a la función principal de procesamiento.
+ * 
+ * @param argc Número de argumentos de línea de comandos
+ * @param argv Array de cadenas con los argumentos de línea de comandos
+ * @return 0 si la ejecución fue exitosa, 1 en caso de error
+ */
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Usage: %s [base_address] [input_file] [output_file]\n", argv[0]);

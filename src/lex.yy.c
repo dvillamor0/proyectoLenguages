@@ -289,32 +289,35 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 29
-#define YY_END_OF_BUFFER 30
-static yyconst short int yy_acclist[102] =
+#define YY_NUM_RULES 33
+#define YY_END_OF_BUFFER 34
+static yyconst short int yy_acclist[124] =
     {   0,
-       30,   28,   29,    1,   28,   29,    1,   29,   28,   29,
-       28,   29,   22,   28,   29,   23,   28,   29,   17,   28,
-       29,   15,   28,   29,   21,   28,   29,   16,   28,   29,
-       18,   28,   29,   27,   28,   29,   20,   28,   29,    9,
-       28,   29,   19,   28,   29,   13,   28,   29,   26,   28,
-       29,   26,   28,   29,   26,   28,   29,   26,   28,   29,
-       26,   28,   29,   26,   28,   29,   24,   28,   29,   25,
-       28,   29,    1,   12,    2,   27,   10,   11,   14,   26,
-       26,   26,   26,    5,   26,   26,   26,   27,   27,    7,
-       26,    8,   26,    3,   26,    4,   26,   26,   26,    6,
+       34,   32,   33,    1,   32,   33,    1,   33,   32,   33,
+       32,   33,   24,   32,   33,   25,   32,   33,   19,   32,
+       33,   17,   32,   33,   23,   32,   33,   18,   32,   33,
+       20,   32,   33,   31,   32,   33,   22,   32,   33,   11,
+       32,   33,   21,   32,   33,   15,   32,   33,   30,   32,
+       33,   30,   32,   33,   30,   32,   33,   30,   32,   33,
+       30,   32,   33,   30,   32,   33,   30,   32,   33,   30,
+       32,   33,   28,   32,   33,   29,   32,   33,   26,   32,
+       33,   27,   32,   33,    1,   14,    2,   31,   12,   13,
+       16,   30,   30,   30,   30,   30,    5,   30,   30,   30,
 
-       26
+       30,   31,   31,   30,    7,   30,    8,   30,    3,   30,
+        9,   30,    4,   30,   30,   30,   30,   30,    6,   30,
+       30,   10,   30
     } ;
 
-static yyconst short int yy_accept[58] =
+static yyconst short int yy_accept[70] =
     {   0,
         1,    1,    1,    2,    4,    7,    9,   11,   13,   16,
        19,   22,   25,   28,   31,   34,   37,   40,   43,   46,
-       49,   52,   55,   58,   61,   64,   67,   70,   73,   74,
-       75,   75,   76,   76,   77,   77,   78,   79,   80,   81,
-       82,   83,   84,   86,   87,   88,   89,   89,   90,   92,
-       94,   96,   98,   99,  100,  102,  102
+       49,   52,   55,   58,   61,   64,   67,   70,   73,   76,
+       79,   82,   85,   86,   87,   87,   88,   88,   89,   89,
+       90,   91,   92,   93,   94,   95,   96,   97,   99,  100,
+      101,  102,  103,  103,  104,  105,  107,  109,  111,  113,
+      115,  116,  117,  118,  119,  121,  122,  124,  124
     } ;
 
 static yyconst int yy_ec[256] =
@@ -325,14 +328,14 @@ static yyconst int yy_ec[256] =
         1,    2,    4,    1,    5,    1,    1,    1,    1,    6,
         7,    8,    9,   10,   11,   12,   13,   14,   14,   14,
        14,   14,   14,   14,   14,   14,   14,    1,   15,   16,
-       17,   18,    1,    1,   19,   19,   19,   19,   20,   21,
-       19,   19,   22,   19,   19,   19,   19,   19,   19,   19,
-       19,   23,   19,   19,   19,   19,   24,   19,   19,   19,
-        1,    1,    1,    1,    1,    1,   19,   19,   19,   19,
+       17,   18,    1,    1,   19,   20,   20,   20,   21,   22,
+       20,   20,   23,   20,   20,   20,   20,   24,   20,   20,
+       20,   25,   20,   20,   20,   20,   26,   20,   20,   20,
+       27,    1,   28,    1,   20,    1,   29,   20,   20,   20,
 
-       25,   26,   19,   27,   28,   19,   19,   29,   19,   30,
-       31,   19,   19,   19,   19,   32,   33,   19,   19,   19,
-       19,   19,   34,    1,   35,    1,    1,    1,    1,    1,
+       30,   31,   32,   33,   34,   20,   20,   35,   20,   36,
+       37,   20,   20,   38,   20,   39,   40,   20,   20,   20,
+       20,   20,   41,    1,   42,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -349,66 +352,73 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst int yy_meta[36] =
+static yyconst int yy_meta[43] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    2,    1,    1,    1,    1,    2,    2,
+        2,    2,    2,    2,    2,    2,    1,    1,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    1,    1
+        1,    1
     } ;
 
-static yyconst short int yy_base[59] =
+static yyconst short int yy_base[71] =
     {   0,
-        0,    0,   81,   82,   34,   36,   63,   76,   82,   82,
-       82,   82,   82,   82,   82,   28,   82,   61,   60,   59,
-        0,   45,   12,   48,   48,   45,   82,   82,   41,   82,
-       68,   82,   56,   35,   43,   82,   82,   82,    0,   37,
-       37,   37,    0,   34,   37,   36,   50,   45,    0,    0,
-        0,    0,   29,   26,    0,   82,   61,   44
+        0,    0,   96,   97,   41,   43,   78,   91,   97,   97,
+       97,   97,   97,   97,   97,   35,   97,   76,   75,   74,
+       52,    0,   53,   13,   57,   58,   56,   52,   97,   97,
+       97,   97,   48,   97,   81,   97,   69,   40,   46,   97,
+       97,   97,    0,   44,   42,   43,   43,    0,   39,   35,
+       39,   45,   58,   57,   39,    0,    0,    0,    0,    0,
+       33,   35,   34,   28,    0,   25,    0,   97,   75,   56
     } ;
 
-static yyconst short int yy_def[59] =
+static yyconst short int yy_def[71] =
     {   0,
-       56,    1,   56,   56,   56,   56,   56,   57,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       58,   58,   58,   58,   58,   58,   56,   56,   56,   56,
-       57,   56,   56,   56,   56,   56,   56,   56,   58,   58,
-       58,   58,   58,   58,   58,   56,   56,   56,   58,   58,
-       58,   58,   58,   58,   58,    0,   56,   56
+       68,    1,   68,   68,   68,   68,   68,   69,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       70,   70,   70,   70,   70,   70,   70,   70,   68,   68,
+       68,   68,   68,   68,   69,   68,   68,   68,   68,   68,
+       68,   68,   70,   70,   70,   70,   70,   70,   70,   70,
+       70,   68,   68,   68,   70,   70,   70,   70,   70,   70,
+       70,   70,   70,   70,   70,   70,   70,    0,   68,   68
     } ;
 
-static yyconst short int yy_nxt[118] =
+static yyconst short int yy_nxt[140] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
        14,    4,   15,   16,   17,   18,   19,   20,   21,   22,
-       23,   24,   25,   26,   21,   21,   21,   21,   21,   21,
-       21,   21,   21,   27,   28,   29,   29,   29,   29,   33,
-       41,   34,   29,   29,   42,   39,   33,   35,   34,   46,
-       55,   47,   35,   47,   35,   35,   48,   54,   48,   35,
-       35,   31,   31,   48,   53,   52,   51,   50,   49,   46,
-       32,   45,   44,   43,   40,   38,   37,   36,   32,   30,
-       56,    3,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+       23,   24,   25,   26,   27,   28,   29,   30,   22,   22,
+       22,   22,   22,   22,   22,   22,   22,   22,   22,   22,
+       31,   32,   33,   33,   33,   33,   37,   46,   38,   33,
+       33,   37,   47,   38,   53,   39,   53,   43,   52,   54,
+       39,   67,   66,   65,   39,   39,   64,   63,   62,   39,
+       54,   54,   61,   60,   39,   35,   35,   59,   58,   57,
+       56,   55,   52,   36,   51,   50,   49,   48,   45,   44,
+       42,   41,   40,   36,   34,   68,    3,   68,   68,   68,
 
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68
     } ;
 
-static yyconst short int yy_chk[118] =
+static yyconst short int yy_chk[140] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    5,    5,    6,    6,   16,
-       23,   16,   29,   29,   23,   58,   34,   16,   34,   46,
-       54,   35,   16,   35,   34,   46,   35,   53,   48,   34,
-       46,   57,   57,   47,   45,   44,   42,   41,   40,   33,
-       31,   26,   25,   24,   22,   20,   19,   18,    8,    7,
-        3,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    5,    5,    6,    6,   16,   24,   16,   33,
+       33,   38,   24,   38,   39,   16,   39,   70,   52,   39,
+       38,   66,   64,   63,   16,   52,   62,   61,   55,   38,
+       54,   53,   51,   50,   52,   69,   69,   49,   47,   46,
+       45,   44,   37,   35,   28,   27,   26,   25,   23,   21,
+       20,   19,   18,    8,    7,    3,   68,   68,   68,   68,
 
-       56,   56,   56,   56,   56,   56,   56,   56,   56,   56,
-       56,   56,   56,   56,   56,   56,   56
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68,   68,
+       68,   68,   68,   68,   68,   68,   68,   68,   68
     } ;
 
 static yy_state_type yy_state_buf[YY_BUF_SIZE + 2], *yy_state_ptr;
@@ -428,6 +438,13 @@ char *yytext;
 #line 1 ".\\analizador_lexico.l"
 #define INITIAL 0
 #line 2 ".\\analizador_lexico.l"
+    /**
+     * @archivo: analizador_lexico.l
+     * @descripción: Analizador léxico para un lenguaje de programación personalizado
+     * @autor: [Nombre del autor]
+     * @fecha: [Fecha de creación/modificación]
+     */
+    
     // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
     #include <stdio.h>
     #include <stdlib.h>
@@ -435,32 +452,70 @@ char *yytext;
     // Inclusión del header generado por el analizador sintactico.
     #include "analizador_sintactico.tab.h"
 
-    // Definicion del maximo de simbolos en la tabla.
+    /**
+     * @constante: MAX_SYMBOLS
+     * @descripción: Define el tamaño máximo de la tabla de símbolos
+     * @valor: 1000 entradas
+     */
     #define MAX_SYMBOLS 1000
 
-    // Constantes para identificar el tipo de simbolo.
-    #define SYMTAB_IDENTIFIER 1
-    #define SYMTAB_NUMBER 2
+    /**
+     * @constantes: Tipos de símbolos
+     * @descripción: Identificadores para categorizar las entradas en la tabla de símbolos
+     */
+    #define SYMTAB_IDENTIFIER 1  // Identificador (variables, funciones)
+    #define SYMTAB_NUMBER 2      // Número de punto flotante
+    #define SYMTAB_NATURAL 3     // Número natural (entero sin signo)
 
-    // Estructura que representa una entrada en la tabla de simbolos.
+    /**
+     * @estructura: SymbolEntry
+     * @descripción: Representa una entrada en la tabla de símbolos
+     * @miembros:
+     *   - name: Nombre o lexema del símbolo
+     *   - type: Tipo del símbolo según las constantes definidas
+     *   - value: Unión que almacena el valor según el tipo del símbolo
+     */
     typedef struct {
         char *name;   // Nombre del simbolo.
         int type;     // Tipo de simbolo (identificador o numero).
         union {
             double number_value;  // Valor numerico (para numeros).
             char *string_value;   // Valor en forma de cadena (no se usa en este codigo).
+            unsigned int natural_value; // Valor para numeros naturales.
+
         } value;
     } SymbolEntry;
 
-    // Declaracion de la tabla de simbolos y contador de entradas.
+    /**
+     * @variable: symbol_table
+     * @descripción: Tabla de símbolos implementada como un arreglo de entradas
+     */
     SymbolEntry symbol_table[MAX_SYMBOLS];
+    
+    /**
+     * @variable: symbol_count
+     * @descripción: Contador que mantiene el número actual de símbolos en la tabla
+     * @inicialización: 0
+     */
     int symbol_count = 0;
 
-    // Declaracion de las funciones para instalar identificadores y numeros.
+    /**
+     * @función: install_id
+     * @descripción: Instala un identificador en la tabla de símbolos
+     * @parámetros: char *lexeme - Cadena que representa el identificador
+     * @retorno: Índice del símbolo en la tabla
+     */
     int install_id(char *lexeme);
+    
+    /**
+     * @función: install_num
+     * @descripción: Instala un número en la tabla de símbolos
+     * @parámetros: char *lexeme - Cadena que representa el número
+     * @retorno: Índice del símbolo en la tabla
+     */
     int install_num(char *lexeme);
 /* Definiciones de expresiones regulares */
-#line 464 "lex.yy.c"
+#line 519 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -611,9 +666,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 46 ".\\analizador_lexico.l"
+#line 91 ".\\analizador_lexico.l"
 
-#line 617 "lex.yy.c"
+#line 672 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -661,14 +716,14 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 57 )
+				if ( yy_current_state >= 69 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			*yy_state_ptr++ = yy_current_state;
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 82 );
+		while ( yy_base[yy_current_state] != 97 );
 
 yy_find_action:
 		yy_current_state = *--yy_state_ptr;
@@ -706,150 +761,170 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 47 ".\\analizador_lexico.l"
+#line 92 ".\\analizador_lexico.l"
 { /* Skip whitespace */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 48 ".\\analizador_lexico.l"
+#line 93 ".\\analizador_lexico.l"
 { /* Skip comments */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 50 ".\\analizador_lexico.l"
+#line 95 ".\\analizador_lexico.l"
 { return TOKEN_FUN; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 51 ".\\analizador_lexico.l"
+#line 96 ".\\analizador_lexico.l"
 { return TOKEN_RET; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 52 ".\\analizador_lexico.l"
+#line 97 ".\\analizador_lexico.l"
 { return TOKEN_IF; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 53 ".\\analizador_lexico.l"
+#line 98 ".\\analizador_lexico.l"
 { return TOKEN_WHILE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 54 ".\\analizador_lexico.l"
+#line 99 ".\\analizador_lexico.l"
 { return TOKEN_ENT; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 55 ".\\analizador_lexico.l"
+#line 100 ".\\analizador_lexico.l"
 { return TOKEN_FLO; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 57 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_LT; }
+#line 101 ".\\analizador_lexico.l"
+{ return TOKEN_NAT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 58 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_LE; }
+#line 102 ".\\analizador_lexico.l"
+{ return TOKEN_ARREGLO; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 59 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_EQ; }  
+#line 105 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_LT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 60 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_NE; }
+#line 106 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_LE; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 61 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_GT; }
+#line 107 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_EQ; }  
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 62 ".\\analizador_lexico.l"
-{ return TOKEN_RELOP_GE; }
+#line 108 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_NE; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 64 ".\\analizador_lexico.l"
-{ return TOKEN_PLUS; }
+#line 109 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_GT; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 65 ".\\analizador_lexico.l"
-{ return TOKEN_MINUS; }
+#line 110 ".\\analizador_lexico.l"
+{ return TOKEN_RELOP_GE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 66 ".\\analizador_lexico.l"
-{ return TOKEN_MULT; }
+#line 112 ".\\analizador_lexico.l"
+{ return TOKEN_PLUS; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 67 ".\\analizador_lexico.l"
-{ return TOKEN_DIV; }
+#line 113 ".\\analizador_lexico.l"
+{ return TOKEN_MINUS; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 68 ".\\analizador_lexico.l"
-{ return TOKEN_ASSIGN; }   
+#line 114 ".\\analizador_lexico.l"
+{ return TOKEN_MULT; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 69 ".\\analizador_lexico.l"
-{ return TOKEN_SEMICOLON; }
+#line 115 ".\\analizador_lexico.l"
+{ return TOKEN_DIV; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 70 ".\\analizador_lexico.l"
-{ return TOKEN_COMMA; }
+#line 116 ".\\analizador_lexico.l"
+{ return TOKEN_ASSIGN; }   
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 71 ".\\analizador_lexico.l"
-{ return TOKEN_LPAREN; }
+#line 117 ".\\analizador_lexico.l"
+{ return TOKEN_SEMICOLON; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 72 ".\\analizador_lexico.l"
-{ return TOKEN_RPAREN; }
+#line 118 ".\\analizador_lexico.l"
+{ return TOKEN_COMMA; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 73 ".\\analizador_lexico.l"
-{ return TOKEN_LBRACE; }
+#line 119 ".\\analizador_lexico.l"
+{ return TOKEN_LPAREN; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 74 ".\\analizador_lexico.l"
-{ return TOKEN_RBRACE; }
+#line 120 ".\\analizador_lexico.l"
+{ return TOKEN_RPAREN; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 76 ".\\analizador_lexico.l"
-{ yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
+#line 121 ".\\analizador_lexico.l"
+{ return TOKEN_LBRACE; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 77 ".\\analizador_lexico.l"
-{ yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
+#line 122 ".\\analizador_lexico.l"
+{ return TOKEN_RBRACE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 79 ".\\analizador_lexico.l"
-{ printf("Lexical Error: Unexpected character %s\n", yytext); }
+#line 123 ".\\analizador_lexico.l"
+{ return TOKEN_LBRACK; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 80 ".\\analizador_lexico.l"
+#line 124 ".\\analizador_lexico.l"
+{ return TOKEN_RBRACK; }
+	YY_BREAK
+case 30:
+YY_RULE_SETUP
+#line 126 ".\\analizador_lexico.l"
+{ yylval.symbol_index = install_id(yytext); return TOKEN_ID; }
+	YY_BREAK
+case 31:
+YY_RULE_SETUP
+#line 127 ".\\analizador_lexico.l"
+{ yylval.symbol_index = install_num(yytext); return TOKEN_NUMBER; }
+	YY_BREAK
+case 32:
+YY_RULE_SETUP
+#line 129 ".\\analizador_lexico.l"
+{ printf("Lexical Error: Unexpected character %s\n", yytext); }
+	YY_BREAK
+case 33:
+YY_RULE_SETUP
+#line 130 ".\\analizador_lexico.l"
 ECHO;
 	YY_BREAK
-#line 853 "lex.yy.c"
+#line 928 "lex.yy.c"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 
@@ -1138,7 +1213,7 @@ static yy_state_type yy_get_previous_state()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 57 )
+			if ( yy_current_state >= 69 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1168,11 +1243,11 @@ yy_state_type yy_current_state;
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 57 )
+		if ( yy_current_state >= 69 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 56);
+	yy_is_jam = (yy_current_state == 68);
 	if ( ! yy_is_jam )
 		*yy_state_ptr++ = yy_current_state;
 
@@ -1733,24 +1808,22 @@ int main()
 	return 0;
 	}
 #endif
-#line 80 ".\\analizador_lexico.l"
+#line 130 ".\\analizador_lexico.l"
 
 
-/*
- * Funcion: install_id
- * ---------------------
- * Instala un identificador en la tabla de simbolos.
+/**
+ * @función: install_id
+ * @descripción: Instala un identificador en la tabla de símbolos. Si el identificador
+ *              ya existe, retorna su índice. Si no, crea una nueva entrada.
  *
- * Parametro:
- *   lexeme - Cadena que representa el identificador.
+ * @parámetros:
+ *   - lexeme: Cadena que representa el identificador a instalar
  *
- * Retorna:
- *   Indice del simbolo en la tabla.
+ * @retorno: Índice del símbolo en la tabla
  *
- * Procedimiento:
- *   - Verifica si la tabla esta llena.
- *   - Busca si el identificador ya existe.
- *   - Si no existe, lo agrega y aumenta el contador.
+ * @complejidad: O(n) donde n es el número actual de símbolos en la tabla
+ * 
+ * @manejo_errores: Termina el programa si la tabla está llena
  */
 int install_id(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
@@ -1758,6 +1831,7 @@ int install_id(char *lexeme) {
         exit(1);
     }
     
+    // Busca el identificador en la tabla existente
     for (int i = 0; i < symbol_count; i++) {
         if (symbol_table[i].type == SYMTAB_IDENTIFIER && 
             strcmp(symbol_table[i].name, lexeme) == 0) {
@@ -1765,26 +1839,26 @@ int install_id(char *lexeme) {
         }
     }
     
+    // Si no existe, crea una nueva entrada
     symbol_table[symbol_count].name = strdup(lexeme);
     symbol_table[symbol_count].type = SYMTAB_IDENTIFIER;
     return symbol_count++;
 }
 
-/*
- * Funcion: install_num
- * ----------------------
- * Instala un numero en la tabla de simbolos.
+/**
+ * @función: install_num
+ * @descripción: Instala un número en la tabla de símbolos. Convierte el lexema
+ *              a un valor numérico de punto flotante y lo almacena.
  *
- * Parametro:
- *   lexeme - Cadena que representa el numero.
+ * @parámetros:
+ *   - lexeme: Cadena que representa el número a instalar
  *
- * Retorna:
- *   Indice del simbolo en la tabla.
+ * @retorno: Índice del símbolo en la tabla
  *
- * Procedimiento:
- *   - Verifica si la tabla esta llena.
- *   - Agrega el numero, convirtiendo la cadena a valor numerico.
- *   - Aumenta el contador y retorna el indice.
+ * @observaciones: A diferencia de los identificadores, no verifica duplicados
+ *                de números. Cada número se instala como una nueva entrada.
+ *
+ * @manejo_errores: Termina el programa si la tabla está llena
  */
 int install_num(char *lexeme) {
     if (symbol_count >= MAX_SYMBOLS) {
@@ -1792,6 +1866,7 @@ int install_num(char *lexeme) {
         exit(1);
     }
     
+    // Crea una nueva entrada para el número
     symbol_table[symbol_count].name = strdup(lexeme);
     symbol_table[symbol_count].type = SYMTAB_NUMBER;
     symbol_table[symbol_count].value.number_value = atof(lexeme);

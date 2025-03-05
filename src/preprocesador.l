@@ -1,21 +1,61 @@
 %{
+    /**
+     * @archivo: preprocesador.l
+     * @descripción: Implementación de un preprocesador para manejo de directivas de importación
+     * @autor: [Nombre del autor]
+     * @fecha: [Fecha de creación/modificación]
+     * @versión: 1.0
+     */
+    
     // Inclusión de bibliotecas estandar para entrada/salida, manejo de memoria y cadenas.
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
 
-    // Definicion del tamaño maximo del buffer.
+    /**
+     * @constante: MAX_BUFFER
+     * @descripción: Define el tamaño máximo del buffer para almacenar contenido de archivos
+     * @valor: 1000 bytes
+     */
     #define MAX_BUFFER 1000
+    
+    /**
+     * @variable: buffer
+     * @descripción: Buffer general para operaciones de lectura/escritura
+     * @tamaño: MAX_BUFFER bytes
+     */
     char buffer[MAX_BUFFER];
+    
+    /**
+     * @variable: lib_content
+     * @descripción: Buffer específico para almacenar el contenido de las bibliotecas importadas
+     * @tamaño: MAX_BUFFER bytes
+     */
     char lib_content[MAX_BUFFER];
+    
+    /**
+     * @variable: import_active
+     * @descripción: Bandera que indica si actualmente se está procesando una importación
+     * @valores: 0 = no activo, 1 = activo
+     * @inicialización: 0
+     */
     int import_active = 0;
 
-    // Declaracion de la funcion que procesa la importacion de bibliotecas.
+    /**
+     * @función: process_import
+     * @descripción: Procesa la directiva de importación leyendo y mostrando el contenido de una biblioteca
+     * @parámetros: const char* lib_name - Nombre de la biblioteca a importar
+     * @retorno: void
+     */
     void process_import(const char* lib_name);
 %}
 
 %option noyywrap
 
+/**
+ * @sección: Definiciones de patrones léxicos
+ * @descripción: Expresiones regulares para identificar diferentes tokens en el código fuente
+ */
 DIGIT    [0-9]
 NUMBER   {DIGIT}+("."{DIGIT}+)?  
 ID       [a-zA-Z][a-zA-Z0-9_]*
@@ -55,18 +95,28 @@ COMMENT  #[^\r\n]*{NL}?
 
 %%
 
-/*
- * Funcion: process_import
- * -------------------------
- * Lee el contenido de una biblioteca y lo imprime.
+/**
+ * @función: process_import
+ * @descripción: Lee y procesa el contenido de un archivo de biblioteca (.lib)
+ *               e imprime su contenido en la salida estándar.
  *
- * Parametro:
- *   lib_name - Nombre de la biblioteca sin la extension.
+ * @parámetros:
+ *   - lib_name: Nombre de la biblioteca sin la extensión
  *
- * Procedimiento:
- *   - Construye el nombre del archivo agregando ".lib".
- *   - Abre el archivo y, si se abre correctamente, lee su contenido.
- *   - Imprime el contenido y cierra el archivo.
+ * @funcionamiento:
+ *   1. Construye la ruta completa al archivo de biblioteca
+ *   2. Intenta abrir el archivo en modo lectura
+ *   3. Si la apertura es exitosa, lee todo el contenido en un buffer
+ *   4. Imprime el contenido en la salida estándar
+ *   5. Cierra el archivo
+ *
+ * @manejo_errores:
+ *   - Muestra un mensaje de error si no puede abrir el archivo
+ *   - Controla el tamaño máximo de lectura para evitar desbordamientos
+ *
+ * @observaciones:
+ *   - Utiliza la bandera import_active para evitar procesar el contenido
+ *     de la biblioteca como parte del flujo léxico normal
  */
 void process_import(const char* lib_name) {
     FILE* lib_file;
@@ -90,15 +140,33 @@ void process_import(const char* lib_name) {
     fclose(lib_file);
 }
 
-/*
- * Funcion: main
- * ---------------
- * Funcion principal del programa.
+/**
+ * @función: main
+ * @descripción: Punto de entrada principal del programa que configura la entrada/salida
+ *               y ejecuta el analizador léxico.
  *
- * Procedimiento:
- *   - Verifica que se proporcione uno o dos argumentos.
- *   - Abre el archivo de entrada y, si se especifica, redirige la salida a un archivo.
- *   - Ejecuta el analizador lexico y cierra el archivo de entrada.
+ * @parámetros:
+ *   - argc: Número de argumentos de línea de comandos
+ *   - argv: Array de cadenas con los argumentos
+ *
+ * @retorno:
+ *   - 0: Ejecución exitosa
+ *   - 1: Error en los argumentos o al abrir archivos
+ *
+ * @uso_válido:
+ *   programa <archivo_entrada> [archivo_salida]
+ *
+ * @manejo_errores:
+ *   - Verifica que el número de argumentos sea correcto (1 o 2 argumentos)
+ *   - Valida que se pueda abrir el archivo de entrada
+ *   - Verifica que se pueda crear/abrir el archivo de salida (si se especifica)
+ *
+ * @flujo:
+ *   1. Valida argumentos de línea de comandos
+ *   2. Abre el archivo de entrada
+ *   3. Configura la redirección de salida (opcional)
+ *   4. Ejecuta el analizador léxico (yylex)
+ *   5. Libera recursos y termina
  */
 int main(int argc, char** argv) {
     if (argc < 2 || argc > 3) {
